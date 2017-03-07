@@ -3,13 +3,14 @@ pyswi
 =====
 
 
-Add a short description here!
+Python package for the swi calculation.
 
 
 Description
 ===========
 
-A longer description of your project goes here...
+Python package for the swi calculation.
+
 
 
 Note
