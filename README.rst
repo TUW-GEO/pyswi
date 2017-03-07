@@ -15,7 +15,15 @@ Python package for the swi calculation.
 Installation
 ===========
 
-Needed python packages see requirments.txt
+In the root directory of the repository run the following command to create a new conda environment:
+
+conda env create -f conda_environment.yml
+
+
+The new environment can be activated by calling:
+
+source activate swi_env
+
 
 swi_calc_routines.pyx has to be compiled using the following commands (Linux):
 
