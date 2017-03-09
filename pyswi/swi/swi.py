@@ -15,17 +15,14 @@
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """
-
 This module represents the WARP Processing step Soil Water Index (SWI).
 """
-from pyswi.swi.swi_calc_routines import swi_calc_cy
 import numpy as np
 import pyximport
+pyximport.install(setup_args={'include_dirs': [np.get_include()]})
+from pyswi.swi.swi_calc_routines import swi_calc_cy
 import pytesmo.timedate.julian as julian
 import pandas as pd
-pyximport.install(setup_args={'include_dirs': [np.get_include()]})
-
-from math import exp
 
 uint8_nan = np.iinfo(np.uint8).max
 
@@ -206,10 +203,8 @@ def calc(ssm_ts, ssf_ts, swi_ts, gain=None, ctime=None):
 
     return swi_ts, gain_out
 
-
-
-
 # --- Help functions ---
+
 
 def swi_dict_to_dataframe(swi_dict, ctime):
     """

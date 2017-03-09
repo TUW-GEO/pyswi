@@ -28,7 +28,6 @@ dependencies:
   - pykdtree==1.2.1
   - pyparsing==2.2.0
   - pyproj==1.9.5.1
-  - pyswi==0.0.post0.dev1+n0010d16
   - pytesmo==0.6.2
   - scipy==0.18.1
   - subprocess32==3.2.7

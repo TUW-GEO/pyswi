@@ -22,7 +22,6 @@ from pytesmo.time_series.filters import exp_filter
 import unittest
 import numpy as np
 import pandas as pd
-import datetime
 
 class SwiTest(unittest.TestCase):
 
@@ -56,7 +55,6 @@ class SwiTest(unittest.TestCase):
         swi_ts = swi_ts_test['SWI_005']
 
         np.testing.assert_array_almost_equal(swi_ts, pytesmo_swi, 4)
-
 
     def test_gain(self):
         """
