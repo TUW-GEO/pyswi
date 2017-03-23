@@ -30,10 +30,12 @@ float64_nan = -999999.
 float32_nan = -999999.
 
 
-def process_uf_pd(ssm_userformat_data, proc_param={}, ctime=[1, 5, 10, 15, 20, 40, 60, 100], gain_in=None):
+def process_uf_pd(ssm_userformat_data, proc_param={},
+                  ctime=[1, 5, 10, 15, 20, 40, 60, 100], gain_in=None, jd_daily_out=False):
     """
     Processing of surface soil water index and the gain value.
-    This function calls the calculate function and handles the conversions of the input/output formats of the gain to
+    This function calls the calculate function and handles
+    the conversions of the input/output formats of the gain to
     the formats that are needed for the calculation.
 
     Parameters
@@ -42,13 +44,15 @@ def process_uf_pd(ssm_userformat_data, proc_param={}, ctime=[1, 5, 10, 15, 20, 4
         Surface soil moisture userdata time series including ssm and ssf values.
     proc_param : dict
         Processing parameters. e.g. date_begin, date_end (julian date)
-    swi_param : dict
-        Soil Water Index parameters.
     ctime : list
         Ctime values that should be calculated.
     gain_in : pandas.DataFrame
          Input gain parameters of last calculation.
          fields gpi, last_jd, nom, denom
+    jd_daily_out : bool
+         If the flag is True the jd value of the swi will be set to every day
+         23:59 of the time range, otherwise it takes the jd values from the ssm
+         input within the range.
 
     Returns
     -------
@@ -56,64 +60,38 @@ def process_uf_pd(ssm_userformat_data, proc_param={}, ctime=[1, 5, 10, 15, 20, 4
         Soil Water Index time series. Each field is for a ctime value.
         fields jd, SWI_xxx, QFLAG_xxx (e.g. SWI_010 for ctime value 10)
     gain : pandas.DataFrame
-        Output gain parameters of last calculation. Each field is for a ctime value.
-        fields gpi, last_jd(= date index), NOM_xxx, DENOM_xxx (e.g. NOM_010 for ctime value 10)
+        Output gain parameters of last calculation.
+        Each field is for a ctime value.
+        fields gpi, last_jd(= date index), NOM_xxx, DENOM_xxx
+        (e.g. NOM_010 for ctime value 10)
     """
 
     juldate = pd_datetime_to_juldate(ssm_userformat_data.axes[0].values)
 
-    ssm_ts = {'jd': juldate,
-              'sm': ssm_userformat_data['sm'].values}
-
-    ssf_ts = ssm_userformat_data['ssf'].values
-
-    if 'date_from' in proc_param and 'date_to' in proc_param:
-        date_from = proc_param['date_from']
-        date_to = proc_param['date_to']
-    else:
-        date_from = np.min(ssm_ts['jd'])
-        date_to = np.max(ssm_ts['jd'])
-
-    num_swi = (date_to - date_from)
-    num_swi = num_swi.astype('timedelta64[D]')
-    num_swi = num_swi.astype(int)+1
-
-    if type(ctime) is not np.array:
-        ctime = np.array(ctime)
-
-    # Init empty swi_ts
-    swi_ts = {'jd': np.zeros([num_swi], dtype=np.float64),
-              'swi': np.zeros([num_swi, len(ctime)], dtype=np.float32),
-              'qflag': np.zeros([num_swi, len(ctime)], dtype=np.float32)}
-
-    swi_dates = np.arange(num_swi) + date_from
-
-    swi_ts['jd'] = swi_dates
-
-    gain = None
+    juldate = np.array(juldate)
 
     if gain_in is not None:
-        gain = gain_dataframe_to_dict(gain_in, ctime)
+        gain_in = gain_dataframe_to_inputdict(gain_in, ctime)
 
-    if num_swi != len(juldate):
-        indices = [i for i, x in enumerate(ssm_ts['jd']) if x == date_from]
-        startdate_idx = indices[0]
-        ssm_ts['sm'] = ssm_userformat_data['sm'].values[startdate_idx:]
-        ssm_ts['jd'] = juldate[startdate_idx:]
+    swi_ts, gain_out_mp = process_swi(ssm_userformat_data['sm'].values, juldate,
+                                      proc_param=proc_param, ctime=ctime,
+                                      gain_in=gain_in,
+                                      jd_daily_out=jd_daily_out)
 
-    swi_ts, gain_out_mp = calc(ssm_ts, swi_ts, ssf_ts=ssf_ts, ctime=ctime, gain=gain)
+    swi_ts = swi_outputdict_to_dataframe(swi_ts, ctime)
 
-    swi_ts = swi_dict_to_dataframe(swi_ts, ctime)
-
-    gain = gain_dict_to_dataframe(gain_out_mp, ctime)
+    gain = gain_outputdict_to_dataframe(gain_out_mp, ctime)
 
     return swi_ts, gain
 
 
-def process_swi(ssm, jd, ssf_ts=None, proc_param={}, ctime=[1, 5, 10, 15, 20, 40, 60, 100], gain_in=None):
+def process_swi(ssm, jd, proc_param={}, ctime=[1, 5, 10, 15, 20, 40, 60, 100],
+                gain_in=None, jd_daily_out=False):
     """
     Processing of surface soil water index and the gain value.
-    This function calls the calculate function and handles the conversions of the input/output formats of the gain to
+    The ssm should already be filtered.
+    This function calls the calculate function and handles
+    the conversions of the input/output formats of the gain to
     the formats that are needed for the calculation.
 
     Parameters
@@ -122,8 +100,6 @@ def process_swi(ssm, jd, ssf_ts=None, proc_param={}, ctime=[1, 5, 10, 15, 20, 40
         Surface soil moisture time series.
     jd : numpy.ndarray
         Julian dates time series.
-    ssf : numpy.ndarray
-        Surface State Flag time series.
     proc_param : dict
         Processing parameters. e.g. date_begin, date_end (julian date)
     ctime : list
@@ -131,6 +107,10 @@ def process_swi(ssm, jd, ssf_ts=None, proc_param={}, ctime=[1, 5, 10, 15, 20, 40
     gain_in : dict
          Input gain parameters of last calculation.
          fields gpi, last_jd, nom, denom
+    jd_daily_out : bool
+         If the flag is True the jd value of the swi will be set to every day
+         23:59 of the time range, otherwise it takes the jd values from the ssm
+         input within the range.
 
     Returns
     -------
@@ -138,23 +118,42 @@ def process_swi(ssm, jd, ssf_ts=None, proc_param={}, ctime=[1, 5, 10, 15, 20, 40
         Soil Water Index time series. Each field is for a ctime value.
         fields jd, SWI_xxx, QFLAG_xxx (e.g. SWI_010 for ctime value 10)
     gain : dict
-        Output gain parameters of last calculation. Each field is for a ctime value.
-        fields gpi, last_jd, NOM_xxx, DENOM_xxx (e.g. NOM_010 for ctime value 10)
+        Output gain parameters of last calculation.
+        Each field is for a ctime value.
+        fields gpi, last_jd, NOM_xxx, DENOM_xxx
+        (e.g. NOM_010 for ctime value 10)
     """
 
     ssm_ts = {'jd': jd,
               'sm': ssm}
 
+    swi_dates = []
+
     if 'date_from' in proc_param and 'date_to' in proc_param:
         date_from = proc_param['date_from']
         date_to = proc_param['date_to']
+
+        if jd_daily_out is False:
+            for d in range(0, len(jd)):
+                if date_from <= jd[d] <= date_to:
+                    swi_dates.append(jd[d])
+            swi_dates = np.array(swi_dates)
     else:
         date_from = np.min(ssm_ts['jd'])
         date_to = np.max(ssm_ts['jd'])
+        if jd_daily_out is False:
+            swi_dates = jd
 
     num_swi = (date_to - date_from)
     num_swi = num_swi.astype('timedelta64[D]')
     num_swi = num_swi.astype(int)+1
+
+    if jd_daily_out is True:
+        month, day, year = julian.caldat(date_from)
+        start_jd = julian.julday(month, day,
+                                 year, 23, 59)
+
+        swi_dates = np.arange(num_swi) + start_jd
 
     if type(ctime) is not np.array:
         ctime = np.array(ctime)
@@ -163,8 +162,6 @@ def process_swi(ssm, jd, ssf_ts=None, proc_param={}, ctime=[1, 5, 10, 15, 20, 40
     swi_ts = {'jd': np.zeros([num_swi], dtype=np.float64),
               'swi': np.zeros([num_swi, len(ctime)], dtype=np.float32),
               'qflag': np.zeros([num_swi, len(ctime)], dtype=np.float32)}
-
-    swi_dates = np.arange(num_swi) + date_from
 
     if num_swi != len(jd):
         indices = [i for i, x in enumerate(ssm_ts['jd']) if x == date_from]
@@ -179,7 +176,8 @@ def process_swi(ssm, jd, ssf_ts=None, proc_param={}, ctime=[1, 5, 10, 15, 20, 40
     if gain_in is not None:
         gain = inputdict_to_gain_dict(gain_in, ctime)
 
-    swi_ts, gain_out_mp = calc(ssm_ts, swi_ts, ssf_ts=ssf_ts, ctime=ctime, gain=gain)
+    swi_ts, gain_out_mp = calc(ssm_ts, swi_ts,
+                               ctime=ctime, gain=gain)
 
     swit_ts = swi_dict_to_outputdict(swi_ts, ctime)
 
@@ -188,7 +186,7 @@ def process_swi(ssm, jd, ssf_ts=None, proc_param={}, ctime=[1, 5, 10, 15, 20, 40
     return swit_ts, gain_out
 
 
-def calc(ssm_ts, swi_ts, ssf_ts=None, gain=None, ctime=None):
+def calc(ssm_ts, swi_ts, gain=None, ctime=None):
     """
     Calculation of surface soil water index.
 
@@ -228,19 +226,8 @@ def calc(ssm_ts, swi_ts, ssf_ts=None, gain=None, ctime=None):
         gain['denom'].fill(1)
         gain['nom'].fill(1)
 
-#   Only considering "non frozen" values (ssf = 1)
     juldate = ssm_ts['jd']
     ssm = ssm_ts['sm']
-
-    if ssf_ts is not None:
-        f_nan = float32_nan
-        frozen = np.where(ssf_ts != 1)[0]
-        ssm_ts['sm'][frozen] = f_nan
-        valid = np.where(ssm_ts['sm'] != f_nan)[0]
-        if len(valid) == 0:
-            return swi_ts, gain
-        juldate = ssm_ts['jd'][valid]
-        ssm = ssm_ts['sm'][valid]
 
     ssm = np.asarray(ssm, dtype=np.float32)
 
@@ -257,11 +244,12 @@ def calc(ssm_ts, swi_ts, ssf_ts=None, gain=None, ctime=None):
     denom = gain['denom']
 
     swi_ts['swi'] = np.zeros([len(swi_ts['jd']), len(ctime)], dtype=np.float32)
-    swi_ts['qflag'] = np.zeros([len(swi_ts['jd']), len(ctime)], dtype=np.float32)
+    swi_ts['qflag'] = np.zeros([len(swi_ts['jd']), len(ctime)],
+                               dtype=np.float32)
 
-    swi_ts['swi'], swi_qflag, nom, denom, last_jd_var = swi_calc_cy(juldate, ssm, ctime, swi_ts['jd'], swi_ts['swi'],
-                                                                    swi_ts['qflag'], nom, denom, last_jd_var,
-                                                                    norm_factor)
+    swi_ts['swi'], swi_qflag, nom, denom, last_jd_var = \
+        swi_calc_cy(juldate, ssm, ctime, swi_ts['jd'], swi_ts['swi'],
+                    swi_ts['qflag'], nom, denom, last_jd_var, norm_factor)
 
     gain_out = {'denom': denom, 'nom': nom, 'last_jd': last_jd_var}
 
@@ -286,16 +274,10 @@ def pd_datetime_to_juldate(pd_datetimes):
     """
     date_buffer = pd.DatetimeIndex(pd_datetimes)
 
-    juldate_tmp = np.zeros([len(pd_datetimes)], dtype=np.float64)
-    for i in range(0, len(date_buffer)):
-        buf = julian.julday(date_buffer.month[i], date_buffer.day[i], date_buffer.year[i], date_buffer.hour[i],
-                            date_buffer.minute[i], date_buffer.second[i])
-        juldate_tmp[i] = buf
-
-    return juldate_tmp
+    return date_buffer.to_julian_date()
 
 
-def swi_dict_to_dataframe(swi_dict, ctime):
+def swi_outputdict_to_dataframe(swi_dict, ctime):
     """
     Converts a swi dictionary format to a pandas DataFrame format.
 
@@ -316,15 +298,12 @@ def swi_dict_to_dataframe(swi_dict, ctime):
     dates = pd.to_datetime(swi_dict['jd'] - pd.Timestamp(0).to_julian_date(),
                            unit='D')
 
-    swi = swi_dict['swi']
     jd = swi_dict['jd']
-    qflag = swi_dict['qflag']
-
     dataframe_dict = {'jd': jd}
 
-    for i in range(0, len(ctime)):
-        dataframe_dict["SWI_%03d" % (ctime[i],)] = [item[i] for item in swi]
-        dataframe_dict["QFLAG_%03d" % (ctime[i],)] = [item[i] for item in qflag]
+    for t in ctime:
+        dataframe_dict["SWI_%03d" % (t,)] = swi_dict["SWI_%03d" % (t,)]
+        dataframe_dict["QFLAG_%03d" % (t,)] = swi_dict["QFLAG_%03d" % (t,)]
 
     swi_ts_df = pd.DataFrame(dataframe_dict, index=dates)
 
@@ -357,8 +336,10 @@ def swi_dict_to_outputdict(swi_dict, ctime):
     dataframe_dict = {'jd': jd}
 
     for i in range(0, len(ctime)):
-        dataframe_dict["SWI_%03d" % (ctime[i],)] = np.array([item[i] for item in swi])
-        dataframe_dict["QFLAG_%03d" % (ctime[i],)] = np.array([item[i] for item in qflag])
+        dataframe_dict["SWI_%03d" % (ctime[i],)] = \
+            np.array([item[i] for item in swi])
+        dataframe_dict["QFLAG_%03d" % (ctime[i],)] = \
+            np.array([item[i] for item in qflag])
 
     return dataframe_dict
 
@@ -387,8 +368,7 @@ def gain_dict_to_outputdict(gain_dict, ctime):
     nom = gain_dict['nom']
     denom = gain_dict['denom']
 
-    dataframe_dict = {}
-    dataframe_dict['last_jd'] = last_jd
+    dataframe_dict = {'last_jd': last_jd}
 
     for i in range(0, len(ctime)):
         dataframe_dict["NOM_%03d" % (ctime[i],)] = nom[i]
@@ -396,14 +376,16 @@ def gain_dict_to_outputdict(gain_dict, ctime):
 
     return dataframe_dict
 
+
 def inputdict_to_gain_dict(gain_in, ctime):
     """
-    Converts an input gain dictionary format to an algorithmusable gain dict format.
+    Converts an input gain dictionary format to
+    an algorithmusable gain dict format.
     There the ctime index equals the gain index fot that ctime.
 
     Parameters
     ----------
-    gain_dict : dict
+    gain_in : dict
         Gain parameters of last calculation.
         fields gpi, last_jd, nom, denom
     ctime : numpy.ndarray
@@ -415,10 +397,8 @@ def inputdict_to_gain_dict(gain_in, ctime):
         Gain parameters of last calculation.
         fields last_jd, nom, denom
     """
-    gain_dict = {}
-    gain_dict['last_jd'] = gain_in['last_jd']
-    gain_dict['nom'] = np.zeros(len(ctime))
-    gain_dict['denom'] = np.zeros(len(ctime))
+    gain_dict = {'last_jd': gain_in['last_jd'], 'nom': np.zeros(len(ctime)),
+                 'denom': np.zeros(len(ctime))}
 
     for i in range(0, len(ctime)):
         gain_dict['nom'][i] = gain_in["NOM_%03d" % (ctime[i],)]
@@ -427,7 +407,7 @@ def inputdict_to_gain_dict(gain_in, ctime):
     return gain_dict
 
 
-def gain_dict_to_dataframe(gain_dict, ctime):
+def gain_outputdict_to_dataframe(gain_dict, ctime):
     """
     Converts a gain(_out) dictionary format to a pandas DataFrame format.
 
@@ -443,25 +423,27 @@ def gain_dict_to_dataframe(gain_dict, ctime):
     -------
     gain_dataframe : pandas.DataFrame
         Gain parameters of last calculation. Each field is for a ctime value.
-        fields last_jd(= date index), NOM_xxx, DENOM_xxx (e.g. NOM_010 for ctime value 10)
+        fields last_jd(= date index), NOM_xxx, DENOM_xxx
+        (e.g. NOM_010 for ctime value 10)
     """
-    last_jd = pd.to_datetime([gain_dict['last_jd'], gain_dict['last_jd']] - pd.Timestamp(0).to_julian_date(), unit='D')
-
-    nom = gain_dict['nom']
-    denom = gain_dict['denom']
+    last_jd = pd.to_datetime([gain_dict['last_jd'],
+                              gain_dict['last_jd']] -
+                              pd.Timestamp(0).to_julian_date(), unit='D')
 
     dataframe_dict = {}
 
     for i in range(0, len(ctime)):
-        dataframe_dict["NOM_%03d" % (ctime[i],)] = nom[i]
-        dataframe_dict["DENOM_%03d" % (ctime[i],)] = denom[i]
+        dataframe_dict["NOM_%03d" % (ctime[i],)] = \
+            gain_dict["NOM_%03d" % (ctime[i],)]
+        dataframe_dict["DENOM_%03d" % (ctime[i],)] = \
+            gain_dict["DENOM_%03d" % (ctime[i],)]
 
     gain_df = pd.DataFrame(dataframe_dict, index=last_jd)
 
     return gain_df
 
 
-def gain_dataframe_to_dict(gain_dataframe, ctime):
+def gain_dataframe_to_inputdict(gain_dataframe, ctime):
     """
     Converts a gain(_in) pandas dataframe to a dictionary format.
 
@@ -469,7 +451,8 @@ def gain_dataframe_to_dict(gain_dataframe, ctime):
     ----------
     gain_dataframe : pandas.DataFrame
         Gain parameters of last calculation. Each field is for a ctime value.
-        fields gpi, last_jd(= date index), NOM_xxx, DENOM_xxx (e.g. NOM_010 for ctime value 10)
+        fields gpi, last_jd(= date index), NOM_xxx, DENOM_xxx
+        (e.g. NOM_010 for ctime value 10)
     ctime : numpy.ndarray
         Integer values for the ctime variations.
 
@@ -482,13 +465,14 @@ def gain_dataframe_to_dict(gain_dataframe, ctime):
 
     gain_dict = {}
     last_jd = gain_dataframe.index[0]
-    gain_dict['last_jd'] = julian.julday(last_jd.month, last_jd.day, last_jd.year, last_jd.hour,
+    gain_dict['last_jd'] = julian.julday(last_jd.month, last_jd.day,
+                                         last_jd.year, last_jd.hour,
                                          last_jd.minute, last_jd.second)
-    gain_dict['nom'] = np.zeros(len(ctime))
-    gain_dict['denom'] = np.zeros(len(ctime))
 
     for i in range(0, len(ctime)):
-        gain_dict['nom'][i] = gain_dataframe["NOM_%03d" % (ctime[i],)].values[0]
-        gain_dict['denom'][i] = gain_dataframe["DENOM_%03d" % (ctime[i],)].values[0]
+        gain_dict["NOM_%03d" % (ctime[i],)] = \
+            gain_dataframe["NOM_%03d" % (ctime[i],)].values[0]
+        gain_dict["DENOM_%03d" % (ctime[i],)] = \
+            gain_dataframe["DENOM_%03d" % (ctime[i],)].values[0]
 
     return gain_dict
