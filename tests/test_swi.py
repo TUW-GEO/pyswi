@@ -16,7 +16,7 @@
 """
 This module tests the soil water index calculation.
 """
-from pyswi.swi.swi import process_uf_pd
+from pyswi.swi.swi import process_swi_pd
 from pyswi.swi.swi import process_swi
 from pytesmo.time_series.filters import exp_filter
 import pytesmo.timedate.julian as julian
@@ -46,8 +46,8 @@ class SwiTest(unittest.TestCase):
                           'sm': [10, 20, 30, 40, 50, 60, 70, 80, 90],
                           'ssf': [1, 1, 1, 1, 1, 1, 1, 1, 1]}, index=pd_dates)
 
-        swi_ts_test, gain_test = process_uf_pd(ssm_userformat_data_test,
-                                               ctime=[ctime])
+        swi_ts_test, gain_test = process_swi_pd(ssm_userformat_data_test,
+                                                ctime=[ctime])
 
         sm_in = ssm_userformat_data_test['sm'].values.astype(float)
 
@@ -93,10 +93,10 @@ class SwiTest(unittest.TestCase):
                                      'ssf': ssf_data_part2},
                                     index=pd_dates_part2)
 
-        swi_ts_part1, gain_test = process_uf_pd(ssm_ut_part1, ctime=ctime)
+        swi_ts_part1, gain_test = process_swi_pd(ssm_ut_part1, ctime=ctime)
 
-        swi_ts_part2, gain_test = process_uf_pd(ssm_ut_part2, ctime=ctime,
-                                                gain_in=gain_test)
+        swi_ts_part2, gain_test = process_swi_pd(ssm_ut_part2, ctime=ctime,
+                                                 gain_in=gain_test)
 
         sm_in = ssm_ut_whole['sm'].values.astype(float)
 
@@ -133,8 +133,8 @@ class SwiTest(unittest.TestCase):
         sm_pytesmo = np.array([30, 40, 50])
 
         swi_ts_test, gain_test = \
-            process_uf_pd(ssm_userformat_data_test, ctime=[ctime],
-                          proc_param=proc_param)
+            process_swi_pd(ssm_userformat_data_test, ctime=[ctime],
+                           proc_param=proc_param)
 
         sm_in = sm_pytesmo.astype(float)
 

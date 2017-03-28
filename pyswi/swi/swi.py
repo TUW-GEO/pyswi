@@ -30,8 +30,9 @@ float64_nan = -999999.
 float32_nan = -999999.
 
 
-def process_uf_pd(ssm_userformat_data, proc_param={},
-                  ctime=[1, 5, 10, 15, 20, 40, 60, 100], gain_in=None, jd_daily_out=False):
+def process_swi_pd(ssm_userformat_data, proc_param={},
+                   ctime=[1, 5, 10, 15, 20, 40, 60, 100], gain_in=None,
+                   jd_daily_out=False):
     """
     Processing of surface soil water index and the gain value.
     This function calls the calculate function and handles
