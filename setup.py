@@ -29,7 +29,7 @@ class Cythonize(Command):
         # Make sure the compiled Cython files in the distribution are
         # up-to-date
         from Cython.Build import cythonize
-        cythonize(['pytswi/swi/swi_calc_routiones.pyx'])
+        cythonize(['pyswi/swi/swi_calc_routines.pyx'])
 
 
 class NumpyBuildExt(_build_ext):
