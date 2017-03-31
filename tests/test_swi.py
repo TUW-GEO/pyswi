@@ -18,6 +18,8 @@ This module tests the soil water index calculation.
 """
 from pyswi.swi.swi import process_swi_pd
 from pyswi.swi.swi import process_swi
+from pyswi.swi.swi import calc_noise
+from pyswi.swi.swi import calc_noise_rec
 from pytesmo.time_series.filters import exp_filter
 import pytesmo.timedate.julian as julian
 import unittest
@@ -303,6 +305,43 @@ class SwiTest(unittest.TestCase):
         pytesmo_swi = np.delete(pytesmo_swi, [4, 9])
 
         np.testing.assert_array_almost_equal(swi_ts, pytesmo_swi, 4)
+
+    def test_swi_noise_calc(self):
+        """
+        Test correct calculation of SWI, compared to the pytesmo calculation.
+        """
+
+        ctime = [5, 50, 100]
+
+        dates = pd.date_range('2007-01-01', periods=9).to_julian_date().values
+
+        sm_noise = np.array([3, 3, 3, 3, 3, 3, 3, 3, 3])
+
+        noise_dict1 = calc_noise(sm_noise, dates, ctime)
+
+        noise_dict2 = calc_noise_rec(sm_noise, dates, ctime)
+
+        np.testing.assert_array_almost_equal(noise_dict1['NOM_SN_050'],
+                                             noise_dict2['NOM_SN_050'], 10)
+        np.testing.assert_array_almost_equal(noise_dict1['DEN_SN_050'],
+                                             noise_dict2['DEN_SN_050'], 10)
+        np.testing.assert_array_almost_equal(noise_dict1['SWI_NOISE_050'],
+                                             noise_dict2['SWI_NOISE_050'], 10)
+
+        np.testing.assert_array_almost_equal(noise_dict1['NOM_SN_005'],
+                                             noise_dict2['NOM_SN_005'], 10)
+        np.testing.assert_array_almost_equal(noise_dict1['DEN_SN_005'],
+                                             noise_dict2['DEN_SN_005'], 10)
+        np.testing.assert_array_almost_equal(noise_dict1['SWI_NOISE_005'],
+                                             noise_dict2['SWI_NOISE_005'], 10)
+
+        np.testing.assert_array_almost_equal(noise_dict1['NOM_SN_100'],
+                                             noise_dict2['NOM_SN_100'], 10)
+        np.testing.assert_array_almost_equal(noise_dict1['DEN_SN_100'],
+                                             noise_dict2['DEN_SN_100'], 10)
+        np.testing.assert_array_almost_equal(noise_dict1['SWI_NOISE_100'],
+                                             noise_dict2['SWI_NOISE_100'], 10)
+
 
 if __name__ == '__main__':
     unittest.main()
