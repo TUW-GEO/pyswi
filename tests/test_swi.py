@@ -308,18 +308,19 @@ class SwiTest(unittest.TestCase):
 
     def test_swi_noise_calc(self):
         """
-        Test correct calculation of SWI, compared to the pytesmo calculation.
+        Test correct calculation of SWI Noise, comparing the two different
+        approaches.
         """
 
         ctime = [5, 50, 100]
 
-        dates = pd.date_range('2007-01-01', periods=9).to_julian_date().values
+        dates = pd.date_range('2007-01-01', periods=99).to_julian_date().values
 
-        sm_noise = np.array([3, 3, 3, 3, 3, 3, 3, 3, 3])
+        sm_noise = np.zeros(99)
+        sm_noise.fill(3)
 
         noise_dict1 = calc_noise(sm_noise, dates, ctime)
-
-        noise_dict2 = calc_noise_rec(sm_noise, dates, ctime)
+        noise_dict2 = calc_noise_rec(sm_noise, dates, ctime, last_den=0)
 
         np.testing.assert_array_almost_equal(noise_dict1['NOM_SN_050'],
                                              noise_dict2['NOM_SN_050'], 10)
@@ -341,7 +342,73 @@ class SwiTest(unittest.TestCase):
                                              noise_dict2['DEN_SN_100'], 10)
         np.testing.assert_array_almost_equal(noise_dict1['SWI_NOISE_100'],
                                              noise_dict2['SWI_NOISE_100'], 10)
+    def test_process_swi_noise(self):
+        """
+        Test correct calculation of SWI Noise inside the swi calculation
+        process.
+        """
 
+        ctime = [5, 50, 100]
+
+        dates = pd.date_range('2007-01-01', periods=9).to_julian_date().values
+
+        sm_noise = np.zeros(9)
+        sm_noise.fill(3)
+
+        sm = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90])
+
+        swi_ts_test, gain_test = process_swi(sm, dates, ctime=ctime,
+                                             ssm_noise=sm_noise)
+
+        noise_dict = calc_noise_rec(sm_noise, dates, ctime)
+
+        np.testing.assert_array_almost_equal(swi_ts_test['SWI_NOISE_050'],
+                                             noise_dict['SWI_NOISE_050'], 5)
+
+        np.testing.assert_array_almost_equal(swi_ts_test['SWI_NOISE_005'],
+                                             noise_dict['SWI_NOISE_005'], 5)
+
+        np.testing.assert_array_almost_equal(swi_ts_test['SWI_NOISE_100'],
+                                             noise_dict['SWI_NOISE_100'], 5)
+
+    # def test_swi_gain_noise(self):
+    #     """
+    #     Test correct calculation of SWI Noise gain.
+    #     """
+    #
+    #     ctime = [5, 50, 100]
+    #
+    #     dates1 = pd.date_range('2007-01-01', periods=9).to_julian_date().values
+    #     dates2 = pd.date_range('2007-01-10', periods=9).to_julian_date().values
+    #     dates_all = pd.date_range('2007-01-01', periods=18)\
+    #         .to_julian_date().values
+    #
+    #     sm_noise = np.zeros(9)
+    #     sm_noise.fill(3)
+    #     sm_noise_all = np.zeros(18)
+    #     sm_noise_all.fill(3)
+    #
+    #     sm = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90])
+    #
+    #     swi_ts_all, gain_all = process_swi(sm, dates_all, ctime=ctime,
+    #                                        ssm_noise=sm_noise_all)
+    #
+    #     swi_ts_1, gain_1 = process_swi(sm, dates1, ctime=ctime,
+    #                                    ssm_noise=sm_noise)
+    #
+    #     swi_ts_2, gain_2 = process_swi(sm, dates2, ctime=ctime,
+    #                                    ssm_noise=sm_noise, gain_in=gain_1)
+    #
+    #
+    #
+    #     np.testing.assert_array_almost_equal(swi_ts_all['SWI_NOISE_050'][9:],
+    #                                          swi_ts_2['SWI_NOISE_050'], 5)
+    #
+    #     np.testing.assert_array_almost_equal(swi_ts_all['SWI_NOISE_005'][9:],
+    #                                          swi_ts_2['SWI_NOISE_005'], 5)
+    #
+    #     np.testing.assert_array_almost_equal(swi_ts_all['SWI_NOISE_100'][9:],
+    #                                          swi_ts_2['SWI_NOISE_100'], 5)
 
 if __name__ == '__main__':
     unittest.main()

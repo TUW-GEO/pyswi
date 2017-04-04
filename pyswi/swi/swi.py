@@ -21,6 +21,7 @@ import numpy as np
 import pyximport
 pyximport.install(setup_args={'include_dirs': [np.get_include()]})
 from pyswi.swi.swi_calc_routines import swi_calc_cy
+from pyswi.swi.swi_calc_routines import swi_calc_cy_noise
 import pytesmo.timedate.julian as julian
 import pandas as pd
 
@@ -34,7 +35,7 @@ float32_nan = -999999.
 
 def process_swi_pd(ssm_userformat_data, proc_param={},
                    ctime=[1, 5, 10, 15, 20, 40, 60, 100], gain_in=None,
-                   jd_daily_out=False):
+                   jd_daily_out=False, ssm_noise=None):
     """
     Processing of surface soil water index and the gain value.
     This function calls the calculate function and handles
@@ -79,7 +80,8 @@ def process_swi_pd(ssm_userformat_data, proc_param={},
     swi_ts, gain_out_mp = process_swi(ssm_userformat_data['sm'].values, juldate,
                                       proc_param=proc_param, ctime=ctime,
                                       gain_in=gain_in,
-                                      jd_daily_out=jd_daily_out)
+                                      jd_daily_out=jd_daily_out,
+                                      ssm_noise=ssm_noise)
 
     swi_ts = swi_outputdict_to_dataframe(swi_ts, ctime)
 
@@ -89,7 +91,7 @@ def process_swi_pd(ssm_userformat_data, proc_param={},
 
 
 def process_swi(ssm, jd, proc_param={}, ctime=[1, 5, 10, 15, 20, 40, 60, 100],
-                gain_in=None, jd_daily_out=False):
+                gain_in=None, ssm_noise=None, jd_daily_out=False):
     """
     Processing of surface soil water index and the gain value.
     The ssm should already be filtered.
@@ -109,7 +111,7 @@ def process_swi(ssm, jd, proc_param={}, ctime=[1, 5, 10, 15, 20, 40, 60, 100],
         Ctime values that should be calculated.
     gain_in : dict
          Input gain parameters of last calculation.
-         fields gpi, last_jd, nom, denom
+         fields gpi, last_jd, nom, denom, nom_ns
     jd_daily_out : bool
          If the flag is True the jd value of the swi will be set to every day
          23:59 of the time range, otherwise it takes the jd values from the ssm
@@ -123,7 +125,7 @@ def process_swi(ssm, jd, proc_param={}, ctime=[1, 5, 10, 15, 20, 40, 60, 100],
     gain : dict
         Output gain parameters of last calculation.
         Each field is for a ctime value.
-        fields gpi, last_jd, NOM_xxx, DENOM_xxx
+        fields gpi, last_jd, NOM_xxx, DENOM_xxx, NOM_NS_xxx (SWI Noise nom)
         (e.g. NOM_010 for ctime value 10)
     """
 
@@ -163,8 +165,7 @@ def process_swi(ssm, jd, proc_param={}, ctime=[1, 5, 10, 15, 20, 40, 60, 100],
 
     # Init empty swi_ts
     swi_ts = {'jd': np.zeros([num_swi], dtype=np.float64),
-              'swi': np.zeros([num_swi, len(ctime)], dtype=np.float32),
-              'qflag': np.zeros([num_swi, len(ctime)], dtype=np.float32)}
+              'swi': np.zeros([num_swi, len(ctime)], dtype=np.float32)}
 
     if num_swi != len(jd):
         indices = [i for i, x in enumerate(ssm_ts['jd']) if x == date_from]
@@ -179,8 +180,8 @@ def process_swi(ssm, jd, proc_param={}, ctime=[1, 5, 10, 15, 20, 40, 60, 100],
     if gain_in is not None:
         gain = inputdict_to_gain_dict(gain_in, ctime)
 
-    swi_ts, gain_out_mp = calc(ssm_ts, swi_ts,
-                               ctime=ctime, gain=gain)
+    swi_ts, gain_out_mp = calc(ssm_ts, swi_ts, ctime=ctime,
+                               gain=gain, ssm_noise=ssm_noise)
 
     swit_ts = swi_dict_to_outputdict(swi_ts, ctime)
 
@@ -189,8 +190,8 @@ def process_swi(ssm, jd, proc_param={}, ctime=[1, 5, 10, 15, 20, 40, 60, 100],
     return swit_ts, gain_out
 
 
-def calc(ssm_ts, swi_ts, gain=None, ctime=np.array([1, 5, 10, 15, 20, 40, 60,
-                                                    100])):
+def calc(ssm_ts, swi_ts, gain=None,
+         ctime=np.array([1, 5, 10, 15, 20, 40, 60, 100]), ssm_noise=None):
     """
     Calculation of surface soil water index.
 
@@ -214,16 +215,15 @@ def calc(ssm_ts, swi_ts, gain=None, ctime=np.array([1, 5, 10, 15, 20, 40, 60,
         fields jd, swi, qflag
     gain_out : dict
         Gain parameters of last calculation.
-        fields gpi, last_jd, nom, denom
+        fields gpi, last_jd, nom, denom, nom_ns
     """
 
     if gain is None:
         gain = {'last_jd': np.double(0),
-                'denom': np.zeros(len(ctime)),
-                'nom': np.zeros(len(ctime))
+                'denom': np.ones(len(ctime)),
+                'nom': np.ones(len(ctime)),
+                'nom_ns': np.ones(len(ctime))
                 }
-        gain['denom'].fill(1)
-        gain['nom'].fill(1)
 
     juldate = ssm_ts['jd']
     ssm = ssm_ts['sm']
@@ -243,14 +243,34 @@ def calc(ssm_ts, swi_ts, gain=None, ctime=np.array([1, 5, 10, 15, 20, 40, 60,
     denom = gain['denom']
 
     swi_ts['swi'] = np.zeros([len(swi_ts['jd']), len(ctime)], dtype=np.float32)
-    swi_ts['qflag'] = np.zeros([len(swi_ts['jd']), len(ctime)],
-                               dtype=np.float32)
 
-    swi_ts['swi'], swi_qflag, nom, denom, last_jd_var = \
-        swi_calc_cy(juldate, ssm, ctime, swi_ts['jd'], swi_ts['swi'],
-                    swi_ts['qflag'], nom, denom, last_jd_var, norm_factor)
+    nom_ns = None
 
-    gain_out = {'denom': denom, 'nom': nom, 'last_jd': last_jd_var}
+    if ssm_noise is None:
+        swi_ts['qflag'] = np.zeros([len(swi_ts['jd']), len(ctime)],
+                                   dtype=np.float32)
+
+        swi_ts['swi'], swi_ts['qflag'], nom, denom, last_jd_var = \
+            swi_calc_cy(juldate, ssm, ctime, swi_ts['jd'], swi_ts['swi'],
+                        swi_ts['qflag'], nom, denom, last_jd_var, norm_factor)
+    else:
+        swi_ts['swi_noise'] = np.zeros([len(swi_ts['jd']), len(ctime)],
+                                       dtype=np.float32)
+
+        swi_noise = np.zeros((len(swi_ts['jd']), len(ctime)), dtype=np.float32)
+        denom_ns = np.zeros((len(swi_ts['jd']), len(ctime)), dtype=np.float32)
+        nom_ns = np.zeros((len(swi_ts['jd']), len(ctime)), dtype=np.float32)
+
+   #     for t in ctime:
+   #         denom_ns[:][t].fill()
+
+        swi_ts['swi'], swi_ts['swi_noise'], nom, denom, last_jd_var, nom_ns = \
+            swi_calc_cy_noise(juldate, ssm, ctime, swi_ts['jd'], swi_ts['swi'],
+                              nom, denom, last_jd_var, ssm_noise, swi_noise,
+                              denom_ns, nom_ns)
+
+    gain_out = {'denom': denom, 'nom': nom,
+                'last_jd': last_jd_var, 'nom_ns': nom_ns}
 
     return swi_ts, gain_out
 
@@ -258,6 +278,7 @@ def calc(ssm_ts, swi_ts, gain=None, ctime=np.array([1, 5, 10, 15, 20, 40, 60,
 def calc_noise(ssm_noise, jd, ctime=[1, 5]):
     """
     Calculation of surface soil water index noise.
+    Much slower than the reccurence approach.
 
     Parameters
     ----------
@@ -287,9 +308,10 @@ def calc_noise(ssm_noise, jd, ctime=[1, 5]):
         den = np.zeros(len_ctime)
         for c in range(0, len_ctime):
             for j in range(0, i+1):
-                exp_term = exp(((-2)*(jd[i]-jd[j])) / ctime[c])
-                nom[c] = nom[c] + ssm_noise[i] * exp_term
-                den[c] = den[c] + exp(((-1)*(jd[i] - jd[j])) / ctime[c])
+                exp_term = exp(((-2)*(jd[i] - jd[j])) / ctime[c])
+                nom[c] += ssm_noise[i] * exp_term
+                den[c] += exp(((-1)*(jd[i] - jd[j])) / ctime[c])
+
             nom_db[i][c] = nom[c]
             den_db[i][c] = den[c]
             n_swi[i][c] = (nom[c] / (den[c] ** 2))
@@ -308,10 +330,11 @@ def calc_noise(ssm_noise, jd, ctime=[1, 5]):
     return swi_noise_ts
 
 
-def calc_noise_rec(ssm_noise, jd, ctime=[1, 5]):
+def calc_noise_rec(ssm_noise, jd, ctime=[1, 5], last_den=1, last_nom=0):
     """
     Calculation of surface soil water index noise.
     Recurrence approach of calculation.
+    Faster than calc_noise
 
     Parameters
     ----------
@@ -321,6 +344,12 @@ def calc_noise_rec(ssm_noise, jd, ctime=[1, 5]):
         Array of the julian dates.
     ctime : numpy.ndarray
         Integer values for the ctime variations.
+    last_den : float
+        denom value of the last calculation and starting point for
+        the calculation.
+    last_nom : numpy.ndarray
+        nom value of the last calculation and starting point for
+        the calculation.
 
     Returns
     -------
@@ -336,20 +365,27 @@ def calc_noise_rec(ssm_noise, jd, ctime=[1, 5]):
     den = np.zeros((len_sm, len_ctime))
     n_swi = np.zeros((len_sm, len_ctime))
 
-    # exp(0) = 1
-    nom_sn[0] = ssm_noise[0]
-    den[0] = 1
+    last_jd = jd[0]
+    den_values = np.ones(len_ctime)
+    nom_values = np.zeros(len_ctime)
+
+    den_values.fill(last_den)
+    nom_values.fill(last_nom)
 
     for i in range(0, len_sm):
         for c in range(0, len_ctime):
-            fn = exp(((-1) * (jd[i]-jd[i-1]))/ctime[c])
-            den[i][c] = 1 + fn * den[i-1][c]
+            tdiff = (jd[i]-last_jd) / ctime[c]
+            fn = exp((-1) * tdiff)
+            den[i][c] = 1 + fn * den_values[c]
             den_sn = den[i][c] ** 2
 
-            exp_term = exp(((-2)*(jd[i]-jd[i-1])) / ctime[c])
-            nom_sn[i][c] = nom_sn[i-1][c] * exp_term + ssm_noise[i]
+            exp_term = exp((-2)*tdiff)
+            nom_sn[i][c] = nom_values[c] * exp_term + ssm_noise[i]
 
             n_swi[i][c] = nom_sn[i][c] / den_sn
+            den_values[c] = den[i][c]
+            nom_values[c] = nom_sn[i][c]
+        last_jd = jd[i]
 
     inputdict = {'nom_sn': nom_sn,
                  'den_sn': den,
@@ -460,7 +496,9 @@ def dict_to_outputdict(inputdict, variables_ctimedep, ctime,
 
     for name, value in depvar_buffer.iteritems():
         for i in range(0, len(ctime)):
-            if np.isscalar(value[i]):
+            if value is None:
+                output_dict[name.upper()+"_%03d" % (ctime[i],)] = None
+            elif np.isscalar(value[i]):
                 output_dict[name.upper()+"_%03d" % (ctime[i],)] = value[i]
             else:
                 output_dict[name.upper()+"_%03d" % (ctime[i],)] = \
@@ -488,8 +526,14 @@ def swi_dict_to_outputdict(swi_dict, ctime):
         Soil Water Index time series. Each field is for a ctime value.
         fields jd, SWI_xxx, QFLAG_xxx (e.g. SWI_010 for ctime value 10)
     """
+    variables_ctimedep = ['swi']
 
-    variables_ctimedep = ['swi', 'qflag']
+    if 'qflag' in swi_dict:
+        variables_ctimedep.append('qflag')
+
+    if 'swi_noise' in swi_dict:
+        variables_ctimedep.append('swi_noise')
+
     variables_other = ['jd']
 
     return dict_to_outputdict(swi_dict, variables_ctimedep, ctime,
@@ -515,7 +559,7 @@ def gain_dict_to_outputdict(gain_dict, ctime):
         Gain parameters of last calculation. Each field is for a ctime value.
         fields last_jd, NOM_xxx, DENOM_xxx (e.g. NOM_010 for ctime value 10)
     """
-    variables_ctimedep = ['nom', 'denom']
+    variables_ctimedep = ['nom', 'denom', 'nom_ns']
     variables_other = ['last_jd']
 
     return dict_to_outputdict(gain_dict, variables_ctimedep, ctime,
@@ -543,11 +587,13 @@ def inputdict_to_gain_dict(gain_in, ctime):
         fields last_jd, nom, denom
     """
     gain_dict = {'last_jd': gain_in['last_jd'], 'nom': np.zeros(len(ctime)),
-                 'denom': np.zeros(len(ctime))}
+                 'denom': np.zeros(len(ctime)), 'nom_ns': np.zeros(len(ctime))}
 
     for i in range(0, len(ctime)):
         gain_dict['nom'][i] = gain_in["NOM_%03d" % (ctime[i],)]
         gain_dict['denom'][i] = gain_in["DENOM_%03d" % (ctime[i],)]
+        if "NOM_NS_%03d" % (ctime[i],) in gain_in:
+            gain_dict['nom_ns'][i] = gain_in["NOM_NS_%03d" % (ctime[i],)]
 
     return gain_dict
 
