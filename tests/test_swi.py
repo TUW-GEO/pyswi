@@ -342,6 +342,7 @@ class SwiTest(unittest.TestCase):
                                              noise_dict2['DEN_SN_100'], 10)
         np.testing.assert_array_almost_equal(noise_dict1['SWI_NOISE_100'],
                                              noise_dict2['SWI_NOISE_100'], 10)
+
     def test_process_swi_noise(self):
         """
         Test correct calculation of SWI Noise inside the swi calculation
@@ -371,44 +372,51 @@ class SwiTest(unittest.TestCase):
         np.testing.assert_array_almost_equal(swi_ts_test['SWI_NOISE_100'],
                                              noise_dict['SWI_NOISE_100'], 5)
 
-    # def test_swi_gain_noise(self):
-    #     """
-    #     Test correct calculation of SWI Noise gain.
-    #     """
-    #
-    #     ctime = [5, 50, 100]
-    #
-    #     dates1 = pd.date_range('2007-01-01', periods=9).to_julian_date().values
-    #     dates2 = pd.date_range('2007-01-10', periods=9).to_julian_date().values
-    #     dates_all = pd.date_range('2007-01-01', periods=18)\
-    #         .to_julian_date().values
-    #
-    #     sm_noise = np.zeros(9)
-    #     sm_noise.fill(3)
-    #     sm_noise_all = np.zeros(18)
-    #     sm_noise_all.fill(3)
-    #
-    #     sm = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90])
-    #
-    #     swi_ts_all, gain_all = process_swi(sm, dates_all, ctime=ctime,
-    #                                        ssm_noise=sm_noise_all)
-    #
-    #     swi_ts_1, gain_1 = process_swi(sm, dates1, ctime=ctime,
-    #                                    ssm_noise=sm_noise)
-    #
-    #     swi_ts_2, gain_2 = process_swi(sm, dates2, ctime=ctime,
-    #                                    ssm_noise=sm_noise, gain_in=gain_1)
-    #
-    #
-    #
-    #     np.testing.assert_array_almost_equal(swi_ts_all['SWI_NOISE_050'][9:],
-    #                                          swi_ts_2['SWI_NOISE_050'], 5)
-    #
-    #     np.testing.assert_array_almost_equal(swi_ts_all['SWI_NOISE_005'][9:],
-    #                                          swi_ts_2['SWI_NOISE_005'], 5)
-    #
-    #     np.testing.assert_array_almost_equal(swi_ts_all['SWI_NOISE_100'][9:],
-    #                                          swi_ts_2['SWI_NOISE_100'], 5)
+    def test_swi_gain_noise(self):
+        """
+        Test correct calculation of SWI Noise gain.
+        """
+
+        ctime = [5, 50, 100]
+
+        dates = pd.date_range('2007-01-01', periods=9).to_julian_date().values
+        sm = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90])
+        sm_noise = np.zeros(9)
+        sm_noise.fill(3)
+
+        dates_part1 = dates[:-4]
+        dates_part2 = dates[5:]
+        sm_data_part1 = np.array(sm[:-4])
+        sm_data_part2 = np.array(sm[5:])
+        sm_noise1 = sm_noise[:-4]
+        sm_noise2 = sm_noise[5:]
+
+        swi_ts_all, gain_all = process_swi(sm, dates, ctime=ctime,
+                                           ssm_noise=sm_noise)
+
+        swi_ts_1, gain_1 = process_swi(sm_data_part1, dates_part1, ctime=ctime,
+                                       ssm_noise=sm_noise1)
+
+        swi_ts_2, gain_2 = process_swi(sm_data_part2, dates_part2, ctime=ctime,
+                                       ssm_noise=sm_noise2, gain_in=gain_1)
+
+        swi_ns_ctime1 = swi_ts_1['SWI_NOISE_005'].tolist()
+        swi_ns_ctime2 = swi_ts_2['SWI_NOISE_005'].tolist()
+
+        np.testing.assert_array_almost_equal(swi_ts_all['SWI_NOISE_005'],
+                                             swi_ns_ctime1+swi_ns_ctime2, 5)
+
+        swi_ns_ctime1 = swi_ts_1['SWI_NOISE_050'].tolist()
+        swi_ns_ctime2 = swi_ts_2['SWI_NOISE_050'].tolist()
+
+        np.testing.assert_array_almost_equal(swi_ts_all['SWI_NOISE_050'],
+                                             swi_ns_ctime1+swi_ns_ctime2, 5)
+
+        swi_ns_ctime1 = swi_ts_1['SWI_NOISE_100'].tolist()
+        swi_ns_ctime2 = swi_ts_2['SWI_NOISE_100'].tolist()
+
+        np.testing.assert_array_almost_equal(swi_ts_all['SWI_NOISE_100'],
+                                             swi_ns_ctime1+swi_ns_ctime2, 5)
 
 if __name__ == '__main__':
     unittest.main()

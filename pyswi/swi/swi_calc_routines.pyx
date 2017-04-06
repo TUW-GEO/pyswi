@@ -75,8 +75,7 @@ def swi_calc_cy_noise(np.ndarray[np.double_t] juldate,
                       double last_jd_var,
                       np.ndarray[np.double_t] ssm_noise,
                       np.ndarray[np.float32_t, ndim=2] swi_noise,
-                      np.ndarray[np.float32_t, ndim=2] denom_noise,
-                      np.ndarray[np.float32_t, ndim=2] nom_noise):
+                      np.ndarray[np.double_t] nom_noise):
 
      cdef int i = 0
      cdef int j = 0
@@ -86,7 +85,6 @@ def swi_calc_cy_noise(np.ndarray[np.double_t] juldate,
      cdef int len_swi = len(swi_jd)
      cdef int len_jd = len(juldate)
      cdef int len_ctime = len(ctime)
-     cdef np.ndarray[np.float_t] nom_k = np.empty(len(ctime))
 
      for i in range(len_swi):
 
@@ -97,7 +95,7 @@ def swi_calc_cy_noise(np.ndarray[np.double_t] juldate,
                      nom[k] = ef[k] * nom[k] + ssm[j]
                      denom[k] = ef[k] * denom[k] + 1
                      exp_term = ef[k] ** 2
-                     nom_k[k] = nom_k[k] * exp_term + ssm_noise[j]
+                     nom_noise[k] = nom_noise[k] * exp_term + ssm_noise[j]
                  last_jd_var = juldate[j]
                  j += 1
 
@@ -105,10 +103,8 @@ def swi_calc_cy_noise(np.ndarray[np.double_t] juldate,
                  continue  # no valid SSM measurement before swi_jd[i]
 
              for k in range(len_ctime):
-
                  swi_ts[i, k] = nom[k] / denom[k]
-                 nom_noise[i, k] = nom_k[k]
-                 denom_noise[i, k] = denom[k] ** 2
-                 swi_noise[i, k] = nom_noise[i][k]/denom_noise[i, k]
+                 denom_ns = denom[k] ** 2
+                 swi_noise[i, k] = nom_noise[k] / denom_ns
 
-     return swi_ts, swi_noise, nom, denom, last_jd_var, nom_k
+     return swi_ts, swi_noise, nom, denom, last_jd_var, nom_noise

@@ -112,6 +112,8 @@ def process_swi(ssm, jd, proc_param={}, ctime=[1, 5, 10, 15, 20, 40, 60, 100],
     gain_in : dict
          Input gain parameters of last calculation.
          fields gpi, last_jd, nom, denom, nom_ns
+    ssm_noise : numpy.ndarray
+        SSM noise of the given ssm timeseries.
     jd_daily_out : bool
          If the flag is True the jd value of the swi will be set to every day
          23:59 of the time range, otherwise it takes the jd values from the ssm
@@ -207,6 +209,8 @@ def calc(ssm_ts, swi_ts, gain=None,
         fields gpi, last_jd, nom, denom
     ctime : numpy.ndarray
         Integer values for the ctime variations.
+    ssm_noise : numpy.ndarray
+        SSM noise of the given ssm timeseries.
 
     Returns
     -------
@@ -222,7 +226,7 @@ def calc(ssm_ts, swi_ts, gain=None,
         gain = {'last_jd': np.double(0),
                 'denom': np.ones(len(ctime)),
                 'nom': np.ones(len(ctime)),
-                'nom_ns': np.ones(len(ctime))
+                'nom_ns': np.zeros(len(ctime))
                 }
 
     juldate = ssm_ts['jd']
@@ -242,9 +246,9 @@ def calc(ssm_ts, swi_ts, gain=None,
     nom = gain['nom']
     denom = gain['denom']
 
-    swi_ts['swi'] = np.zeros([len(swi_ts['jd']), len(ctime)], dtype=np.float32)
+    nom_ns = np.ones(len(ctime))
 
-    nom_ns = None
+    swi_ts['swi'] = np.zeros([len(swi_ts['jd']), len(ctime)], dtype=np.float32)
 
     if ssm_noise is None:
         swi_ts['qflag'] = np.zeros([len(swi_ts['jd']), len(ctime)],
@@ -258,16 +262,14 @@ def calc(ssm_ts, swi_ts, gain=None,
                                        dtype=np.float32)
 
         swi_noise = np.zeros((len(swi_ts['jd']), len(ctime)), dtype=np.float32)
-        denom_ns = np.zeros((len(swi_ts['jd']), len(ctime)), dtype=np.float32)
-        nom_ns = np.zeros((len(swi_ts['jd']), len(ctime)), dtype=np.float32)
 
-   #     for t in ctime:
-   #         denom_ns[:][t].fill()
+        if gain['nom_ns'] is not None:
+            nom_ns = gain['nom_ns']
 
         swi_ts['swi'], swi_ts['swi_noise'], nom, denom, last_jd_var, nom_ns = \
             swi_calc_cy_noise(juldate, ssm, ctime, swi_ts['jd'], swi_ts['swi'],
                               nom, denom, last_jd_var, ssm_noise, swi_noise,
-                              denom_ns, nom_ns)
+                              nom_ns)
 
     gain_out = {'denom': denom, 'nom': nom,
                 'last_jd': last_jd_var, 'nom_ns': nom_ns}
@@ -665,5 +667,8 @@ def gain_dataframe_to_inputdict(gain_dataframe, ctime):
             gain_dataframe["NOM_%03d" % (ctime[i],)].values[0]
         gain_dict["DENOM_%03d" % (ctime[i],)] = \
             gain_dataframe["DENOM_%03d" % (ctime[i],)].values[0]
+        if "NOM_NS_%03d" % (ctime[i],) in gain_dataframe:
+            gain_dict["NOM_NS_%03d" % (ctime[i],)] = \
+                        gain_dataframe["NOM_NS_%03d" % (ctime[i],)].values[0]
 
     return gain_dict
