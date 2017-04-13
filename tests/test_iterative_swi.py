@@ -21,8 +21,8 @@ from pyswi.swi.iterative_swi import IterativeSWI
 import unittest
 import numpy as np
 import os
-import pandas as pd
 from tempfile import mkdtemp
+
 
 class SwiTest(unittest.TestCase):
 
@@ -36,7 +36,8 @@ class SwiTest(unittest.TestCase):
 
     def test_iterative_swi_calc(self):
         """
-        Test correct calculation of SWI to a hardcoded calculated output.
+        Test correct calculation of SWI compared to a hardcoded calculated
+        output.
         """
 
         ssm = np.array([20., 20., 20.])
@@ -52,15 +53,16 @@ class SwiTest(unittest.TestCase):
         gain_ref = np.array([0.549834, 0.59868766, 0.64565631])
 
         swi, qflag, gain = iterative_swi(ssm, ssm_jd, time_scale, prev_swi,
-                                             prev_gain, prev_qflag, prev_jd)
+                                         prev_gain, prev_qflag, prev_jd)
 
         np.testing.assert_array_almost_equal(swi, swi_ref, decimal=6)
         np.testing.assert_array_almost_equal(qflag, qflag_ref, decimal=6)
         np.testing.assert_array_almost_equal(gain, gain_ref, decimal=6)
 
-    def test_iterative_swi_calc(self):
+    def test_iterative_swi(self):
         """
-        Test correct calculation of SWI to a hardcoded calculated output.
+        Test correct calculation of SWI including the import of the test data
+        compared to a hardcoded calculated output.
         """
 
         ssm = np.array([45., 46., 32., 51., 65., 23., 54., 44., 23., 42., 46.,
@@ -82,51 +84,15 @@ class SwiTest(unittest.TestCase):
                             13.7698161826, 6.5855642612, 5.810906756,
                             14.8500950432, 15.4957513494])
 
-        # gain_ref = np.array([0.5498339973, 0.5498339973, 0.5498339973,
-        #                      0.5498339973, 0.5498339973, 0.5498339973,
-        #                      0.5498339973, 0.5498339973, 0.5498339973,
-        #                      0.5498339973, 0.5498339973, 0.5498339973,
-        #                      0.5498339973, 0.5498339973, 0.5498339973,
-        #                      0.5986876601, 0.5986876601, 0.6456563062,
-        #                      0.6456563062, 0.6456563062])
-
         outdir = os.path.join(mkdtemp())
         print outdir
         iter_swi = IterativeSWI(ssm, os.path.join(self.curpath(),
-                                         'data',
-                                         'iterative_swi'))
+                                                  'data',
+                                                  'iterative_swi'))
 
         swi = iter_swi.calc_iter(ssm_jd, ssm, ctime)
 
         np.testing.assert_array_almost_equal(swi, swi_ref, decimal=6)
-
-    # def test_iterative_swi_process(self):
-    #     """
-    #     Test correct calculation of SWI, compared to the pytesmo calculation.
-    #     """
-    #     outdir = os.path.join(mkdtemp())
-    #     print outdir
-    #     ssm = np.array([20., 20., 20.])
-    #     ssm_jd = pd.date_range('2007-01-01', periods=3).to_julian_date().values
-    #
-    #     ctime = 5
-    #
-    #     iter_swi = IterativeSWI(ssm, outdir)
-    #
-    #     swi = iter_swi.calc_iter(ssm_jd, ssm, ctime)
-    #
-    #     swi_ref = np.array([15.49833997, 15.9868766, 16.45656306])
-    #
-    #     iter_swi.store_iter_data()
-    #
-    #     iter_swi.load_iter_data()
-    #
-    #     ssm = np.array([10., 10., 25.])
-    #     ssm_jd = pd.date_range('2007-01-03', periods=3).to_julian_date().values
-    #
-    #     swi = iter_swi.calc_iter(ssm_jd, ssm, ctime)
-    #
-    #     np.testing.assert_array_almost_equal(swi, swi_ref, decimal=6)
 
 
 if __name__ == '__main__':

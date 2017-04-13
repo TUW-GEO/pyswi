@@ -403,7 +403,39 @@ def calc_noise_rec(ssm_noise, jd, ctime=[1, 5], last_den=1, last_nom=0):
     return outputdict
 
 def iterative_swi(ssm, ssm_jd, ctime, prev_swi, prev_gain, prev_qflag, prev_jd):
+    """
+    Takes input data and previous data and calculates swi
+    values for next dates. All arrays have to be the same shape
+    so that the whole batch can be calculated at once
+    initializing and masking has to be done outside of this basic
+    function
 
+    Parameters
+    ----------
+    ssm : numpy.array
+        surface soil moisture
+    ssm_jd : numpy.array
+        observation time of ssm given as julian date
+    ctime : int
+        T value for SWI calculation
+    prev_swi : numpy.array
+        values of SWI at previous iteration
+    prev_gain : numpy.array
+        values of gain from previous iteration
+    prev_qflag : numpy.array
+        values of qflag from previous iteration
+    prev_jd : numpy.array
+        values of julian date from previous iteration
+
+    Returns
+    -------
+    swi : numpy.array
+        swi results
+    qflag : numpy.array
+        quality flag results
+    gain : numpy.array
+        gain for next iteration
+    """
     # Calculate time diff
     time_diff = (ssm_jd - prev_jd).astype(np.float)
 

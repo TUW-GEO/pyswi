@@ -22,34 +22,20 @@ import numpy as np
 
 
 class IterativeSWI(object):
-    """Class for calculation of the SSF in iterative mode.
+    """Class for calculation of the SWI in iterative mode.
 
-    This means that mean_sigma, mean_sigma_gain, previous_ssf and
-    previous_julian_date have to be stored for a successful restart after a break.
+    This means that previous_swi, previous_gain, previous_qflag and
+    previous_julian_date have to be stored for a successful
+    restart after a break.
 
-    This is suitable if the SSF is calculated from a series of swaths/images.
+    This is suitable if the SWI is calculated from a series of swaths/images.
 
     Parameters
     ----------
-    ft_thresholds: numpy.recarray
-        record array of the freeze thaw thresholds of the full grid(mostly WARP DGG).
-
-        with the fields:
-        ['sig_flevel']
-        ['sig_tlevel']
-        ['pt1_doy']
-        ['pt2_doy']
-        ['msig_summer']
-        ['msig_winter']
-        ['sig_stdev_frozen']
-        ['sig_slop_minust']
-        ['pice_flag']
+    sm: numpy.recarray
+        record array of the soil moisture values.
     iter_data_path: string
         Path where the iteration data is/will be stored.
-    td_max: float, optional
-        time difference maximum that is allowed between observation so the same points.
-        This is given in fractional days. Default is 4 days since this is on the safe side for
-        data in low latitude regions.
     """
 
     def __init__(self, sm, iter_data_path):
@@ -77,27 +63,42 @@ class IterativeSWI(object):
         self.iterstepdata.save_iter_data(self.iter_data)
 
     def calc_iter(self, sm_jd, sm, ctime):
+        """
+        Calculate SSF iteratively.
 
+        Parameters
+        ----------
+        sm_jd: numpy.ndarray
+            Julian days array
+        sm: numpy.ndarray
+            Soil moisture values
+        ctime: int
+            T value for SWI calculation
+
+        Returns
+        ------
+        swi: numpy.ndarray
+            Array with the new calculated swi values.
+        """
         prev_swi = self.iter_data['swi']
         prev_gain = self.iter_data['gain']
         prev_qflag = self.iter_data['qflag']
         prev_jd = self.iter_data['jd']
 
-        swi, qflag, gain = iterative_swi(sm, sm_jd, ctime, prev_swi, prev_gain, prev_qflag, prev_jd)
+        swi, qflag, gain = iterative_swi(sm, sm_jd, ctime, prev_swi, prev_gain,
+                                         prev_qflag, prev_jd)
 
-        self.iter_data['swi'] = np.zeros([len(swi)])
-        self.iter_data['gain'] = np.ones([len(swi)])
-        self.iter_data['qflag'] = np.zeros([len(swi)])
-        self.iter_data['jd'] = np.array([2456596.64583333, 2456596.64583333, 2456596.64583333, 2456596.64583333, 2456596.64583333, 2456596.64583333, 2456596.64583333, 2456596.64583333, 2456596.64583333, 2456596.64583333, 2456596.64583333, 2456596.64583333, 2456596.64583333, 2456596.64583333, 2456596.64583333, 2456596.64583333, 2456596.64583333, 2456596.64583333, 2456596.64583333, 2456596.64583333])
-      #  self.iter_data['jd'].fill()
-        #self.iter_data['swi'] = swi
-        #self.iter_data['qflag'] = qflag
-        #self.iter_data['gain'] = gain
-        #self.iter_data['jd'] = sm_jd
+        self.iter_data['swi'] = swi
+        self.iter_data['qflag'] = qflag
+        self.iter_data['gain'] = gain
+        self.iter_data['jd'] = sm_jd
+
         # update iter_data header for complete file.
         valid_jd = np.where(self.iter_data['jd'] != self.float_nan)
-        header = {'sensing_start': julian2datetime(np.min(self.iter_data['jd'][valid_jd])),
-                  'sensing_end': julian2datetime(np.max(self.iter_data['jd'][valid_jd])),
+        header = {'sensing_start': julian2datetime(
+                      np.min(self.iter_data['jd'][valid_jd])),
+                  'sensing_end': julian2datetime(
+                      np.max(self.iter_data['jd'][valid_jd])),
                   'processing_start': self.processing_start,
                   'processing_end': datetime.now()}
 
