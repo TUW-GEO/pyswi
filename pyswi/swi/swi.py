@@ -402,6 +402,22 @@ def calc_noise_rec(ssm_noise, jd, ctime=[1, 5], last_den=1, last_nom=0):
 
     return outputdict
 
+def iterative_swi(ssm, ssm_jd, ctime, prev_swi, prev_gain, prev_qflag, prev_jd):
+
+    # Calculate time diff
+    time_diff = (ssm_jd - prev_jd).astype(np.float)
+
+    # calculate qflag and gain based on previous values
+    qflag = 1.0 + np.exp(-(time_diff / float(ctime))) * prev_qflag
+
+    gain = (prev_gain / (prev_gain.astype(np.float) +
+                         np.exp(-(time_diff / float(ctime)))))
+
+    # calculate SWI
+    swi = prev_swi + gain * (ssm - prev_swi)
+
+    return swi, qflag, gain
+
 # --- Help functions ---
 
 

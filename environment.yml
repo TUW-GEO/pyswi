@@ -31,4 +31,5 @@ dependencies:
   - pytesmo==0.6.2
   - scipy==0.18.1
   - subprocess32==3.2.7
+  - iterative_storage==0.1
 
