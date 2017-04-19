@@ -39,6 +39,17 @@ class IterativeSWI(object):
     """
 
     def __init__(self, sm, iter_data_path):
+        """
+        Initializes the IterativeSWI class.
+
+        Parameters
+        ----------
+        sm: numpy.ndarray
+            Soil Moisture values of the whole image.
+        iter_data_path: string
+            Output and input path of the calculation results.
+
+        """
         self.iter_data_path = iter_data_path
         self.float_nan = -999999.
         self.gain_nan = 1.
@@ -54,17 +65,22 @@ class IterativeSWI(object):
         self.load_iter_data()
 
     def load_iter_data(self):
+        """
+        Loads the iterative swi data from the iter_data_path to iter_data.
+        If there is no feasible file, the iter_data is set empty.
+        """
         if self.iterstepdata.files_available is False:
             self.iter_data = self.iterstepdata.get_empty_data()
         else:
             self.iter_data = self.iterstepdata.read_latest_iter_data()
 
     def store_iter_data(self):
+        """ Stores the iterative swi data to the iter_data_path. """
         self.iterstepdata.save_iter_data(self.iter_data)
 
     def calc_iter(self, sm_jd, sm, ctime):
         """
-        Calculate SSF iteratively.
+        Calculate SWI iteratively.
 
         Parameters
         ----------

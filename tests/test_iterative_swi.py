@@ -18,10 +18,10 @@ This module tests the soil water index calculation.
 """
 from pyswi.swi.swi import iterative_swi
 from pyswi.swi.iterative_swi import IterativeSWI
+from tempfile import mkdtemp
 import unittest
 import numpy as np
 import os
-from tempfile import mkdtemp
 
 
 class SwiTest(unittest.TestCase):
@@ -84,8 +84,6 @@ class SwiTest(unittest.TestCase):
                             13.7698161826, 6.5855642612, 5.810906756,
                             14.8500950432, 15.4957513494])
 
-        outdir = os.path.join(mkdtemp())
-        print outdir
         iter_swi = IterativeSWI(ssm, os.path.join(self.curpath(),
                                                   'data',
                                                   'iterative_swi'))
@@ -93,6 +91,73 @@ class SwiTest(unittest.TestCase):
         swi = iter_swi.calc_iter(ssm_jd, ssm, ctime)
 
         np.testing.assert_array_almost_equal(swi, swi_ref, decimal=6)
+
+    def test_iterative_swi_load_save(self):
+        """
+        Test correct save and load process of the iterative SWI.
+        """
+        out_path = mkdtemp()
+        print out_path
+
+        ssm = np.array([45., 46., 32., 51., 65., 23., 54., 44., 23., 42., 46.,
+                        75., 43., 23., 12., 23., 11., 9., 23., 24.])
+
+        ssm_jd = np.array([2456597.64583333, 2456597.64583333, 2456597.64583333,
+                           2456597.64583333, 2456597.64583333, 2456597.64583333,
+                           2456597.64583333, 2456597.64583333, 2456597.64583333,
+                           2456597.64583333, 2456597.64583333, 2456597.64583333,
+                           2456597.64583333, 2456597.64583333, 2456597.64583333,
+                           2456598.64583333, 2456598.64583333, 2456599.64583333,
+                           2456599.64583333, 2456599.64583333])
+        ctime = 5
+
+        swi_ref = np.array([24.7425298791, 25.2923638764, 17.594687914,
+                            28.0415338629, 35.7392098253, 12.6461819382,
+                            29.6910358549, 24.1926958817, 12.6461819382,
+                            23.0930278871, 25.2923638764, 41.2375497984,
+                            23.6428618844, 12.6461819382, 6.5980079677,
+                            13.7698161826, 6.5855642612, 5.810906756,
+                            14.8500950432, 15.4957513494])
+
+        iter_swi = IterativeSWI(ssm, os.path.join(self.curpath(),
+                                                  'data',
+                                                  'iterative_swi'))
+
+        swi = iter_swi.calc_iter(ssm_jd, ssm, ctime)
+
+        iter_swi.iterstepdata.path = out_path
+
+        iter_swi.store_iter_data()
+
+        np.testing.assert_array_almost_equal(swi, swi_ref, decimal=6)
+
+        iter_swi2 = IterativeSWI(ssm, out_path)
+
+        ssm2 = np.array([45., 46., 32., 51., 65., 23., 54., 44., 23., 42., 46.,
+                        75., 43., 23., 12., 23., 11., 9., 23., 24.])
+
+        ssm_jd2 = np.array([2456598.64583333, 2456598.64583333,
+                            2456598.64583333, 2456598.64583333,
+                            2456598.64583333, 2456598.64583333,
+                            2456598.64583333, 2456598.64583333,
+                            2456598.64583333, 2456598.64583333,
+                            2456598.64583333, 2456598.64583333,
+                            2456598.64583333, 2456598.64583333,
+                            2456598.64583333, 2456599.64583333,
+                            2456599.64583333, 2456600.64583333,
+                            2456600.64583333, 2456600.64583333])
+
+        swi_ref2 = np.array([32.881162537, 33.6118550378, 23.3821600263,
+                             37.2653175419, 47.4950125534, 16.8059275189,
+                             39.4573950444, 32.1504700362, 16.8059275189,
+                             30.6890850345, 33.6118550378, 54.8019375617,
+                             31.4197775354, 16.8059275189, 8.7683100099,
+                             17.668451265, 8.4501288658, 7.2169955022,
+                             18.44343295, 19.2453213392])
+
+        swi2 = iter_swi2.calc_iter(ssm_jd2, ssm2, ctime)
+
+        np.testing.assert_array_almost_equal(swi2, swi_ref2, decimal=6)
 
 
 if __name__ == '__main__':
