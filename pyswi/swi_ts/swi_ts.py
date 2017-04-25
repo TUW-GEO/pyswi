@@ -20,8 +20,10 @@ This module represents the WARP Processing step Soil Water Index (SWI).
 import numpy as np
 import pyximport
 pyximport.install(setup_args={'include_dirs': [np.get_include()]})
-from pyswi.swi.swi_calc_routines import swi_calc_cy
-from pyswi.swi.swi_calc_routines import swi_calc_cy_noise
+
+from pyswi.swi_ts.swi_calc_routines import swi_calc_cy
+from pyswi.swi_ts.swi_calc_routines import swi_calc_cy_noise
+
 import pytesmo.timedate.julian as julian
 import pandas as pd
 
@@ -41,6 +43,7 @@ def process_swi_pd(ssm_userformat_data, proc_param={},
     This function calls the calculate function and handles
     the conversions of the input/output formats of the gain to
     the formats that are needed for the calculation.
+    This function is dependent on the process_swi function.
 
     Parameters
     ----------
@@ -54,9 +57,9 @@ def process_swi_pd(ssm_userformat_data, proc_param={},
          Input gain parameters of last calculation.
          fields gpi, last_jd, nom, denom
     jd_daily_out : bool
-         If the flag is True the jd value of the swi will be set to every day
-         23:59 of the time range, otherwise it takes the jd values from the ssm
-         input within the range.
+         If the flag is True the jd value of the swi_img will be set to every
+         day 23:59 of the time range, otherwise it takes the jd values from the
+         ssm input within the range.
 
     Returns
     -------
@@ -115,9 +118,9 @@ def process_swi(ssm, jd, proc_param={}, ctime=[1, 5, 10, 15, 20, 40, 60, 100],
     ssm_noise : numpy.ndarray
         SSM noise of the given ssm timeseries.
     jd_daily_out : bool
-         If the flag is True the jd value of the swi will be set to every day
-         23:59 of the time range, otherwise it takes the jd values from the ssm
-         input within the range.
+         If the flag is True the jd value of the swi_img will be set to every
+         day 23:59 of the time range, otherwise it takes the jd values from the
+         ssm input within the range.
 
     Returns
     -------
@@ -167,7 +170,8 @@ def process_swi(ssm, jd, proc_param={}, ctime=[1, 5, 10, 15, 20, 40, 60, 100],
 
     # Init empty swi_ts
     swi_ts = {'jd': np.zeros([num_swi], dtype=np.float64),
-              'swi': np.zeros([num_swi, len(ctime)], dtype=np.float32)}
+              'swi': np.zeros([num_swi, len(ctime)], dtype=np.float32),
+              'qflag': np.zeros([num_swi, len(ctime)], dtype=np.float32)}
 
     if num_swi != len(jd):
         indices = [i for i, x in enumerate(ssm_ts['jd']) if x == date_from]
@@ -216,7 +220,7 @@ def calc(ssm_ts, swi_ts, gain=None,
     -------
     swi_ts : dict
         Soil water index series.
-        fields jd, swi, qflag
+        fields jd, swi_img, qflag
     gain_out : dict
         Gain parameters of last calculation.
         fields gpi, last_jd, nom, denom, nom_ns
@@ -474,13 +478,13 @@ def pd_datetime_to_juldate(pd_datetimes):
 
 def swi_outputdict_to_dataframe(swi_dict, ctime):
     """
-    Converts a swi dictionary format to a pandas DataFrame format.
+    Converts a swi_img dictionary format to a pandas DataFrame format.
 
     Parameters
     ----------
     swi_dict : dict
         Soil Water Index time series as a dictionary.
-        fields gpi, jd, swi, qflag
+        fields gpi, jd, swi_img, qflag
     ctime : numpy.ndarray
         Integer values for the ctime variations.
 
@@ -559,14 +563,14 @@ def dict_to_outputdict(inputdict, variables_ctimedep, ctime,
 
 def swi_dict_to_outputdict(swi_dict, ctime):
     """
-    Converts a swi dictionary format to a usable output dictionary
+    Converts a swi_img dictionary format to a usable output dictionary
     with names like SWI_010 as keys.
 
     Parameters
     ----------
     swi_dict : dict
         Soil Water Index time series as a dictionary.
-        fields gpi, jd, swi, qflag
+        fields gpi, jd, swi_img, qflag
     ctime : numpy.ndarray
         Integer values for the ctime variations.
 
@@ -577,6 +581,7 @@ def swi_dict_to_outputdict(swi_dict, ctime):
         fields jd, SWI_xxx, QFLAG_xxx (e.g. SWI_010 for ctime value 10)
     """
     variables_ctimedep = ['swi']
+
 
     if 'qflag' in swi_dict:
         variables_ctimedep.append('qflag')

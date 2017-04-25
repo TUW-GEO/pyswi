@@ -16,12 +16,14 @@
 """
 This module tests the soil water index calculation.
 """
-from pyswi.swi.swi import iterative_swi
-from pyswi.swi.iterative_swi import IterativeSWI
-from tempfile import mkdtemp
-import unittest
-import numpy as np
 import os
+import unittest
+from tempfile import mkdtemp
+
+import numpy as np
+
+from pyswi.swi_img.iterative_swi import IterativeSWI
+from pyswi.swi_img.swi_img import iterative_swi
 
 
 class SwiTest(unittest.TestCase):

@@ -16,15 +16,19 @@
 """
 This module tests the soil water index calculation.
 """
-from pyswi.swi.swi import process_swi_pd
-from pyswi.swi.swi import process_swi
-from pyswi.swi.swi import calc_noise
-from pyswi.swi.swi import calc_noise_rec
-from pytesmo.time_series.filters import exp_filter
-import pytesmo.timedate.julian as julian
+
+from pyswi.swi_ts.swi_ts import calc_noise
+from pyswi.swi_ts.swi_ts import calc_noise_rec
+
 import unittest
+
 import numpy as np
 import pandas as pd
+import pytesmo.timedate.julian as julian
+from pytesmo.time_series.filters import exp_filter
+
+from pyswi.swi_ts.swi_ts import process_swi
+from pyswi.swi_ts.swi_ts import process_swi_pd
 
 
 class SwiTest(unittest.TestCase):

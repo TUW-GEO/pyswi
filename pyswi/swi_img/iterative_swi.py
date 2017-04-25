@@ -15,10 +15,12 @@
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from datetime import datetime
-from iterative_storage.iter_data import IterStepData
-from pyswi.swi.swi import iterative_swi
-from pytesmo.timedate.julian import julian2datetime
+
 import numpy as np
+from iterative_storage.iter_data import IterStepData
+from pytesmo.timedate.julian import julian2datetime
+
+from pyswi.swi_img.swi_img import iterative_swi
 
 
 class IterativeSWI(object):
@@ -66,7 +68,7 @@ class IterativeSWI(object):
 
     def load_iter_data(self):
         """
-        Loads the iterative swi data from the iter_data_path to iter_data.
+        Loads the iterative swi_img data from the iter_data_path to iter_data.
         If there is no feasible file, the iter_data is set empty.
         """
         if self.iterstepdata.files_available is False:
@@ -75,7 +77,7 @@ class IterativeSWI(object):
             self.iter_data = self.iterstepdata.read_latest_iter_data()
 
     def store_iter_data(self):
-        """ Stores the iterative swi data to the iter_data_path. """
+        """ Stores the iterative swi_img data to the iter_data_path. """
         self.iterstepdata.save_iter_data(self.iter_data)
 
     def calc_iter(self, sm_jd, sm, ctime):
@@ -93,8 +95,8 @@ class IterativeSWI(object):
 
         Returns
         ------
-        swi: numpy.ndarray
-            Array with the new calculated swi values.
+        swi_img: numpy.ndarray
+            Array with the new calculated swi_img values.
         """
         prev_swi = self.iter_data['swi']
         prev_gain = self.iter_data['gain']
