@@ -3,13 +3,17 @@ pyswi
 =====
 
 
-Python package for the swi calculation.
+Python package for the swi ts calculation.
 
 
 Description
 ===========
 
-Python package for the swi calculation.
+The package includes the following features:
+
+* SWI TS: SWI TS Calculation with SWI GAIN support.
+* SWI TS: Calculation of the QFLAG.
+* SWI TS: Calculation of SWI NOISE including SWI NOISE GAIN.
 
 
 Installation
@@ -23,8 +27,7 @@ The new environment can be activated by calling:
 
 source activate swi_env
 
-Note
-====
+Usage
+===========
 
-This project has been set up using PyScaffold 2.5.7. For details and usage
-information on PyScaffold see http://pyscaffold.readthedocs.org/.
+For the usage of the functions, please have a look at the unit tests.
