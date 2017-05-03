@@ -406,6 +406,7 @@ def calc_noise_rec(ssm_noise, jd, ctime=[1, 5], last_den=1, last_nom=0):
 
     return outputdict
 
+
 def iterative_swi(ssm, ssm_jd, ctime, prev_swi, prev_gain, prev_qflag, prev_jd):
     """
     Takes input data and previous data and calculates swi
@@ -581,7 +582,6 @@ def swi_dict_to_outputdict(swi_dict, ctime):
         fields jd, SWI_xxx, QFLAG_xxx (e.g. SWI_010 for ctime value 10)
     """
     variables_ctimedep = ['swi']
-
 
     if 'qflag' in swi_dict:
         variables_ctimedep.append('qflag')

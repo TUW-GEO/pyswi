@@ -29,7 +29,7 @@ class Cythonize(Command):
         # Make sure the compiled Cython files in the distribution are
         # up-to-date
         from Cython.Build import cythonize
-        cythonize(['pyswi/swi_img/swi_calc_routines.pyx'])
+        cythonize(['pyswi/swi_ts/swi_calc_routines.pyx'])
 
 
 class NumpyBuildExt(_build_ext):
@@ -42,8 +42,8 @@ class NumpyBuildExt(_build_ext):
                 ext.include_dirs.append(numpy_incl)
         _build_ext.build_extensions(self)
 
-ext_modules = [Extension("pyswi.swi_img.swi_calc_routines",
-                         ["pyswi/swi_img/swi_calc_routines.c"], include_dirs=[]), ]
+ext_modules = [Extension("pyswi.swi_ts.swi_calc_routines",
+                         ["pyswi/swi_ts/swi_calc_routines.c"], include_dirs=[]), ]
 
 
 
@@ -54,7 +54,7 @@ def setup_package():
     needs_sphinx = {'build_sphinx', 'upload_docs'}.intersection(sys.argv)
     sphinx = ['sphinx'] if needs_sphinx else []
     setup(setup_requires=['six', 'pyscaffold>=2.5a0,<2.6a0'] + sphinx,
-          tests_require=['test_swi'],
+          tests_require=['test_swi_ts', 'test_swi_img'],
           cmdclass=cmdclass,
           ext_modules=ext_modules,
           use_pyscaffold=True)
