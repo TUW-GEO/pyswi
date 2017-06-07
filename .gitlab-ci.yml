@@ -1,0 +1,40 @@
+image: cpaulik/gitlab-ci-image:v2
+before_script:
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update conda
+  - conda env create -f environment.yml
+  - source activate swi_env
+  - conda list
+
+after_script:
+  - conda env remove -n swi_env
+
+variables:
+  GIT_SSL_NO_VERIFY: "true"
+  PIP_EXTRA_INDEX_URL: "http://dvlp1.geo.tuwien.ac.at:8080/simple"
+  PIP_TRUSTED_HOST: "dvlp1.geo.tuwien.ac.at"
+  PIP_USE_WHEEL: "yes"
+  NO_PROXY: "dvlp1.geo.tuwien.ac.at,$NO_PROXY"
+  no_proxy: "dvlp1.geo.tuwien.ac.at,$no_proxy"
+
+stages:
+- test
+- release
+
+test_job:
+  stage: test
+  script:
+    - python setup.py test
+  except:
+    - tags
+
+release_job:
+  stage: release
+  script:
+    - python setup.py test
+    - python setup.py sdist
+  artifacts:
+    paths:
+      - dist/*.tar.gz
+  only:
+    - tags
