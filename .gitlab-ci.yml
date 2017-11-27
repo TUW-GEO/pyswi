@@ -2,9 +2,6 @@ image: cpaulik/gitlab-ci-image:v2
 before_script:
   - conda config --set always_yes yes --set changeps1 no
   - conda update conda
-  - conda env create -f environment.yml
-  - source activate swi_env
-  - conda list
 
 after_script:
   - conda env remove -n swi_env
@@ -21,9 +18,38 @@ stages:
 - test
 - release
 
-test_job:
+test_py27:
   stage: test
   script:
+    - wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh
+    - bash miniconda.sh -b -p $HOME/miniconda
+    - export PATH="$HOME/miniconda/bin:$PATH"
+    - conda config --set always_yes yes --set changeps1 no
+    - conda create -q -n swi_env cython numpy pandas netCDF4 pyproj scipy
+    - source activate swi_env
+    - pip install pygeobase
+    - pip install pygeogrids
+    - pip install pykdtree
+    - pip install pytesmo
+    - pip install iterative_storage
+    - python setup.py test
+  except:
+    - tags
+
+test_py36:
+  stage: test
+  script:
+    - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+    - bash miniconda.sh -b -p $HOME/miniconda
+    - export PATH="$HOME/miniconda/bin:$PATH"
+    - conda config --set always_yes yes --set changeps1 no
+    - conda create -q -n swi_env cython numpy pandas netCDF4 pyproj scipy
+    - source activate swi_env
+    - pip install pygeobase
+    - pip install pygeogrids
+    - pip install pykdtree
+    - pip install pytesmo
+    - pip install iterative_storage
     - python setup.py test
   except:
     - tags
@@ -31,6 +57,17 @@ test_job:
 release_job:
   stage: release
   script:
+    - wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh
+    - bash miniconda.sh -b -p $HOME/miniconda
+    - export PATH="$HOME/miniconda/bin:$PATH"
+    - conda config --set always_yes yes --set changeps1 no
+    - conda create -q -n swi_env cython numpy pandas netCDF4 pyproj scipy
+    - source activate swi_env
+    - pip install pygeobase
+    - pip install pygeogrids
+    - pip install pykdtree
+    - pip install pytesmo
+    - pip install iterative_storage
     - python setup.py test
     - python setup.py sdist
   artifacts:
