@@ -23,6 +23,7 @@ pyximport.install(setup_args={'include_dirs': [np.get_include()]})
 
 from pyswi.swi_ts.swi_calc_routines import swi_calc_cy
 from pyswi.swi_ts.swi_calc_routines import swi_calc_cy_noise
+from future.utils import iteritems
 
 import pytesmo.timedate.julian as julian
 import pandas as pd
@@ -549,7 +550,7 @@ def dict_to_outputdict(inputdict, variables_ctimedep, ctime,
     for var in variables_other:
         output_dict[var] = inputdict[var]
 
-    for name, value in depvar_buffer.iteritems():
+    for name, value in iteritems(depvar_buffer):
         for i in range(0, len(ctime)):
             if value is None:
                 output_dict[name.upper()+"_%03d" % (ctime[i],)] = None
