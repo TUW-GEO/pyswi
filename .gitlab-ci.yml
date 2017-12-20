@@ -25,7 +25,7 @@ test_py27:
     - bash miniconda.sh -b -p $HOME/miniconda
     - export PATH="$HOME/miniconda/bin:$PATH"
     - conda config --set always_yes yes --set changeps1 no
-    - conda create -q -n swi_env cython numpy pandas netCDF4 pyproj scipy
+    - conda create -q -n swi_env cython numpy pandas netCDF4 pyproj scipy future
     - source activate swi_env
     - pip install pygeobase
     - pip install pygeogrids
@@ -43,7 +43,7 @@ test_py36:
     - bash miniconda.sh -b -p $HOME/miniconda
     - export PATH="$HOME/miniconda/bin:$PATH"
     - conda config --set always_yes yes --set changeps1 no
-    - conda create -q -n swi_env cython numpy pandas netCDF4 pyproj scipy
+    - conda create -q -n swi_env cython numpy pandas netCDF4 pyproj scipy future
     - source activate swi_env
     - pip install pygeobase
     - pip install pygeogrids
