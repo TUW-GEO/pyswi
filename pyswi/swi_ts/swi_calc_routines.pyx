@@ -55,7 +55,7 @@ def swi_calc_cy(np.ndarray[np.double_t] juldate,
                 continue  # no valid SSM measurement before swi_jd[i]
 
             for k in range(len_ctime):
-                if ssm[i] != nan:
+                if ssm[i] != nan or ssm[i] == np.nan:
                     swi_ts[i, k] = nom[k] / denom[k]
                 else:
                     swi_ts[i, k] = np.nan
