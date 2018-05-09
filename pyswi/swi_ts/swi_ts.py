@@ -38,7 +38,7 @@ float32_nan = -999999.
 
 def process_swi_pd(ssm_userformat_data, proc_param={},
                    ctime=[1, 5, 10, 15, 20, 40, 60, 100], gain_in=None,
-                   jd_daily_out=False, ssm_noise=None):
+                   jd_daily_out=False, ssm_noise=None, nom_init=1, denom_init=1):
     """
     Processing of surface soil water index and the gain value.
     This function calls the calculate function and handles
@@ -61,6 +61,10 @@ def process_swi_pd(ssm_userformat_data, proc_param={},
          If the flag is True the jd value of the swi_img will be set to every
          day 23:59 of the time range, otherwise it takes the jd values from the
          ssm input within the range.
+    nom_init : np.float64
+         Initial value of nom in the swi calculation.
+    denom_init : np.float64
+         Initial value of denom in the swi calculation.
 
     Returns
     -------
@@ -85,7 +89,8 @@ def process_swi_pd(ssm_userformat_data, proc_param={},
                                       proc_param=proc_param, ctime=ctime,
                                       gain_in=gain_in,
                                       jd_daily_out=jd_daily_out,
-                                      ssm_noise=ssm_noise)
+                                      ssm_noise=ssm_noise, nom_init=nom_init,
+                                      denom_init=denom_init)
 
     swi_ts = swi_outputdict_to_dataframe(swi_ts, ctime)
 
@@ -95,7 +100,8 @@ def process_swi_pd(ssm_userformat_data, proc_param={},
 
 
 def process_swi(ssm, jd, proc_param={}, ctime=[1, 5, 10, 15, 20, 40, 60, 100],
-                gain_in=None, ssm_noise=None, jd_daily_out=False):
+                gain_in=None, ssm_noise=None, jd_daily_out=False, nom_init=1,
+                denom_init=1):
     """
     Processing of surface soil water index and the gain value.
     The ssm should already be filtered.
@@ -122,6 +128,10 @@ def process_swi(ssm, jd, proc_param={}, ctime=[1, 5, 10, 15, 20, 40, 60, 100],
          If the flag is True the jd value of the swi_img will be set to every
          day 23:59 of the time range, otherwise it takes the jd values from the
          ssm input within the range.
+    nom_init : np.float64
+         Initial value of nom in the swi calculation.
+    denom_init : np.float64
+         Initial value of denom in the swi calculation.
 
     Returns
     -------
@@ -187,8 +197,9 @@ def process_swi(ssm, jd, proc_param={}, ctime=[1, 5, 10, 15, 20, 40, 60, 100],
     if gain_in is not None:
         gain = inputdict_to_gain_dict(gain_in, ctime)
 
-    swi_ts, gain_out_mp = calc(ssm_ts, swi_ts, ctime=ctime,
-                               gain=gain, ssm_noise=ssm_noise)
+    swi_ts, gain_out_mp = calc(ssm_ts, swi_ts, ctime=ctime, gain=gain,
+                               ssm_noise=ssm_noise, nom_init=nom_init,
+                               denom_init=denom_init)
 
     swit_ts = swi_dict_to_outputdict(swi_ts, ctime)
 
@@ -198,7 +209,8 @@ def process_swi(ssm, jd, proc_param={}, ctime=[1, 5, 10, 15, 20, 40, 60, 100],
 
 
 def calc(ssm_ts, swi_ts, gain=None,
-         ctime=np.array([1, 5, 10, 15, 20, 40, 60, 100]), ssm_noise=None):
+         ctime=np.array([1, 5, 10, 15, 20, 40, 60, 100]), ssm_noise=None,
+         nom_init=1, denom_init=1):
     """
     Calculation of surface soil water index.
 
@@ -216,6 +228,10 @@ def calc(ssm_ts, swi_ts, gain=None,
         Integer values for the ctime variations.
     ssm_noise : numpy.ndarray
         SSM noise of the given ssm timeseries.
+    nom_init : np.float64
+         Initial value of nom in the swi calculation.
+    denom_init : np.float64
+         Initial value of denom in the swi calculation.
 
     Returns
     -------
@@ -229,8 +245,8 @@ def calc(ssm_ts, swi_ts, gain=None,
 
     if gain is None:
         gain = {'last_jd': np.double(0),
-                'denom': np.ones(len(ctime)),
-                'nom': np.ones(len(ctime)),
+                'denom': np.full(len(ctime), denom_init, dtype=np.float64),
+                'nom': np.full(len(ctime), nom_init, dtype=np.float64),
                 'nom_ns': np.zeros(len(ctime))
                 }
 
