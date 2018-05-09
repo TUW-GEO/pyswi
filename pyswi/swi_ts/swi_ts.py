@@ -19,10 +19,12 @@ This module represents the WARP Processing step Soil Water Index (SWI).
 """
 import numpy as np
 import pyximport
-pyximport.install(setup_args={'include_dirs': [np.get_include()]})
+pyximport.install(setup_args={'include_dirs': [np.get_include()]}, inplace=True)
+
 
 from pyswi.swi_ts.swi_calc_routines import swi_calc_cy
 from pyswi.swi_ts.swi_calc_routines import swi_calc_cy_noise
+
 from future.utils import iteritems
 
 import pytesmo.timedate.julian as julian

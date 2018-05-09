@@ -43,7 +43,7 @@ class NumpyBuildExt(_build_ext):
         _build_ext.build_extensions(self)
 
 ext_modules = [Extension("pyswi.swi_ts.swi_calc_routines",
-                         ["pyswi/swi_ts/swi_calc_routines.c"], include_dirs=[]), ]
+                         ["pyswi/swi_ts/swi_calc_routines_.c"], include_dirs=[]), ]
 
 
 
@@ -62,3 +62,4 @@ def setup_package():
 
 if __name__ == "__main__":
     setup_package()
+
