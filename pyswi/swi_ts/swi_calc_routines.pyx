@@ -25,7 +25,8 @@ def swi_calc_cy(np.ndarray[np.double_t] juldate,
                 np.ndarray[np.float_t] nom,
                 np.ndarray[np.float_t] denom,
                 double last_jd_var,
-                np.ndarray[np.float_t] norm_factor):
+                np.ndarray[np.float_t] norm_factor,
+                double nan):
 
     cdef int i
     cdef int j = 0
@@ -40,21 +41,25 @@ def swi_calc_cy(np.ndarray[np.double_t] juldate,
     for i in range(len_swi):
 
             while j < len_jd and juldate[j] <= swi_jd[i]:
-                tdiff = juldate[j] - last_jd_var
-                for k in range(len_ctime):
-                    ef[k] = exp(-tdiff / ctime[k])
-                    nom[k] = ef[k] * nom[k] + ssm[j]
-                    denom[k] = ef[k] * denom[k] + 1
+                if ssm[j] != nan or ssm[j] == np.nan:
+                    tdiff = juldate[j] - last_jd_var
+                    for k in range(len_ctime):
+                        ef[k] = exp(-tdiff / ctime[k])
+                        nom[k] = ef[k] * nom[k] + ssm[j]
+                        denom[k] = ef[k] * denom[k] + 1
 
-                last_jd_var = juldate[j]
+                    last_jd_var = juldate[j]
                 j += 1
 
             if denom[0] == 0:
                 continue  # no valid SSM measurement before swi_jd[i]
 
             for k in range(len_ctime):
+                if ssm[i] != nan:
+                    swi_ts[i, k] = nom[k] / denom[k]
+                else:
+                    swi_ts[i, k] = np.nan
 
-                swi_ts[i, k] = nom[k] / denom[k]
                 qflag = 100.0 * denom[k] * exp(-(swi_jd[i] - last_jd_var) / ctime[k]) / norm_factor[k]
                 if qflag > 100:
                     qflag = 100

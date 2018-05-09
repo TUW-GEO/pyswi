@@ -38,7 +38,8 @@ float32_nan = -999999.
 
 def process_swi_pd(ssm_userformat_data, proc_param={},
                    ctime=[1, 5, 10, 15, 20, 40, 60, 100], gain_in=None,
-                   jd_daily_out=False, ssm_noise=None, nom_init=1, denom_init=1):
+                   jd_daily_out=False, ssm_noise=None, nom_init=1, denom_init=1,
+                   nan=-999999.0):
     """
     Processing of surface soil water index and the gain value.
     This function calls the calculate function and handles
@@ -65,6 +66,8 @@ def process_swi_pd(ssm_userformat_data, proc_param={},
          Initial value of nom in the swi calculation.
     denom_init : np.float64
          Initial value of denom in the swi calculation.
+    nan : long
+         Defines the non values of the input data that should be skipped.
 
     Returns
     -------
@@ -90,7 +93,8 @@ def process_swi_pd(ssm_userformat_data, proc_param={},
                                       gain_in=gain_in,
                                       jd_daily_out=jd_daily_out,
                                       ssm_noise=ssm_noise, nom_init=nom_init,
-                                      denom_init=denom_init)
+                                      denom_init=denom_init,
+                                      nan=nan)
 
     swi_ts = swi_outputdict_to_dataframe(swi_ts, ctime)
 
@@ -101,7 +105,7 @@ def process_swi_pd(ssm_userformat_data, proc_param={},
 
 def process_swi(ssm, jd, proc_param={}, ctime=[1, 5, 10, 15, 20, 40, 60, 100],
                 gain_in=None, ssm_noise=None, jd_daily_out=False, nom_init=1,
-                denom_init=1):
+                denom_init=1, nan=-999999.0):
     """
     Processing of surface soil water index and the gain value.
     The ssm should already be filtered.
@@ -132,6 +136,8 @@ def process_swi(ssm, jd, proc_param={}, ctime=[1, 5, 10, 15, 20, 40, 60, 100],
          Initial value of nom in the swi calculation.
     denom_init : np.float64
          Initial value of denom in the swi calculation.
+    nan : long
+         Defines the non values of the input data that should be skipped.
 
     Returns
     -------
@@ -199,7 +205,7 @@ def process_swi(ssm, jd, proc_param={}, ctime=[1, 5, 10, 15, 20, 40, 60, 100],
 
     swi_ts, gain_out_mp = calc(ssm_ts, swi_ts, ctime=ctime, gain=gain,
                                ssm_noise=ssm_noise, nom_init=nom_init,
-                               denom_init=denom_init)
+                               denom_init=denom_init, nan=nan)
 
     swit_ts = swi_dict_to_outputdict(swi_ts, ctime)
 
@@ -210,7 +216,7 @@ def process_swi(ssm, jd, proc_param={}, ctime=[1, 5, 10, 15, 20, 40, 60, 100],
 
 def calc(ssm_ts, swi_ts, gain=None,
          ctime=np.array([1, 5, 10, 15, 20, 40, 60, 100]), ssm_noise=None,
-         nom_init=1, denom_init=1):
+         nom_init=1, denom_init=1, nan=-999999.0):
     """
     Calculation of surface soil water index.
 
@@ -232,6 +238,8 @@ def calc(ssm_ts, swi_ts, gain=None,
          Initial value of nom in the swi calculation.
     denom_init : np.float64
          Initial value of denom in the swi calculation.
+    nan : long
+         Defines the non values of the input data that should be skipped.
 
     Returns
     -------
@@ -277,7 +285,8 @@ def calc(ssm_ts, swi_ts, gain=None,
 
         swi_ts['swi'], swi_ts['qflag'], nom, denom, last_jd_var = \
             swi_calc_cy(juldate, ssm, ctime, swi_ts['jd'], swi_ts['swi'],
-                        swi_ts['qflag'], nom, denom, last_jd_var, norm_factor)
+                        swi_ts['qflag'], nom, denom, last_jd_var,
+                        norm_factor, nan)
     else:
         swi_ts['swi_noise'] = np.zeros([len(swi_ts['jd']), len(ctime)],
                                        dtype=np.float32)

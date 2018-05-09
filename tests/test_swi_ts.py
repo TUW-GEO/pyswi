@@ -177,6 +177,30 @@ class SwiTest(unittest.TestCase):
 
         np.testing.assert_array_almost_equal(swi_ts, pytesmo_swi, 4)
 
+    def test_process_swi_calc_nan_values(self):
+        """
+        Test correct calculation of SWI, compared to the pytesmo calculation
+        including nan values.
+        """
+        ctime_pytesmo = 5
+        ctime = [5, 50, 100]
+
+        dates = pd.date_range('2007-01-01', periods=9).to_julian_date().values
+
+        sm = np.array([10, 20, 30, 40, 50, 60, 999, 80, 10])
+
+        swi_ts_test, gain_test = process_swi(sm, dates, ctime=ctime,
+                                             denom_init=1, nom_init=1, nan=999)
+
+        sm_in = sm.astype(float)
+
+        pytesmo_swi = exp_filter(sm_in, np.asarray(dates, dtype=float),
+                                 ctime=ctime_pytesmo, nan=999)
+
+        swi_ts = swi_ts_test['SWI_005']
+
+        np.testing.assert_array_almost_equal(swi_ts, pytesmo_swi, 4)
+
     def test_process_swi_gain(self):
         """
         Test gain in/out of the SWI calculation.
