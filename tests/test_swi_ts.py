@@ -53,8 +53,8 @@ class SwiTest(unittest.TestCase):
                           'ssf': [1, 1, 1, 1, 1, 1, 1, 1, 1]}, index=pd_dates)
 
         swi_ts_test, gain_test = process_swi_pd(ssm_userformat_data_test,
-                                                ctime=[ctime], denom_init=1,
-                                                nom_init=1)
+                                                ctime=[ctime], denom_init=0,
+                                                nom_init=0)
 
         sm_in = ssm_userformat_data_test['sm'].values.astype(float)
 
@@ -101,11 +101,11 @@ class SwiTest(unittest.TestCase):
                                     index=pd_dates_part2)
 
         swi_ts_part1, gain_test = process_swi_pd(ssm_ut_part1, ctime=ctime,
-                                                 denom_init=1, nom_init=1)
+                                                 denom_init=0, nom_init=0)
 
         swi_ts_part2, gain_test = process_swi_pd(ssm_ut_part2, ctime=ctime,
                                                  gain_in=gain_test,
-                                                 denom_init=1, nom_init=1)
+                                                 denom_init=0, nom_init=0)
 
         sm_in = ssm_ut_whole['sm'].values.astype(float)
 
@@ -143,7 +143,7 @@ class SwiTest(unittest.TestCase):
 
         swi_ts_test, gain_test = \
             process_swi_pd(ssm_userformat_data_test, ctime=[ctime],
-                           proc_param=proc_param, denom_init=1, nom_init=1)
+                           proc_param=proc_param, denom_init=0, nom_init=0)
 
         sm_in = sm_pytesmo.astype(float)
 
@@ -166,7 +166,7 @@ class SwiTest(unittest.TestCase):
         sm = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90])
 
         swi_ts_test, gain_test = process_swi(sm, dates, ctime=ctime,
-                                             denom_init=1, nom_init=1)
+                                             denom_init=0, nom_init=0)
 
         sm_in = sm.astype(float)
 
@@ -190,7 +190,7 @@ class SwiTest(unittest.TestCase):
         sm = np.array([10, 20, 30, 40, 50, 60, 999, 80, 10])
 
         swi_ts_test, gain_test = process_swi(sm, dates, ctime=ctime,
-                                             denom_init=1, nom_init=1, nan=999)
+                                             denom_init=0, nom_init=0, nan=999)
 
         sm_in = sm.astype(float)
 
@@ -220,12 +220,12 @@ class SwiTest(unittest.TestCase):
         sm_data_part2 = np.array(sm_data[5:])
 
         swi_ts_part1, gain_test = process_swi(sm_data_part1, dates_part1,
-                                              ctime=[ctime], denom_init=1,
-                                              nom_init=1)
+                                              ctime=[ctime], denom_init=0,
+                                              nom_init=0)
 
         swi_ts_part2, gain_test = process_swi(sm_data_part2, dates_part2,
                                               ctime=[ctime], gain_in=gain_test,
-                                              denom_init=1, nom_init=1)
+                                              denom_init=0, nom_init=0)
 
         sm_in = np.array(sm_data).astype(float)
 
@@ -260,7 +260,7 @@ class SwiTest(unittest.TestCase):
 
         swi_ts_test, gain_test = process_swi(sm, dates, ctime=[ctime],
                                              proc_param=proc_param,
-                                             denom_init=1, nom_init=1)
+                                             denom_init=0, nom_init=0)
 
         sm_in = sm_pytesmo.astype(float)
 
@@ -287,7 +287,7 @@ class SwiTest(unittest.TestCase):
         sm = np.array([84, 88, 79, 87, 91, 93, 92, 85, 85, 90])
 
         swi_ts_test, gain_test = process_swi(sm, dates, ctime=ctime,
-                                             denom_init=1, nom_init=1)
+                                             denom_init=0, nom_init=0)
 
         sm_in = sm.astype(float)
 
@@ -321,7 +321,7 @@ class SwiTest(unittest.TestCase):
 
         swi_ts_test, gain_test = process_swi(sm, dates, ctime=ctime,
                                              jd_daily_out=True,
-                                             denom_init=1, nom_init=1)
+                                             denom_init=0, nom_init=0)
 
         pytesmo_sm = np.array([84, 88, 79, 87, 91, 93, 92, 85, 85, 90])
 
@@ -430,16 +430,16 @@ class SwiTest(unittest.TestCase):
         sm_noise2 = sm_noise[5:]
 
         swi_ts_all, gain_all = process_swi(sm, dates, ctime=ctime,
-                                           ssm_noise=sm_noise, denom_init=1,
-                                           nom_init=1)
+                                           ssm_noise=sm_noise, denom_init=0,
+                                           nom_init=0)
 
         swi_ts_1, gain_1 = process_swi(sm_data_part1, dates_part1, ctime=ctime,
                                        ssm_noise=sm_noise1,
-                                       denom_init=1, nom_init=1)
+                                       denom_init=0, nom_init=0)
 
         swi_ts_2, gain_2 = process_swi(sm_data_part2, dates_part2, ctime=ctime,
                                        ssm_noise=sm_noise2, gain_in=gain_1,
-                                       denom_init=1, nom_init=1)
+                                       denom_init=0, nom_init=0)
 
         swi_ns_ctime1 = swi_ts_1['SWI_NOISE_005'].tolist()
         swi_ns_ctime2 = swi_ts_2['SWI_NOISE_005'].tolist()

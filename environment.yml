@@ -29,7 +29,7 @@ dependencies:
   - pykdtree==1.2.1
   - pyparsing==2.2.0
   - pyproj==1.9.5.1
-  - pytesmo==0.6.2
+  - pytesmo==0.6.10
   - scipy==0.18.1
   - subprocess32==3.2.7
   - iterative_storage==0.1

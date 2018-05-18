@@ -40,7 +40,7 @@ float32_nan = -999999.
 
 def process_swi_pd(ssm_userformat_data, proc_param={},
                    ctime=[1, 5, 10, 15, 20, 40, 60, 100], gain_in=None,
-                   jd_daily_out=False, ssm_noise=None, nom_init=1, denom_init=1,
+                   jd_daily_out=False, ssm_noise=None, nom_init=0, denom_init=0,
                    nan=-999999.0):
     """
     Processing of surface soil water index and the gain value.
@@ -106,8 +106,8 @@ def process_swi_pd(ssm_userformat_data, proc_param={},
 
 
 def process_swi(ssm, jd, proc_param={}, ctime=[1, 5, 10, 15, 20, 40, 60, 100],
-                gain_in=None, ssm_noise=None, jd_daily_out=False, nom_init=1,
-                denom_init=1, nan=-999999.0):
+                gain_in=None, ssm_noise=None, jd_daily_out=False, nom_init=0,
+                denom_init=0, nan=-999999.0):
     """
     Processing of surface soil water index and the gain value.
     The ssm should already be filtered.
@@ -218,7 +218,7 @@ def process_swi(ssm, jd, proc_param={}, ctime=[1, 5, 10, 15, 20, 40, 60, 100],
 
 def calc(ssm_ts, swi_ts, gain=None,
          ctime=np.array([1, 5, 10, 15, 20, 40, 60, 100]), ssm_noise=None,
-         nom_init=1, denom_init=1, nan=-999999.0):
+         nom_init=0, denom_init=0, nan=-999999.0):
     """
     Calculation of surface soil water index.
 
