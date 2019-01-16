@@ -1593,7 +1593,7 @@ static const char __pyx_k_nom[] = "nom";
 static const char __pyx_k_ssm[] = "ssm";
 static const char __pyx_k_main[] = "__main__";
 static const char __pyx_k_test[] = "__test__";
-static const char __pyx_k_ctime[] = "ctime";
+static const char __pyx_k_ctime[] = "tvalue";
 static const char __pyx_k_denom[] = "denom";
 static const char __pyx_k_empty[] = "empty";
 static const char __pyx_k_numpy[] = "numpy";
@@ -1608,7 +1608,7 @@ static const char __pyx_k_juldate[] = "juldate";
 static const char __pyx_k_len_swi[] = "len_swi";
 static const char __pyx_k_denom_ns[] = "denom_ns";
 static const char __pyx_k_exp_term[] = "exp_term";
-static const char __pyx_k_len_ctime[] = "len_ctime";
+static const char __pyx_k_len_ctime[] = "len_tvalue";
 static const char __pyx_k_nom_noise[] = "nom_noise";
 static const char __pyx_k_ssm_noise[] = "ssm_noise";
 static const char __pyx_k_swi_noise[] = "swi_noise";
@@ -1863,7 +1863,7 @@ static PyObject *__pyx_pw_5pyswi_6swi_ts_17swi_calc_routines_1swi_calc_cy(PyObje
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_juldate), __pyx_ptype_5numpy_ndarray, 1, "juldate", 0))) __PYX_ERR(0, 19, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_ssm), __pyx_ptype_5numpy_ndarray, 1, "ssm", 0))) __PYX_ERR(0, 20, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_ctime), __pyx_ptype_5numpy_ndarray, 1, "ctime", 0))) __PYX_ERR(0, 21, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_ctime), __pyx_ptype_5numpy_ndarray, 1, "tvalue", 0))) __PYX_ERR(0, 21, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_swi_jd), __pyx_ptype_5numpy_ndarray, 1, "swi_jd", 0))) __PYX_ERR(0, 22, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_swi_ts), __pyx_ptype_5numpy_ndarray, 1, "swi_ts", 0))) __PYX_ERR(0, 23, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_swi_qflag), __pyx_ptype_5numpy_ndarray, 1, "swi_qflag", 0))) __PYX_ERR(0, 24, __pyx_L1_error)
@@ -2729,7 +2729,7 @@ static PyObject *__pyx_pw_5pyswi_6swi_ts_17swi_calc_routines_3swi_calc_cy_noise(
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_juldate), __pyx_ptype_5numpy_ndarray, 1, "juldate", 0))) __PYX_ERR(0, 73, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_ssm), __pyx_ptype_5numpy_ndarray, 1, "ssm", 0))) __PYX_ERR(0, 74, __pyx_L1_error)
-  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_ctime), __pyx_ptype_5numpy_ndarray, 1, "ctime", 0))) __PYX_ERR(0, 75, __pyx_L1_error)
+  if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_ctime), __pyx_ptype_5numpy_ndarray, 1, "tvalue", 0))) __PYX_ERR(0, 75, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_swi_jd), __pyx_ptype_5numpy_ndarray, 1, "swi_jd", 0))) __PYX_ERR(0, 76, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_swi_ts), __pyx_ptype_5numpy_ndarray, 1, "swi_ts", 0))) __PYX_ERR(0, 77, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_nom), __pyx_ptype_5numpy_ndarray, 1, "nom", 0))) __PYX_ERR(0, 78, __pyx_L1_error)

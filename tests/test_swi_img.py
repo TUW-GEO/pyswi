@@ -24,7 +24,7 @@ import numpy as np
 
 from pyswi.swi_img.iterative_swi import IterativeSWI
 from pyswi.swi_img.iterative_swi import IterativeMultiSWI
-from pyswi.swi_img.swi_img import iterative_swi
+from pyswi.swi_img.calc import iterative_swi
 
 
 class IterativeSwiTest(unittest.TestCase):
@@ -166,7 +166,7 @@ class IterativeSwiTest(unittest.TestCase):
     def test_multi_iterative_swi(self):
         """
         Test correct calculation of SWI including the import of the test data
-        compared to a hardcoded calculated output for different ctime values.
+        compared to a hardcoded calculated output for different tvalue values.
         """
 
         ssm = np.array([45., 46., 32., 51., 65., 23., 54., 44., 23., 42., 46.,

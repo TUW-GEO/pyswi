@@ -382,7 +382,7 @@ class SwiTest(unittest.TestCase):
 
     def test_process_swi_noise(self):
         """
-        Test correct calculation of SWI Noise inside the swi calculation
+        Test correct calculation of SWI Noise inside the SWI calculation
         process.
         """
 
