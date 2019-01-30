@@ -68,6 +68,7 @@ class IterativeMultiWeiSWI(object):
         self.iterative_swi = iter_swi
         self.tvalues = tvalues
 
+
     def load_iter_data(self):
         """
         Loads the iterative swi_img data for all tvalue values
@@ -77,12 +78,14 @@ class IterativeMultiWeiSWI(object):
         for it_data in self.iterative_swi:
             it_data.load_iter_data()
 
+
     def store_iter_data(self):
         """ Stores the iterative swi_img data to the iter_data_path. """
         for it_data in self.iterative_swi:
             it_data.store_iter_data()
 
-    def calc_iter(self, next_ssm_jd, next_ssm, next_w):
+
+    def calc_iter(self, next_ssm_jd, next_ssm, next_w, ind):
         """
         Calculate SWI iteratively.
 
@@ -94,6 +97,8 @@ class IterativeMultiWeiSWI(object):
             surface soil moisture
         next_w : numpy.array
             weights given to ssm values
+        ind : numpy.array
+            indices in iter_arr to which values of next_ssm correspond
 
         Returns
         ------
@@ -106,7 +111,7 @@ class IterativeMultiWeiSWI(object):
 
         for i in range(0, len(self.tvalues)):
             key = "SWI_%03d" % (self.tvalues[i],)
-            swi_dict[key] = self.iterative_swi[i].calc_iter(next_ssm_jd, next_ssm, next_w)
+            swi_dict[key] = self.iterative_swi[i].calc_iter(next_ssm_jd,next_ssm,next_w,ind)
 
         return swi_dict
 
@@ -145,19 +150,20 @@ class IterativeWeiSWI(object):
         """
         pref = "SWI_%03d" % (tvalue,)
         self.iter_data_path = iter_data_path
-        self.float_nan = -999999.
+        self.float_nan = np.nan
         self.iterstepdata = IterStepData(self.iter_data_path,
                                          len(ssm),
                                          {'swi': self.float_nan,
-                                          'qflag': self.float_nan,
-                                          'den': self.float_nan,
-                                          'n': self.float_nan,
-                                          'wsum': self.float_nan,
+                                          'qflag': 0.0,
+                                          'den': 1.0,
+                                          'n': 1,
+                                          'wsum': 0.0,
                                           'jd': self.float_nan},
-                                         prefix=pref)
+                                          prefix=pref)
         self.tvalue = tvalue
         self.processing_start = datetime.now()
         self.load_iter_data()
+
 
     def load_iter_data(self):
         """
@@ -169,11 +175,13 @@ class IterativeWeiSWI(object):
         else:
             self.iter_data = self.iterstepdata.read_latest_iter_data()
 
+
     def store_iter_data(self):
         """ Stores the iterative swi_img data to the iter_data_path. """
         self.iterstepdata.save_iter_data(self.iter_data)
 
-    def calc_iter(self, next_ssm_jd, next_ssm, next_w):
+
+    def calc_iter(self, next_ssm_jd, next_ssm, next_w, ind):
         """
         Calculate weighted SWI iteratively.
 
@@ -185,6 +193,8 @@ class IterativeWeiSWI(object):
             surface soil moisture
         next_w : numpy.array
             weights given to ssm values
+        ind : numpy.array
+            indices in iter_arr to which values of next_ssm correspond
 
         Returns
         ------
@@ -194,12 +204,16 @@ class IterativeWeiSWI(object):
         """
 
         # load values from previous calculation
-        swi = self.iter_data['swi']
-        qflag = self.iter_data['qflag']
-        den = self.iter_data['den']
-        n = self.iter_data['n']
-        wsum = self.iter_data['wsum']
-        jd = self.iter_data['jd']
+        swi = self.iter_data['swi'][ind]
+        qflag = self.iter_data['qflag'][ind]
+        den = self.iter_data['den'][ind]
+        n = self.iter_data['n'][ind]
+        wsum = self.iter_data['wsum'][ind]
+        jd = self.iter_data['jd'][ind]
+
+        still_untouched = np.isnan(swi)
+        swi[still_untouched] = next_ssm[still_untouched]
+        jd[still_untouched] = next_ssm_jd[still_untouched]
 
         # calculate new values
         next_swi, next_qflag, next_den, next_n, next_wsum = \
@@ -207,15 +221,15 @@ class IterativeWeiSWI(object):
                                    self.tvalue, swi, den, n, wsum, qflag, jd)
 
         # update values of iter_data with now calculated values
-        self.iter_data['swi'] = next_swi
-        self.iter_data['qflag'] = next_qflag
-        self.iter_data['den'] = next_den
-        self.iter_data['n'] = next_n
-        self.iter_data['wsum'] = next_wsum
-        self.iter_data['jd'] = next_ssm_jd
+        self.iter_data['swi'][ind] = next_swi
+        self.iter_data['qflag'][ind] = next_qflag
+        self.iter_data['den'][ind] = next_den
+        self.iter_data['n'][ind] = next_n
+        self.iter_data['wsum'][ind] = next_wsum
+        self.iter_data['jd'][ind] = next_ssm_jd
 
         # update iter_data header for complete file.
-        valid_jd = np.where(self.iter_data['jd'] != self.float_nan)
+        valid_jd = np.isfinite(self.iter_data['jd'])
         header = {'sensing_start': julian2datetime(
                       np.min(self.iter_data['jd'][valid_jd])),
                   'sensing_end': julian2datetime(
@@ -224,4 +238,4 @@ class IterativeWeiSWI(object):
                   'processing_end': datetime.now()}
 
         self.iter_data['header'].update(header)
-        return swi
+        return self.iter_data['swi']
