@@ -14,6 +14,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import os
 from datetime import datetime
 
 import numpy as np
@@ -60,12 +61,15 @@ class IterativeMultiWeiSWI(object):
             Array of the tvalue integer values used for the SWI calculation.
         """
         iter_swi = []
+        prev_iter_files = []
 
         for i in range(0, len(tvalues)):
             it_swi = IterativeWeiSWI(ssm, iter_data_path, tvalues[i])
             iter_swi.append(it_swi)
+            prev_iter_files.append(it_swi.iterstepdata.files)
 
         self.iterative_swi = iter_swi
+        self.prev_iter_files = prev_iter_files
         self.tvalues = tvalues
 
 
@@ -83,6 +87,13 @@ class IterativeMultiWeiSWI(object):
         """ Stores the iterative swi_img data to the iter_data_path. """
         for it_data in self.iterative_swi:
             it_data.store_iter_data()
+
+
+    def remove_prev_iter_files(self):
+        """ Removes the previous iter files in the iter_data_path. """
+        for it_file_list in self.prev_iter_files:
+            for it_file in it_file_list:
+                os.remove(it_file)
 
 
     def calc_iter(self, next_ssm_jd, next_ssm, next_w, ind):
