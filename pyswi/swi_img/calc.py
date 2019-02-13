@@ -126,27 +126,25 @@ def iterative_weighted_swi(next_ssm, next_w, next_ssm_jd, tvalue,
         sum of weights for next iteration
     """
 
-    next_ssm = next_ssm.astype(np.float)
-
     # Calculate the exponential term
-    time_diff = (next_ssm_jd - jd).astype(np.float)
+    time_diff = (next_ssm_jd - jd)
     next_e_term = np.exp(-(time_diff / float(tvalue)))
 
     # calculate qflag based on previous values
-    next_qflag = 1.0 + next_e_term * qflag
+    next_qflag = (1.0 + next_e_term * qflag).astype(np.float32)
 
     # calculate denominator based on previous values
-    next_den = 1.0 + next_e_term * den.astype(np.float)
+    next_den = (1.0 + next_e_term * den).astype(np.float32)
 
     # increase total number of iterations (i=0, regularly)
-    next_n = n + 1.0
+    next_n = (n + 1.0).astype(np.int32)
 
     # calculate next sum of weights
-    next_wsum = next_w + wsum.astype(np.float)
+    next_wsum = (next_w + wsum).astype(np.float32)
 
     # calculate weighted SWI
     next_swi = ((swi * next_n / n * wsum * (next_den - 1) +
                  next_ssm * next_n * next_w) /
-                (next_wsum * next_den))
+                (next_wsum * next_den)).astype(np.float32)
 
     return next_swi, next_qflag, next_den, next_n, next_wsum

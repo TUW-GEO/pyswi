@@ -161,14 +161,14 @@ class IterativeWeiSWI(object):
         """
         pref = "SWI_%03d" % (tvalue,)
         self.iter_data_path = iter_data_path
-        self.float_nan = np.nan
+        self.float_nan = np.float32(np.nan)
         self.iterstepdata = IterStepData(self.iter_data_path,
                                          len(ssm),
                                          {'swi': self.float_nan,
-                                          'qflag': 0.0,
-                                          'den': 1.0,
-                                          'n': 1,
-                                          'wsum': 0.0,
+                                          'qflag': np.float32(0.0),
+                                          'den': np.float32(1.0),
+                                          'n': np.uint32(1),
+                                          'wsum': np.float32(0.0),
                                           'jd': self.float_nan},
                                           prefix=pref)
         self.tvalue = tvalue
