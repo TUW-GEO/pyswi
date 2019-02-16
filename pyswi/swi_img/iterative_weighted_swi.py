@@ -1,5 +1,4 @@
-# Copyright (c) 2017, Vienna University of Technology (TU Wien), Department
-# of Geodesy and Geoinformation (GEO).
+# Copyright (c) 2019, TU Wien, Department of Geodesy and Geoinformation (GEO).
 # All rights reserved.
 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -18,6 +17,7 @@ import os
 from datetime import datetime
 
 import numpy as np
+
 from iterative_storage.iter_data import IterStepData
 from pytesmo.timedate.julian import julian2datetime
 
@@ -25,14 +25,15 @@ from pyswi.swi_img.calc import iterative_weighted_swi
 
 
 class IterativeMultiWeiSWI(object):
-    """Class for calculation of the weighted SWI in iterative mode.
+    """
+    Class for calculation of the weighted SWI in iterative mode.
 
     This means that previous_swi, previous_gain, previous_qflag and
     previous_julian_date have to be stored for a successful
     restart after a break.
 
-    This class depends on the IterativeSWI class, but takes multiple tvalues as
-    argument.
+    This class depends on the IterativeSWI class, but takes multiple T-values
+    as argument.
 
     This is suitable if the SWI is calculated from a series of swaths/images.
 
@@ -72,7 +73,6 @@ class IterativeMultiWeiSWI(object):
         self.prev_iter_files = prev_iter_files
         self.tvalues = tvalues
 
-
     def load_iter_data(self):
         """
         Loads the iterative swi_img data for all tvalue values
@@ -82,19 +82,20 @@ class IterativeMultiWeiSWI(object):
         for it_data in self.iterative_swi:
             it_data.load_iter_data()
 
-
     def store_iter_data(self):
-        """ Stores the iterative swi_img data to the iter_data_path. """
+        """
+        Stores the iterative swi_img data to the iter_data_path.
+        """
         for it_data in self.iterative_swi:
             it_data.store_iter_data()
 
-
     def remove_prev_iter_files(self):
-        """ Removes the previous iter files in the iter_data_path. """
+        """
+        Removes the previous iter files in the iter_data_path.
+        """
         for it_file_list in self.prev_iter_files:
             for it_file in it_file_list:
                 os.remove(it_file)
-
 
     def calc_iter(self, next_ssm_jd, next_ssm, next_w, ind):
         """
@@ -122,13 +123,15 @@ class IterativeMultiWeiSWI(object):
 
         for i in range(0, len(self.tvalues)):
             key = "SWI_%03d" % (self.tvalues[i],)
-            swi_dict[key] = self.iterative_swi[i].calc_iter(next_ssm_jd,next_ssm,next_w,ind)
+            swi_dict[key] = self.iterative_swi[i].calc_iter(
+                next_ssm_jd, next_ssm, next_w, ind)
 
         return swi_dict
 
 
 class IterativeWeiSWI(object):
-    """Class for calculation of the SWI in iterative mode.
+    """
+    Class for calculation of the SWI in iterative mode.
 
     This means that previous_swi, previous_gain, previous_qflag and
     previous_julian_date have to be stored for a successful
@@ -157,7 +160,6 @@ class IterativeWeiSWI(object):
             Soil Moisture values of the whole image.
         iter_data_path: string
             Output and input path of the calculation results.
-
         """
         pref = "SWI_%03d" % (tvalue,)
         self.iter_data_path = iter_data_path
@@ -170,11 +172,10 @@ class IterativeWeiSWI(object):
                                           'n': np.uint32(1),
                                           'wsum': np.float32(0.0),
                                           'jd': self.float_nan},
-                                          prefix=pref)
+                                         prefix=pref)
         self.tvalue = tvalue
         self.processing_start = datetime.now()
         self.load_iter_data()
-
 
     def load_iter_data(self):
         """
@@ -186,11 +187,11 @@ class IterativeWeiSWI(object):
         else:
             self.iter_data = self.iterstepdata.read_latest_iter_data()
 
-
     def store_iter_data(self):
-        """ Stores the iterative swi_img data to the iter_data_path. """
+        """
+        Stores the iterative swi_img data to the iter_data_path.
+        """
         self.iterstepdata.save_iter_data(self.iter_data)
-
 
     def calc_iter(self, next_ssm_jd, next_ssm, next_w, ind):
         """
@@ -211,9 +212,7 @@ class IterativeWeiSWI(object):
         ------
         swi_img: numpy.ndarray
             Array with the new calculated swi_img values.
-
         """
-
         # load values from previous calculation
         swi = self.iter_data['swi'][ind]
         qflag = self.iter_data['qflag'][ind]
@@ -242,11 +241,11 @@ class IterativeWeiSWI(object):
         # update iter_data header for complete file.
         valid_jd = np.isfinite(self.iter_data['jd'])
         header = {'sensing_start': julian2datetime(
-                      np.min(self.iter_data['jd'][valid_jd])),
-                  'sensing_end': julian2datetime(
-                      np.max(self.iter_data['jd'][valid_jd])),
-                  'processing_start': self.processing_start,
-                  'processing_end': datetime.now()}
+            np.min(self.iter_data['jd'][valid_jd])),
+            'sensing_end': julian2datetime(
+            np.max(self.iter_data['jd'][valid_jd])),
+            'processing_start': self.processing_start,
+            'processing_end': datetime.now()}
 
         self.iter_data['header'].update(header)
         return self.iter_data['swi']

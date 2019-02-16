@@ -2,9 +2,7 @@
 pyswi
 =====
 
-
 Python package for the swi calculation for time series and for images.
-
 
 Description
 ===========

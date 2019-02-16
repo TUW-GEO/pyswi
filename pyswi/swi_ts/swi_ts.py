@@ -1,5 +1,4 @@
-# Copyright (c) 2017, Vienna University of Technology (TU Wien), Department
-# of Geodesy and Geoinformation (GEO).
+# Copyright (c) 2019, TU Wien, Department of Geodesy and Geoinformation (GEO).
 # All rights reserved.
 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -14,23 +13,26 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
 """
 This module represents the WARP Processing step Soil Water Index (SWI).
 """
-import numpy as np
-import pyximport
-pyximport.install(setup_args={'include_dirs': [np.get_include()]}, inplace=True)
-
-
-from pyswi.swi_ts.swi_calc_routines import swi_calc_cy
-from pyswi.swi_ts.swi_calc_routines import swi_calc_cy_noise
-
-from future.utils import iteritems
-
-import pytesmo.timedate.julian as julian
-import pandas as pd
 
 from math import exp
+import pandas as pd
+from future.utils import iteritems
+
+import numpy as np
+
+import pytesmo.timedate.julian as julian
+import pyximport
+
+pyximport.install(setup_args={'include_dirs': [
+                  np.get_include()]}, inplace=True)
+
+from pyswi.swi_ts.swi_calc_routines import swi_calc_cy_noise
+from pyswi.swi_ts.swi_calc_routines import swi_calc_cy
+
 
 uint8_nan = np.iinfo(np.uint8).max
 
@@ -40,8 +42,8 @@ float32_nan = -999999.
 
 def process_swi_pd(ssm_userformat_data, proc_param={},
                    ctime=[1, 5, 10, 15, 20, 40, 60, 100], gain_in=None,
-                   jd_daily_out=False, ssm_noise=None, nom_init=0, denom_init=0,
-                   nan=-999999.0):
+                   jd_daily_out=False, ssm_noise=None, nom_init=0,
+                   denom_init=0, nan=-999999.0):
     """
     Processing of surface soil water index and the gain value.
     This function calls the calculate function and handles
@@ -332,7 +334,7 @@ def calc_noise(ssm_noise, jd, ctime=[1, 5]):
     len_sm = len(jd)
     len_ctime = len(ctime)
 
-# var{n_swi} calculation
+    # var{n_swi} calculation
     nom_db = np.zeros((len_sm, len_ctime))
     den_db = np.zeros((len_sm, len_ctime))
     n_swi = np.zeros((len_sm, len_ctime))
@@ -482,8 +484,6 @@ def iterative_swi(ssm, ssm_jd, ctime, prev_swi, prev_gain, prev_qflag, prev_jd):
     swi = prev_swi + gain * (ssm - prev_swi)
 
     return swi, qflag, gain
-
-# --- Help functions ---
 
 
 def pd_datetime_to_juldate(pd_datetimes):
@@ -702,7 +702,7 @@ def gain_outputdict_to_dataframe(gain_dict, ctime):
     """
     last_jd = pd.to_datetime([gain_dict['last_jd'],
                               gain_dict['last_jd']] -
-                              pd.Timestamp(0).to_julian_date(), unit='D')
+                             pd.Timestamp(0).to_julian_date(), unit='D')
 
     dataframe_dict = {}
 
@@ -750,6 +750,6 @@ def gain_dataframe_to_inputdict(gain_dataframe, ctime):
             gain_dataframe["DENOM_%03d" % (ctime[i],)].values[0]
         if "NOM_NS_%03d" % (ctime[i],) in gain_dataframe:
             gain_dict["NOM_NS_%03d" % (ctime[i],)] = \
-                        gain_dataframe["NOM_NS_%03d" % (ctime[i],)].values[0]
+                gain_dataframe["NOM_NS_%03d" % (ctime[i],)].values[0]
 
     return gain_dict

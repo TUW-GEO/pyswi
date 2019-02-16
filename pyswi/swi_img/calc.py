@@ -1,5 +1,4 @@
-# Copyright (c) 2017, Vienna University of Technology (TU Wien), Department
-# of Geodesy and Geoinformation (GEO).
+# Copyright (c) 2019, TU Wien, Department of Geodesy and Geoinformation (GEO).
 # All rights reserved.
 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -17,10 +16,12 @@
 """
 This module represents the WARP Processing step Soil Water Index (SWI).
 """
+
 import numpy as np
 
 
-def iterative_swi(ssm, ssm_jd, tvalue, prev_swi, prev_gain, prev_qflag, prev_jd):
+def iterative_swi(ssm, ssm_jd, tvalue, prev_swi, prev_gain, prev_qflag,
+                  prev_jd):
     """
     Takes input data and previous data and calculates swi_img
     values for the next date. All arrays have to be the same shape
@@ -80,7 +81,7 @@ def iterative_weighted_swi(next_ssm, next_w, next_ssm_jd, tvalue,
 
     Following Equation (9) in the paper...
 
-    Bauer-Marschallinger B, Paulik C, Hochstöger S, Mistelbauer T,
+    Bauer-Marschallinger B, Paulik C, Hochstoeger S, Mistelbauer T,
     Modanesi S, Ciabatta L, Massari C, Brocca L, Wagner W.
     "Soil moisture from fusion of scatterometer and SAR:
     Closing the scale gap with temporal filtering."
