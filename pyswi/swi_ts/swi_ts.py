@@ -13,16 +13,14 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 """
 This module represents the WARP Processing step Soil Water Index (SWI).
 """
 
 from math import exp
-import pandas as pd
-from future.utils import iteritems
 
 import numpy as np
+import pandas as pd
 
 import pytesmo.timedate.julian as julian
 import pyximport
@@ -30,12 +28,10 @@ import pyximport
 pyximport.install(setup_args={'include_dirs': [
                   np.get_include()]}, inplace=True)
 
-from pyswi.swi_ts.swi_calc_routines import swi_calc_cy_noise
 from pyswi.swi_ts.swi_calc_routines import swi_calc_cy
-
+from pyswi.swi_ts.swi_calc_routines import swi_calc_cy_noise
 
 uint8_nan = np.iinfo(np.uint8).max
-
 float64_nan = -999999.
 float32_nan = -999999.
 
@@ -566,7 +562,6 @@ def dict_to_outputdict(inputdict, variables_ctimedep, ctime,
         Each field is for a tvalue value.
         (e.g. SWI_010 for tvalue value 10)
     """
-
     depvar_buffer = {}
 
     for var in variables_ctimedep:
@@ -577,7 +572,7 @@ def dict_to_outputdict(inputdict, variables_ctimedep, ctime,
     for var in variables_other:
         output_dict[var] = inputdict[var]
 
-    for name, value in iteritems(depvar_buffer):
+    for name, value in depvar_buffer.items():
         for i in range(0, len(ctime)):
             if value is None:
                 output_dict[name.upper()+"_%03d" % (ctime[i],)] = None
