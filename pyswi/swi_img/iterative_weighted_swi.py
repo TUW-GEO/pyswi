@@ -167,10 +167,10 @@ class IterativeWeiSWI(object):
         self.iterstepdata = IterStepData(self.iter_data_path,
                                          len(ssm),
                                          {'swi': self.float_nan,
-                                          'qflag': np.float32(0.0),
-                                          'den': np.float32(1.0),
-                                          'n': np.uint32(1),
-                                          'wsum': np.float32(0.0),
+                                          'qflag': self.float_nan,
+                                          'den': self.float_nan,
+                                          'n': 0,
+                                          'wsum': self.float_nan,
                                           'jd': self.float_nan},
                                          prefix=pref)
         self.tvalue = tvalue
@@ -223,6 +223,10 @@ class IterativeWeiSWI(object):
 
         still_untouched = np.isnan(swi)
         swi[still_untouched] = next_ssm[still_untouched]
+        wsum[still_untouched] = next_w[still_untouched]
+        qflag[still_untouched] = 1.0
+        den[still_untouched] = 1.0
+        n[still_untouched] = 1
         jd[still_untouched] = next_ssm_jd[still_untouched]
 
         # calculate new values
