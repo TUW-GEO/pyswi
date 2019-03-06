@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.3.3
+=============
+
+- correct initialisation of weighted SWI
+
 Version 0.3.2
 =============
 
