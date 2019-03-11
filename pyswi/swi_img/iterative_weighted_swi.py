@@ -22,6 +22,7 @@ from iterative_storage.iter_data import IterStepData
 from pytesmo.timedate.julian import julian2datetime
 
 from pyswi.swi_img.calc import iterative_weighted_swi
+from pyswi.swi_img.calc import iterative_weighted_swi_qflag
 
 
 class IterativeMultiWeiSWI(object):
@@ -97,7 +98,7 @@ class IterativeMultiWeiSWI(object):
             for it_file in it_file_list:
                 os.remove(it_file)
 
-    def calc_iter(self, next_ssm_jd, next_ssm, next_w, ind):
+    def calc_iter(self, next_ssm_jd, next_ssm, next_w, ind, calculate_qflag=False):
         """
         Calculate SWI iteratively.
 
@@ -111,6 +112,9 @@ class IterativeMultiWeiSWI(object):
             weights given to ssm values
         ind : numpy.array
             indices in iter_arr to which values of next_ssm correspond
+        calculate_qflag : bool, optional
+            should the qflag be calculated (only True if iteration over
+            constant timesteps (e.g. daily)
 
         Returns
         ------
@@ -124,7 +128,7 @@ class IterativeMultiWeiSWI(object):
         for i in range(0, len(self.tvalues)):
             key = "SWI_%03d" % (self.tvalues[i],)
             swi_dict[key] = self.iterative_swi[i].calc_iter(
-                next_ssm_jd, next_ssm, next_w, ind)
+                next_ssm_jd, next_ssm, next_w, ind, calculate_qflag=calculate_qflag)
 
         return swi_dict
 
@@ -167,11 +171,11 @@ class IterativeWeiSWI(object):
         self.iterstepdata = IterStepData(self.iter_data_path,
                                          len(ssm),
                                          {'swi': self.float_nan,
-                                          'qflag': self.float_nan,
+                                          'qflag': 1.0,
                                           'den': self.float_nan,
                                           'n': 0,
                                           'wsum': self.float_nan,
-                                          'jd': self.float_nan},
+                                          'jd': np.float64(np.nan)},
                                          prefix=pref)
         self.tvalue = tvalue
         self.processing_start = datetime.now()
@@ -193,7 +197,7 @@ class IterativeWeiSWI(object):
         """
         self.iterstepdata.save_iter_data(self.iter_data)
 
-    def calc_iter(self, next_ssm_jd, next_ssm, next_w, ind):
+    def calc_iter(self, next_ssm_jd, next_ssm, next_w, ind, calculate_qflag=False):
         """
         Calculate weighted SWI iteratively.
 
@@ -207,6 +211,9 @@ class IterativeWeiSWI(object):
             weights given to ssm values
         ind : numpy.array
             indices in iter_arr to which values of next_ssm correspond
+        calculate_qflag : bool, optional
+            should the qflag be calculated (only True if iteration over
+            constant timesteps (e.g. daily)
 
         Returns
         ------
@@ -215,32 +222,41 @@ class IterativeWeiSWI(object):
         """
         # load values from previous calculation
         swi = self.iter_data['swi'][ind]
-        qflag = self.iter_data['qflag'][ind]
         den = self.iter_data['den'][ind]
         n = self.iter_data['n'][ind]
         wsum = self.iter_data['wsum'][ind]
         jd = self.iter_data['jd'][ind]
+        if calculate_qflag:
+            qflag = self.iter_data['qflag'][ind]
 
         still_untouched = np.isnan(swi)
         swi[still_untouched] = next_ssm[still_untouched]
         wsum[still_untouched] = next_w[still_untouched]
-        qflag[still_untouched] = 1.0
         den[still_untouched] = 1.0
         n[still_untouched] = 1
         jd[still_untouched] = next_ssm_jd[still_untouched]
+        if calculate_qflag:
+            qflag[still_untouched] = 1.0
 
         # calculate new values
-        next_swi, next_qflag, next_den, next_n, next_wsum = \
-            iterative_weighted_swi(next_ssm, next_w, next_ssm_jd,
-                                   self.tvalue, swi, den, n, wsum, qflag, jd)
+        if calculate_qflag:
+            next_swi, next_qflag, next_den, next_n, next_wsum = \
+                iterative_weighted_swi_qflag(next_ssm, next_w, next_ssm_jd,
+                                       self.tvalue, swi, den, n, wsum, qflag, jd)
+        else:
+            next_swi, next_den, next_n, next_wsum = \
+                iterative_weighted_swi(next_ssm, next_w, next_ssm_jd,
+                                       self.tvalue, swi, den, n, wsum, jd)
+
 
         # update values of iter_data with now calculated values
         self.iter_data['swi'][ind] = next_swi
-        self.iter_data['qflag'][ind] = next_qflag
         self.iter_data['den'][ind] = next_den
         self.iter_data['n'][ind] = next_n
         self.iter_data['wsum'][ind] = next_wsum
         self.iter_data['jd'][ind] = next_ssm_jd
+        if calculate_qflag:
+            self.iter_data['qflag'][ind] = next_qflag
 
         # update iter_data header for complete file.
         valid_jd = np.isfinite(self.iter_data['jd'])

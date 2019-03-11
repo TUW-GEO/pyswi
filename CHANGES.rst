@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Version 0.3.4
+=============
+
+- weighted SWI does not calculate QFLAG by default (which should be done only daily). Needs proper implementation in the future.
+
 Version 0.3.3
 =============
 
