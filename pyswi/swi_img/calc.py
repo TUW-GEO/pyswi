@@ -141,6 +141,10 @@ def iterative_weighted_swi(next_ssm, next_w, next_ssm_jd, tvalue,
                  next_ssm * next_n * next_w) /
                 (next_wsum * next_den)).astype(np.float32)
 
+    # rectify overshooting due to weighting
+    next_swi[np.where(next_swi < 0)] = 0
+    next_swi[np.where(next_swi > 100)] = 100
+
     return next_swi, next_den, next_n, next_wsum
 
 
@@ -211,5 +215,9 @@ def iterative_weighted_swi_qflag(next_ssm, next_w, next_ssm_jd, tvalue,
     next_swi = ((swi * next_n / n * wsum * (next_den - 1) +
                  next_ssm * next_n * next_w) /
                 (next_wsum * next_den)).astype(np.float32)
+
+    # rectify overshooting due to weighting
+    next_swi[np.where(next_swi < 0)] = 0
+    next_swi[np.where(next_swi > 100)] = 100
 
     return next_swi, next_qflag, next_den, next_n, next_wsum
