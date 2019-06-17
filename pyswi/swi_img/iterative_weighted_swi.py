@@ -187,7 +187,10 @@ class IterativeWeiSWI(object):
         If there is no feasible file, the iter_data is set empty.
         """
         if self.iterstepdata.files_available is False:
-            self.iter_data = self.iterstepdata.get_empty_data()
+            empty_data = self.iterstepdata.get_empty_data()
+            empty_data['header']['processing_start'] = datetime(1900, 1, 1)
+            empty_data['header']['processing_end'] = datetime(1901, 1, 1)
+            self.iter_data = empty_data
         else:
             self.iter_data = self.iterstepdata.read_latest_iter_data()
 
@@ -260,12 +263,10 @@ class IterativeWeiSWI(object):
 
         # update iter_data header for complete file.
         valid_jd = np.isfinite(self.iter_data['jd'])
-        header = {'sensing_start': julian2datetime(
-            np.min(self.iter_data['jd'][valid_jd])),
-            'sensing_end': julian2datetime(
-            np.max(self.iter_data['jd'][valid_jd])),
-            'processing_start': self.processing_start,
-            'processing_end': datetime.now()}
+        header = {'sensing_start': julian2datetime(np.min(self.iter_data['jd'][valid_jd])),
+                  'sensing_end': julian2datetime(np.max(self.iter_data['jd'][valid_jd])),
+                  'processing_start': self.processing_start,
+                  'processing_end': datetime.now()}
 
         self.iter_data['header'].update(header)
         return self.iter_data['swi']
