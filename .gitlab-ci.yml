@@ -3,9 +3,6 @@ before_script:
   - conda config --set always_yes yes --set changeps1 no
   - conda update conda
 
-after_script:
-  - conda env remove -n swi_env
-
 variables:
   GIT_SSL_NO_VERIFY: "true"
   PIP_EXTRA_INDEX_URL: "http://dvlp1.geo.tuwien.ac.at:8080/simple"
@@ -27,11 +24,7 @@ test_py27:
     - conda config --set always_yes yes --set changeps1 no
     - conda create -q -n swi_env cython numpy pandas netCDF4 pyproj scipy future
     - source activate swi_env
-    - pip install pygeobase
-    - pip install pygeogrids
-    - pip install pykdtree
-    - pip install pytesmo
-    - pip install iterative_storage
+    - pip install pygeobase pygeogrids pykdtree pytesmo iterative storage
     - python setup.py test
   except:
     - tags
@@ -45,10 +38,7 @@ test_py36:
     - conda config --set always_yes yes --set changeps1 no
     - conda create -q -n swi_env cython numpy pandas netCDF4 pyproj scipy future
     - source activate swi_env
-    - pip install pygeobase
-    - pip install pygeogrids
-    - pip install pykdtree
-    - pip install pytesmo
+    - pip install pygeobase pygeogrids pykdtree pytesmo iterative storage
     - pip install iterative_storage
     - python setup.py test
   except:
@@ -63,11 +53,7 @@ release_job:
     - conda config --set always_yes yes --set changeps1 no
     - conda create -q -n swi_env cython numpy pandas netCDF4 pyproj scipy future
     - source activate swi_env
-    - pip install pygeobase
-    - pip install pygeogrids
-    - pip install pykdtree
-    - pip install pytesmo
-    - pip install iterative_storage
+    - pip install pygeobase pygeogrids pykdtree pytesmo iterative storage
     - python setup.py test
     - python setup.py sdist
   artifacts:
