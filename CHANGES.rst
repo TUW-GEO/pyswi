@@ -2,16 +2,27 @@
 Changelog
 =========
 
+Version 0.4.0
+=============
+
+- Fixing performance bug in swi_ts by avoiding pandas.to_datetime function
+- New simplified interface for swi_ts
+
+Version 0.3.5
+=============
+
+- Adds processing_start/end to empty_data
+
 Version 0.3.4
 =============
 
-- weighted SWI does not calculate QFLAG by default (which should be done only daily). Needs proper implementation in the future.
-- weighted SWI rectifies overshooting due to weighting (--> 0% > SWI < 100%)
+- Weighted SWI does not calculate QFLAG by default (which should be done only daily). Needs proper implementation in the future.
+- Weighted SWI rectifies overshooting due to weighting (--> 0% > SWI < 100%)
 
 Version 0.3.3
 =============
 
-- correct initialisation of weighted SWI
+- Correct initialisation of weighted SWI
 
 Version 0.3.2
 =============
