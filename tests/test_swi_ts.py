@@ -1,4 +1,4 @@
-# Copyright (c) 2017, Vienna University of Technology (TU Wien), Department
+# Copyright (c) 2019, Vienna University of Technology (TU Wien), Department
 # of Geodesy and Geoinformation (GEO).
 # All rights reserved.
 
@@ -13,451 +13,211 @@
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 """
 This module tests the soil water index calculation.
 """
 
-from pyswi.swi_ts.swi_ts import calc_noise
-from pyswi.swi_ts.swi_ts import calc_noise_rec
-
-import unittest
-
 import numpy as np
+from numpy.lib.recfunctions import unstructured_to_structured
 import pandas as pd
-import pytesmo.timedate.julian as julian
 from pytesmo.time_series.filters import exp_filter
 
-from pyswi.swi_ts.swi_ts import process_swi
-from pyswi.swi_ts.swi_ts import process_swi_pd
+from pyswi.swi_ts.swi_ts import calc_swi_ts, calc_swi_noise, calc_swi_noise_rec
 
 
-class SwiTest(unittest.TestCase):
+def test_process_swi_calc():
+    """
+    Test correct calculation of SWI, compared to the pytesmo calculation.
+    """
+    t_value = [5, 50, 100]
 
-    def setUp(self):
-        """
-        Setup I/O objects, configuration file and grid.
-        """
+    swi_jd = pd.date_range(
+        '2007-01-01', periods=9).to_julian_date().values.astype(np.float64)
 
-    def test_process_uf_pd_calc(self):
-        """
-        Test correct calculation of SWI, compared to the pytesmo calculation.
-        """
-        ctime = 5
+    sm = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90], dtype=np.float32)
 
-        dates = pd.date_range('2007-01-01', periods=9).to_julian_date().values
-        pd_dates = pd.date_range('2007-01-01', periods=9)
+    dtype = np.dtype([('jd', np.float64), ('sm', np.float32)])
+    ssm_ts = unstructured_to_structured(
+        np.hstack((swi_jd[:, np.newaxis], sm[:, np.newaxis])), dtype=dtype)
 
-        ssm_userformat_data_test = \
-            pd.DataFrame({'jd': pd_dates,
-                          'sm': [10, 20, 30, 40, 50, 60, 70, 80, 90],
-                          'ssf': [1, 1, 1, 1, 1, 1, 1, 1, 1]}, index=pd_dates)
+    swi_ts, gain_out = calc_swi_ts(ssm_ts, swi_jd, t_value=t_value)
 
-        swi_ts_test, gain_test = process_swi_pd(ssm_userformat_data_test,
-                                                ctime=[ctime], denom_init=0,
-                                                nom_init=0)
+    for t in t_value:
+        pytesmo_swi = exp_filter(sm.astype(np.float64), swi_jd, t)
+        np.testing.assert_array_almost_equal(swi_ts['swi_{}'.format(t)],
+                                             pytesmo_swi, 4)
 
-        sm_in = ssm_userformat_data_test['sm'].values.astype(float)
 
-        pytesmo_swi = exp_filter(sm_in, np.asarray(dates, dtype=float),
-                                 ctime=ctime)
+def test_process_swi_calc_nan_values():
+    """
+    Test correct calculation of SWI, compared to the pytesmo calculation
+    including nan values.
+    """
+    t_value = [5, 50, 100]
 
-        swi_ts = swi_ts_test['SWI_005']
+    swi_jd = pd.date_range(
+        '2007-01-01', periods=9).to_julian_date().values.astype(np.float64)
 
-        np.testing.assert_array_almost_equal(swi_ts, pytesmo_swi, 4)
+    sm = np.array([10, 20, 30, 40, 50, 60, 999, 80, 10])
 
-    def test_process_uf_pd_gain(self):
-        """
-        Test gain in/out of the SWI calculation.
-        It calculates the first 4 days and returns the value and gain and then
-        starts the calculation of day 5 to 9 and
-        compares it with pytesmo over the whole period.
-        """
+    dtype = np.dtype([('jd', np.float64), ('sm', np.float32)])
+    ssm_ts = unstructured_to_structured(
+        np.hstack((swi_jd[:, np.newaxis], sm[:, np.newaxis])), dtype=dtype)
 
-        ctime_pytesmo = 5
-        ctime = [5, 50, 100]
+    swi_ts, gain_out = calc_swi_ts(ssm_ts, swi_jd, t_value=t_value, nan=999)
 
-        dates = pd.date_range('2007-01-01', periods=9).to_julian_date().values
-        pd_dates = pd.date_range('2007-01-01', periods=9)
+    for t in t_value:
+        pytesmo_swi = exp_filter(sm.astype(np.float64), swi_jd, t, nan=999)
+        np.testing.assert_array_almost_equal(swi_ts['swi_{}'.format(t)],
+                                             pytesmo_swi, 4)
 
-        sm_data = [10, 20, 30, 40, 50, 60, 70, 80, 90]
-        ssf_data = [1, 1, 1, 1, 1, 1, 1, 1, 1]
 
-        ssm_ut_whole = pd.DataFrame({'jd': pd_dates, 'sm': sm_data,
-                                     'ssf': ssf_data}, index=pd_dates)
+def test_process_swi_gain():
+    """
+    Test gain in/out of the SWI calculation.
+    It calculates the first 4 days and returns the value and gain and
+    then starts the calculation of day 5 to 9 and
+    compares it with pytesmo over the whole period.
+    """
+    t_value = [5, 50, 100]
 
-        pd_dates_part1 = pd_dates[:-4]
-        pd_dates_part2 = pd_dates[5:]
-        sm_data_part1 = sm_data[:-4]
-        sm_data_part2 = sm_data[5:]
-        ssf_data_part1 = ssf_data[:-4]
-        ssf_data_part2 = ssf_data[5:]
+    swi_jd = pd.date_range(
+        '2007-01-01', periods=9).to_julian_date().values.astype(np.float64)
 
-        ssm_ut_part1 = pd.DataFrame({'jd': pd_dates_part1, 'sm': sm_data_part1,
-                                     'ssf': ssf_data_part1},
-                                    index=pd_dates_part1)
+    sm = np.array([10, 20, 30, 40, 50, 60, 999, 80, 10])
 
-        ssm_ut_part2 = pd.DataFrame({'jd': pd_dates_part2, 'sm': sm_data_part2,
-                                     'ssf': ssf_data_part2},
-                                    index=pd_dates_part2)
+    dtype = np.dtype([('jd', np.float64), ('sm', np.float32)])
+    ssm_ts_part1 = unstructured_to_structured(
+        np.hstack((swi_jd[:5, np.newaxis], sm[:5, np.newaxis])), dtype=dtype)
+    ssm_ts_part2 = unstructured_to_structured(
+        np.hstack((swi_jd[5:, np.newaxis], sm[5:, np.newaxis])), dtype=dtype)
 
-        swi_ts_part1, gain_test = process_swi_pd(ssm_ut_part1, ctime=ctime,
-                                                 denom_init=0, nom_init=0)
+    swi_ts_1, gain_1 = calc_swi_ts(ssm_ts_part1, swi_jd[:5],
+                                   t_value=t_value, nan=999)
 
-        swi_ts_part2, gain_test = process_swi_pd(ssm_ut_part2, ctime=ctime,
-                                                 gain_in=gain_test,
-                                                 denom_init=0, nom_init=0)
+    swi_ts_2, gain_2 = calc_swi_ts(ssm_ts_part2, swi_jd[5:],
+                                   t_value=t_value, gain_in=gain_1,
+                                   nan=999)
 
-        sm_in = ssm_ut_whole['sm'].values.astype(float)
+    for t in t_value:
+        comb_swi_ts = swi_ts_1['swi_{}'.format(t)].tolist() + \
+            swi_ts_2['swi_{}'.format(t)].tolist()
+        pytesmo_swi = exp_filter(sm.astype(np.float64), swi_jd, t, nan=999)
+        np.testing.assert_array_almost_equal(comb_swi_ts,
+                                             pytesmo_swi, 4)
 
-        pytesmo_swi = exp_filter(sm_in, np.asarray(dates, dtype=float),
-                                 ctime=ctime_pytesmo)
 
-        swi_ts_ctime1 = swi_ts_part1['SWI_005'].tolist()
-        swi_ts_ctime2 = swi_ts_part2['SWI_005'].tolist()
+def test_process_swi_not_daily_out():
+    """
+    Test correct calculation of SWI, compared to the pytesmo calculation.
+    """
+    t_value = [5, 50, 100]
 
-        np.testing.assert_array_almost_equal(swi_ts_ctime1+swi_ts_ctime2,
-                                             pytesmo_swi, 5)
+    swi_jd = np.array([2454102.3093969999, 2454103.3644969999,
+                       2454103.873199, 2454104.9282769999,
+                       2454105.9139760002, 2454106.3213539999,
+                       2454107.3070530002, 2454108.3621530002,
+                       2454108.8708330002, 2454109.9259549999])
 
-    def test_process_uf_pd_time(self):
-        """
-        Test correct calculation of SWI, compared to the pytesmo calculation.
-        """
-        ctime = 5
+    sm = np.array([84, 88, 79, 87, 91, 93, 92, 85, 85, 90])
 
-        pd_dates = pd.date_range('2007-01-01', periods=9)
-
-        dates_area = \
-            pd.date_range('2007-01-03', periods=3).to_julian_date().values
-
-        date_from = min(dates_area)
-        date_to = max(dates_area)
-
-        proc_param = {'date_from': date_from, 'date_to': date_to}
-
-        ssm_userformat_data_test = \
-            pd.DataFrame({'jd': pd_dates,
-                          'sm': [10, 20, 30, 40, 50, 60, 70, 80, 90],
-                          'ssf': [1, 1, 1, 1, 1, 1, 1, 1, 1]}, index=pd_dates)
-
-        sm_pytesmo = np.array([30, 40, 50])
-
-        swi_ts_test, gain_test = \
-            process_swi_pd(ssm_userformat_data_test, ctime=[ctime],
-                           proc_param=proc_param, denom_init=0, nom_init=0)
-
-        sm_in = sm_pytesmo.astype(float)
-
-        pytesmo_swi = exp_filter(sm_in, np.asarray(dates_area, dtype=float),
-                                 ctime=ctime)
-
-        swi_ts = swi_ts_test['SWI_005']
-
-        np.testing.assert_array_almost_equal(swi_ts, pytesmo_swi, 4)
-
-    def test_process_swi_calc(self):
-        """
-        Test correct calculation of SWI, compared to the pytesmo calculation.
-        """
-        ctime_pytesmo = 5
-        ctime = [5, 50, 100]
-
-        dates = pd.date_range('2007-01-01', periods=9).to_julian_date().values
-
-        sm = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90])
-
-        swi_ts_test, gain_test = process_swi(sm, dates, ctime=ctime,
-                                             denom_init=0, nom_init=0)
-
-        sm_in = sm.astype(float)
-
-        pytesmo_swi = exp_filter(sm_in, np.asarray(dates, dtype=float),
-                                 ctime=ctime_pytesmo)
-
-        swi_ts = swi_ts_test['SWI_005']
-
-        np.testing.assert_array_almost_equal(swi_ts, pytesmo_swi, 4)
-
-    def test_process_swi_calc_nan_values(self):
-        """
-        Test correct calculation of SWI, compared to the pytesmo calculation
-        including nan values.
-        """
-        ctime_pytesmo = 5
-        ctime = [5, 50, 100]
-
-        dates = pd.date_range('2007-01-01', periods=9).to_julian_date().values
-
-        sm = np.array([10, 20, 30, 40, 50, 60, 999, 80, 10])
-
-        swi_ts_test, gain_test = process_swi(sm, dates, ctime=ctime,
-                                             denom_init=0, nom_init=0, nan=999)
-
-        sm_in = sm.astype(float)
-
-        pytesmo_swi = exp_filter(sm_in, np.asarray(dates, dtype=float),
-                                 ctime=ctime_pytesmo, nan=999)
-
-        swi_ts = swi_ts_test['SWI_005']
-
-        np.testing.assert_array_almost_equal(swi_ts, pytesmo_swi, 4)
-
-    def test_process_swi_gain(self):
-        """
-        Test gain in/out of the SWI calculation.
-        It calculates the first 4 days and returns the value and gain and
-        then starts the calculation of day 5 to 9 and
-        compares it with pytesmo over the whole period.
-        """
-        ctime = 5
-
-        dates = pd.date_range('2007-01-01', periods=9).to_julian_date().values
-
-        sm_data = [10, 20, 30, 40, 50, 60, 70, 80, 90]
-
-        dates_part1 = dates[:-4]
-        dates_part2 = dates[5:]
-        sm_data_part1 = np.array(sm_data[:-4])
-        sm_data_part2 = np.array(sm_data[5:])
-
-        swi_ts_part1, gain_test = process_swi(sm_data_part1, dates_part1,
-                                              ctime=[ctime], denom_init=0,
-                                              nom_init=0)
-
-        swi_ts_part2, gain_test = process_swi(sm_data_part2, dates_part2,
-                                              ctime=[ctime], gain_in=gain_test,
-                                              denom_init=0, nom_init=0)
-
-        sm_in = np.array(sm_data).astype(float)
-
-        pytesmo_swi = exp_filter(sm_in, np.asarray(dates, dtype=float),
-                                 ctime=ctime)
-
-        swi_ts_ctime1 = swi_ts_part1['SWI_005'].tolist()
-        swi_ts_ctime2 = swi_ts_part2['SWI_005'].tolist()
-
-        np.testing.assert_array_almost_equal(swi_ts_ctime1+swi_ts_ctime2,
-                                             pytesmo_swi, 5)
-
-    def test_process_swi_time(self):
-        """
-        Test correct calculation of SWI, compared to the pytesmo calculation.
-        """
-        ctime = 5
-
-        dates = pd.date_range('2007-01-01', periods=9).to_julian_date().values
-
-        dates_area = \
-            pd.date_range('2007-01-03', periods=3).to_julian_date().values
-
-        date_from = min(dates_area)
-        date_to = max(dates_area)
-
-        proc_param = {'date_from': date_from, 'date_to': date_to}
-
-        sm = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90])
-
-        sm_pytesmo = np.array([30, 40, 50])
-
-        swi_ts_test, gain_test = process_swi(sm, dates, ctime=[ctime],
-                                             proc_param=proc_param,
-                                             denom_init=0, nom_init=0)
-
-        sm_in = sm_pytesmo.astype(float)
-
-        pytesmo_swi = exp_filter(sm_in, np.asarray(dates_area, dtype=float),
-                                 ctime=ctime)
-
-        swi_ts = swi_ts_test['SWI_005']
-
-        np.testing.assert_array_almost_equal(swi_ts, pytesmo_swi, 4)
-
-    def test_process_swi_not_daily_out(self):
-        """
-        Test correct calculation of SWI, compared to the pytesmo calculation.
-        """
-        ctime_pytesmo = 5
-        ctime = [5, 50, 100]
-
-        dates = np.array([2454102.3093969999, 2454103.3644969999,
-                          2454103.873199, 2454104.9282769999,
-                          2454105.9139760002, 2454106.3213539999,
-                          2454107.3070530002, 2454108.3621530002,
-                          2454108.8708330002, 2454109.9259549999])
-
-        sm = np.array([84, 88, 79, 87, 91, 93, 92, 85, 85, 90])
-
-        swi_ts_test, gain_test = process_swi(sm, dates, ctime=ctime,
-                                             denom_init=0, nom_init=0)
-
-        sm_in = sm.astype(float)
-
-        pytesmo_swi = exp_filter(sm_in, np.asarray(dates, dtype=float),
-                                 ctime=ctime_pytesmo)
-
-        swi_ts = swi_ts_test['SWI_005']
-
-        np.testing.assert_array_almost_equal(swi_ts, pytesmo_swi, 4)
-
-    def test_process_swi_daily_out(self):
-        """
-        Test correct calculation of SWI, compared to the pytesmo calculation.
-        """
-        ctime_pytesmo = 5
-        ctime = [5]
-
-        dates = np.array([2454102.3093969999, 2454103.3644969999,
-                          2454103.873199, 2454104.9282769999,
-                          2454105.9139760002, 2454106.3213539999,
-                          2454107.3070530002, 2454108.3621530002,
-                          2454108.8708330002, 2454109.9259549999])
-
-        pytesmo_dates = np.array([2454102.3093969999, 2454103.3644969999,
-                                  2454103.873199, 2454104.9282769999,
-                                  2454105.9139760002, 2454106.3213539999,
-                                  2454107.3070530002, 2454108.3621530002,
-                                  2454108.8708330002, 2454109.9259549999])
-
-        sm = np.array([84, 88, 79, 87, 91, 93, 92, 85, 85, 90])
-
-        swi_ts_test, gain_test = process_swi(sm, dates, ctime=ctime,
-                                             jd_daily_out=True,
-                                             denom_init=0, nom_init=0)
-
-        pytesmo_sm = np.array([84, 88, 79, 87, 91, 93, 92, 85, 85, 90])
-
-        sm_in = pytesmo_sm.astype(float)
-
-        pytesmo_swi = exp_filter(sm_in, np.asarray(pytesmo_dates, dtype=float),
-                                 ctime=ctime_pytesmo)
-
-        swi_ts = swi_ts_test['SWI_005']
-
-        months, days, years = julian.caldat(swi_ts_test['jd'])
-
-        np.testing.assert_array_equal(years, [2007, 2007, 2007, 2007, 2007,
-                                              2007, 2007, 2007])
-        np.testing.assert_equal(days, range(1, 9))
-        np.testing.assert_equal(months, [1, 1, 1, 1, 1, 1, 1, 1])
-
-        pytesmo_swi = np.delete(pytesmo_swi, [4, 9])
-
-        np.testing.assert_array_almost_equal(swi_ts, pytesmo_swi, 4)
-
-    def test_swi_noise_calc(self):
-        """
-        Test correct calculation of SWI Noise, comparing the two different
-        approaches.
-        """
-
-        ctime = [5, 50, 100]
-
-        dates = pd.date_range('2007-01-01', periods=99).to_julian_date().values
-
-        sm_noise = np.zeros(99)
-        sm_noise.fill(3)
-
-        noise_dict1 = calc_noise(sm_noise, dates, ctime)
-        noise_dict2 = calc_noise_rec(sm_noise, dates, ctime, last_den=0)
-
-        np.testing.assert_array_almost_equal(noise_dict1['NOM_SN_050'],
-                                             noise_dict2['NOM_SN_050'], 10)
-        np.testing.assert_array_almost_equal(noise_dict1['DEN_SN_050'],
-                                             noise_dict2['DEN_SN_050'], 10)
-        np.testing.assert_array_almost_equal(noise_dict1['SWI_NOISE_050'],
-                                             noise_dict2['SWI_NOISE_050'], 10)
-
-        np.testing.assert_array_almost_equal(noise_dict1['NOM_SN_005'],
-                                             noise_dict2['NOM_SN_005'], 10)
-        np.testing.assert_array_almost_equal(noise_dict1['DEN_SN_005'],
-                                             noise_dict2['DEN_SN_005'], 10)
-        np.testing.assert_array_almost_equal(noise_dict1['SWI_NOISE_005'],
-                                             noise_dict2['SWI_NOISE_005'], 10)
-
-        np.testing.assert_array_almost_equal(noise_dict1['NOM_SN_100'],
-                                             noise_dict2['NOM_SN_100'], 10)
-        np.testing.assert_array_almost_equal(noise_dict1['DEN_SN_100'],
-                                             noise_dict2['DEN_SN_100'], 10)
-        np.testing.assert_array_almost_equal(noise_dict1['SWI_NOISE_100'],
-                                             noise_dict2['SWI_NOISE_100'], 10)
-
-    def test_process_swi_noise(self):
-        """
-        Test correct calculation of SWI Noise inside the SWI calculation
-        process.
-        """
-
-        ctime = [5, 50, 100]
-
-        dates = pd.date_range('2007-01-01', periods=9).to_julian_date().values
-
-        sm_noise = np.zeros(9)
-        sm_noise.fill(3)
-
-        sm = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90])
-
-        swi_ts_test, gain_test = process_swi(sm, dates, ctime=ctime,
-                                             ssm_noise=sm_noise,
-                                             denom_init=1, nom_init=1)
-
-        noise_dict = calc_noise_rec(sm_noise, dates, ctime)
-
-        np.testing.assert_array_almost_equal(swi_ts_test['SWI_NOISE_050'],
-                                             noise_dict['SWI_NOISE_050'], 5)
-
-        np.testing.assert_array_almost_equal(swi_ts_test['SWI_NOISE_005'],
-                                             noise_dict['SWI_NOISE_005'], 5)
-
-        np.testing.assert_array_almost_equal(swi_ts_test['SWI_NOISE_100'],
-                                             noise_dict['SWI_NOISE_100'], 5)
-
-    def test_swi_gain_noise(self):
-        """
-        Test correct calculation of SWI Noise gain.
-        """
-
-        ctime = [5, 50, 100]
-
-        dates = pd.date_range('2007-01-01', periods=9).to_julian_date().values
-        sm = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90])
-        sm_noise = np.zeros(9)
-        sm_noise.fill(3)
-
-        dates_part1 = dates[:-4]
-        dates_part2 = dates[5:]
-        sm_data_part1 = np.array(sm[:-4])
-        sm_data_part2 = np.array(sm[5:])
-        sm_noise1 = sm_noise[:-4]
-        sm_noise2 = sm_noise[5:]
-
-        swi_ts_all, gain_all = process_swi(sm, dates, ctime=ctime,
-                                           ssm_noise=sm_noise, denom_init=0,
-                                           nom_init=0)
-
-        swi_ts_1, gain_1 = process_swi(sm_data_part1, dates_part1, ctime=ctime,
-                                       ssm_noise=sm_noise1,
-                                       denom_init=0, nom_init=0)
-
-        swi_ts_2, gain_2 = process_swi(sm_data_part2, dates_part2, ctime=ctime,
-                                       ssm_noise=sm_noise2, gain_in=gain_1,
-                                       denom_init=0, nom_init=0)
-
-        swi_ns_ctime1 = swi_ts_1['SWI_NOISE_005'].tolist()
-        swi_ns_ctime2 = swi_ts_2['SWI_NOISE_005'].tolist()
-
-        np.testing.assert_array_almost_equal(swi_ts_all['SWI_NOISE_005'],
-                                             swi_ns_ctime1+swi_ns_ctime2, 5)
-
-        swi_ns_ctime1 = swi_ts_1['SWI_NOISE_050'].tolist()
-        swi_ns_ctime2 = swi_ts_2['SWI_NOISE_050'].tolist()
-
-        np.testing.assert_array_almost_equal(swi_ts_all['SWI_NOISE_050'],
-                                             swi_ns_ctime1+swi_ns_ctime2, 5)
-
-        swi_ns_ctime1 = swi_ts_1['SWI_NOISE_100'].tolist()
-        swi_ns_ctime2 = swi_ts_2['SWI_NOISE_100'].tolist()
-
-        np.testing.assert_array_almost_equal(swi_ts_all['SWI_NOISE_100'],
-                                             swi_ns_ctime1+swi_ns_ctime2, 5)
-
-if __name__ == '__main__':
-    unittest.main()
+    dtype = np.dtype([('jd', np.float64), ('sm', np.float32)])
+    ssm_ts = unstructured_to_structured(
+        np.hstack((swi_jd[:, np.newaxis], sm[:, np.newaxis])), dtype=dtype)
+
+    swi_ts, gain_out = calc_swi_ts(ssm_ts, swi_jd, t_value=t_value)
+
+    for t in t_value:
+        pytesmo_swi = exp_filter(sm.astype(np.float64), swi_jd, t)
+        np.testing.assert_array_almost_equal(swi_ts['swi_{}'.format(t)],
+                                             pytesmo_swi, 4)
+
+
+def test_swi_noise_calc():
+    """
+    Test correct calculation of SWI Noise, comparing the two different
+    approaches.
+    """
+    t_value = [5, 50, 100]
+
+    swi_jd = pd.date_range('2007-01-01', periods=99).to_julian_date().values
+
+    sm_noise = np.zeros(99)
+    sm_noise.fill(3)
+
+    dtype = np.dtype([('jd', np.float64), ('sm_noise', np.float32)])
+    ssm_ts = unstructured_to_structured(
+        np.hstack((swi_jd[:, np.newaxis],
+                   sm_noise[:, np.newaxis])), dtype=dtype)
+
+    swi_ts1, gain1 = calc_swi_noise(ssm_ts, t_value)
+    swi_ts2, gain2 = calc_swi_noise_rec(ssm_ts, t_value, last_den=0)
+
+    for t in t_value:
+        np.testing.assert_array_almost_equal(
+            swi_ts1['swi_noise_{}'.format(t)],
+            swi_ts2['swi_noise_{}'.format(t)], 4)
+        for f in ['denom', 'nom', 'last_jd', 'nom_noise']:
+            np.testing.assert_array_almost_equal(gain1[f], gain2[f])
+
+
+def test_process_swi_noise():
+    """
+    Test correct calculation of SWI Noise inside the SWI calculation
+    process.
+    """
+    t_value = [5, 50, 100]
+
+    swi_jd = pd.date_range(
+        '2007-01-01', periods=9).to_julian_date().values.astype(np.float64)
+
+    sm_noise = np.zeros(9)
+    sm_noise.fill(3)
+
+    sm = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90])
+
+    dtype = np.dtype([('jd', np.float64), ('sm', np.float32),
+                      ('sm_noise', np.float32)])
+    ssm_ts = unstructured_to_structured(
+        np.hstack((swi_jd[:, np.newaxis], sm[:, np.newaxis],
+                   sm_noise[:, np.newaxis])), dtype=dtype)
+
+    swi_ts1, _ = calc_swi_ts(ssm_ts, swi_jd, t_value=t_value,
+                             nom_init=1, denom_init=1)
+
+    swi_ts2, _ = calc_swi_noise_rec(ssm_ts, t_value)
+
+    for t in t_value:
+        np.testing.assert_array_almost_equal(
+            swi_ts1['swi_noise_{}'.format(t)],
+            swi_ts2['swi_noise_{}'.format(t)], 4)
+
+
+def test_swi_gain_noise():
+    """
+    Test correct calculation of SWI Noise gain.
+    """
+    t_value = [5, 50, 100]
+
+    swi_jd = pd.date_range('2007-01-01', periods=9).to_julian_date().values
+    sm = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90])
+    sm_noise = np.zeros(9)
+    sm_noise.fill(3)
+
+    dtype = np.dtype([('jd', np.float64), ('sm', np.float32),
+                      ('sm_noise', np.float32)])
+    ssm_ts = unstructured_to_structured(
+        np.hstack((swi_jd[:, np.newaxis], sm[:, np.newaxis],
+                   sm_noise[:, np.newaxis])), dtype=dtype)
+
+    swi_ts_all, gain_all = calc_swi_ts(ssm_ts, swi_jd, t_value=t_value)
+    swi_ts_1, gain_1 = calc_swi_ts(ssm_ts[:5], swi_jd[:5], t_value=t_value)
+    swi_ts_2, gain_2 = calc_swi_ts(ssm_ts[5:], swi_jd[5:],
+                                   t_value=t_value, gain_in=gain_1)
+
+    for t in t_value:
+        comb_swi_ts = swi_ts_1['swi_noise_{}'.format(t)].tolist() + \
+            swi_ts_2['swi_noise_{}'.format(t)].tolist()
+        np.testing.assert_array_almost_equal(
+            comb_swi_ts, swi_ts_all['swi_noise_{}'.format(t)], 4)

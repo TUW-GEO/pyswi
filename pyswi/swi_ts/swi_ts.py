@@ -19,11 +19,8 @@ This module represents the WARP Processing step Soil Water Index (SWI).
 
 from math import exp
 
-import numpy as np
-import pandas as pd
-
-import pytesmo.timedate.julian as julian
 import pyximport
+import numpy as np
 
 pyximport.install(setup_args={'include_dirs': [
                   np.get_include()]}, inplace=True)
@@ -31,409 +28,220 @@ pyximport.install(setup_args={'include_dirs': [
 from pyswi.swi_ts.swi_calc_routines import swi_calc_cy
 from pyswi.swi_ts.swi_calc_routines import swi_calc_cy_noise
 
-uint8_nan = np.iinfo(np.uint8).max
-float64_nan = -999999.
-float32_nan = -999999.
 
-
-def process_swi_pd(ssm_userformat_data, proc_param={},
-                   ctime=[1, 5, 10, 15, 20, 40, 60, 100], gain_in=None,
-                   jd_daily_out=False, ssm_noise=None, nom_init=0,
-                   denom_init=0, nan=-999999.0):
+def calc_swi_ts(ssm_ts, swi_jd, gain_in=None, t_value=[1, 5, 10, 15, 20],
+                nom_init=0, denom_init=0, nan=-9999.):
     """
-    Processing of surface soil water index and the gain value.
-    This function calls the calculate function and handles
-    the conversions of the input/output formats of the gain to
-    the formats that are needed for the calculation.
-    This function is dependent on the process_swi function.
+    Time series calculation of the Soil Water Index.
 
     Parameters
     ----------
-    ssm_userformat_data : pandas.DataFrame
-        Surface soil moisture userdata time series including ssm and ssf values.
-    proc_param : dict
-        Processing parameters. e.g. date_begin, date_end (julian date)
-    tvalue : list
-        T-values that should be calculated.
-    gain_in : pandas.DataFrame
-         Input gain parameters of last calculation.
-         fields gpi, last_jd, nom, denom
-    jd_daily_out : bool
-         If the flag is True the jd value of the swi_img will be set to every
-         day 23:59 of the time range, otherwise it takes the jd values from the
-         ssm input within the range.
-    nom_init : np.float64
-         Initial value of nom in the SWI calculation.
-    denom_init : np.float64
-         Initial value of denom in the SWI calculation.
-    nan : long
-         Defines the non values of the input data that should be skipped.
-
-    Returns
-    -------
-    swi_ts : pandas.DataFrame
-        Soil Water Index time series. Each field is for a tvalue value.
-        fields jd, SWI_xxx, QFLAG_xxx (e.g. SWI_010 for tvalue value 10)
-    gain : pandas.DataFrame
-        Output gain parameters of last calculation.
-        Each field is for a tvalue value.
-        fields gpi, last_jd(= date index), NOM_xxx, DENOM_xxx
-        (e.g. NOM_010 for tvalue value 10)
-    """
-
-    juldate = pd_datetime_to_juldate(ssm_userformat_data.axes[0].values)
-
-    juldate = np.array(juldate)
-
-    if gain_in is not None:
-        gain_in = gain_dataframe_to_inputdict(gain_in, ctime)
-
-    swi_ts, gain_out_mp = process_swi(ssm_userformat_data['sm'].values, juldate,
-                                      proc_param=proc_param, ctime=ctime,
-                                      gain_in=gain_in,
-                                      jd_daily_out=jd_daily_out,
-                                      ssm_noise=ssm_noise, nom_init=nom_init,
-                                      denom_init=denom_init,
-                                      nan=nan)
-
-    swi_ts = swi_outputdict_to_dataframe(swi_ts, ctime)
-
-    gain = gain_outputdict_to_dataframe(gain_out_mp, ctime)
-
-    return swi_ts, gain
-
-
-def process_swi(ssm, jd, proc_param={}, ctime=[1, 5, 10, 15, 20, 40, 60, 100],
-                gain_in=None, ssm_noise=None, jd_daily_out=False, nom_init=0,
-                denom_init=0, nan=-999999.0):
-    """
-    Processing of surface soil water index and the gain value.
-    The ssm should already be filtered.
-    This function calls the calculate function and handles
-    the conversions of the input/output formats of the gain to
-    the formats that are needed for the calculation.
-
-    Parameters
-    ----------
-    ssm : numpy.ndarray
-        Surface soil moisture time series.
-    jd : numpy.ndarray
-        Julian dates time series.
-    proc_param : dict
-        Processing parameters. e.g. date_begin, date_end (julian date)
-    tvalue : list
-        T-values that should be calculated.
-    gain_in : dict
-         Input gain parameters of last calculation.
-         fields gpi, last_jd, nom, denom, nom_ns
-    ssm_noise : numpy.ndarray
-        SSM noise of the given ssm timeseries.
-    jd_daily_out : bool
-         If the flag is True the jd value of the swi_img will be set to every
-         day 23:59 of the time range, otherwise it takes the jd values from the
-         ssm input within the range.
-    nom_init : np.float64
-         Initial value of nom in the SWI calculation.
-    denom_init : np.float64
-         Initial value of denom in the SWI calculation.
-    nan : long
-         Defines the non values of the input data that should be skipped.
-
-    Returns
-    -------
-    swi_ts : dict
-        Soil Water Index time series. Each field is for a tvalue value.
-        fields jd, SWI_xxx, QFLAG_xxx (e.g. SWI_010 for tvalue value 10)
-    gain : dict
-        Output gain parameters of last calculation.
-        Each field is for a tvalue value.
-        fields gpi, last_jd, NOM_xxx, DENOM_xxx, NOM_NS_xxx (SWI Noise nom)
-        (e.g. NOM_010 for tvalue value 10)
-    """
-
-    ssm_ts = {'jd': jd,
-              'sm': ssm}
-
-    swi_dates = []
-
-    if 'date_from' in proc_param and 'date_to' in proc_param:
-        date_from = proc_param['date_from']
-        date_to = proc_param['date_to']
-
-        if jd_daily_out is False:
-            for d in range(0, len(jd)):
-                if date_from <= jd[d] <= date_to:
-                    swi_dates.append(jd[d])
-            swi_dates = np.array(swi_dates)
-    else:
-        date_from = np.min(ssm_ts['jd'])
-        date_to = np.max(ssm_ts['jd'])
-        if jd_daily_out is False:
-            swi_dates = jd
-
-    num_swi = (date_to - date_from)
-    num_swi = num_swi.astype('timedelta64[D]')
-    num_swi = num_swi.astype(int)+1
-
-    if jd_daily_out is True:
-        month, day, year = julian.caldat(date_from)
-        start_jd = julian.julday(month, day,
-                                 year, 23, 59)
-
-        swi_dates = np.arange(num_swi) + start_jd
-
-    if type(ctime) is not np.array:
-        ctime = np.array(ctime)
-
-    # Init empty swi_ts
-    swi_ts = {'jd': np.zeros([num_swi], dtype=np.float64),
-              'swi': np.zeros([num_swi, len(ctime)], dtype=np.float32),
-              'qflag': np.zeros([num_swi, len(ctime)], dtype=np.float32)}
-
-    if num_swi != len(jd):
-        indices = [i for i, x in enumerate(ssm_ts['jd']) if x == date_from]
-        startdate_idx = indices[0]
-        ssm_ts['sm'] = ssm[startdate_idx:]
-        ssm_ts['jd'] = jd[startdate_idx:]
-
-    swi_ts['jd'] = swi_dates
-
-    gain = None
-
-    if gain_in is not None:
-        gain = inputdict_to_gain_dict(gain_in, ctime)
-
-    swi_ts, gain_out_mp = calc(ssm_ts, swi_ts, ctime=ctime, gain=gain,
-                               ssm_noise=ssm_noise, nom_init=nom_init,
-                               denom_init=denom_init, nan=nan)
-
-    swit_ts = swi_dict_to_outputdict(swi_ts, ctime)
-
-    gain_out = gain_dict_to_outputdict(gain_out_mp, ctime)
-
-    return swit_ts, gain_out
-
-
-def calc(ssm_ts, swi_ts, gain=None,
-         ctime=np.array([1, 5, 10, 15, 20, 40, 60, 100]), ssm_noise=None,
-         nom_init=0, denom_init=0, nan=-999999.0):
-    """
-    Calculation of surface soil water index.
-
-    Parameters
-    ----------
-    ssm_ts : dict
-        Surface soil moisture time series.
-        fields sm, jd as numpy arrays.
-    swi_ts : dict
-        Empty SWI time series dictionary.
-    gain : dict
+    ssm_ts : numpy.ndarray or dict
+        Surface soil moisture time series with fields: jd, sm, sm_noise
+    swi_jd : numpy.ndarray
+        Julian date time stamps of the SWI time series.
+    gain_in : dict, optional
         Gain parameters of last calculation.
-        fields gpi, last_jd, nom, denom
-    tvalue : numpy.ndarray
-        Integer values for the tvalue variations.
-    ssm_noise : numpy.ndarray
-        SSM noise of the given ssm timeseries.
-    nom_init : np.float64
-         Initial value of nom in the SWI calculation.
-    denom_init : np.float64
-         Initial value of denom in the SWI calculation.
-    nan : long
-         Defines the non values of the input data that should be skipped.
+        Dictionary with fields: last_jd, nom, denom
+    t_value : list, optional
+        Characteristic time length (default: 1, 5, 10, 15, 20).
+    nom_init : float64, optional
+        Initial value of nom in the SWI calculation (default: 0).
+    denom_init : float64, optional
+        Initial value of denom in the SWI calculation (default: 0).
+    nan : float64, optional
+        NaN value to be masked in the SWI retrieval.
 
     Returns
     -------
-    swi_ts : dict
-        Soil water index series.
-        fields jd, swi_img, qflag
+    swi_ts : numpy.ndarray
+        Soil Water Index (SWI) time series.
     gain_out : dict
         Gain parameters of last calculation.
         fields gpi, last_jd, nom, denom, nom_ns
     """
+    t_value = np.asarray(t_value)
 
-    if gain is None:
-        gain = {'last_jd': np.double(0),
-                'denom': np.full(len(ctime), denom_init, dtype=np.float64),
-                'nom': np.full(len(ctime), nom_init, dtype=np.float64),
-                'nom_ns': np.zeros(len(ctime))
-                }
+    if gain_in is None:
+        gain_in = {'last_jd': np.float64(0),
+                   'denom': np.full(len(t_value), denom_init, dtype=np.float64),
+                   'nom': np.full(len(t_value), nom_init, dtype=np.float64),
+                   'nom_noise': np.zeros(len(t_value))}
 
-    juldate = ssm_ts['jd']
-    ssm = ssm_ts['sm']
-
-    ssm = np.asarray(ssm, dtype=np.float32)
+    if gain_in['denom'][0] == 1:
+        last_jd_var = ssm_ts['jd'][0]
+    else:
+        last_jd_var = gain_in['last_jd']
 
     norm_factor = \
         np.sum(np.exp(-(np.tensordot(np.arange(1000, dtype=np.float32),
-                                     (1 / ctime), axes=0))), axis=0)
+                                     (1. / t_value), axes=0))), axis=0)
 
-    last_jd_var = gain['last_jd']
+    nom_noise = np.ones(len(t_value), dtype=np.float64)
 
-    if gain['denom'][0] == 1:
-        last_jd_var = juldate[0]
+    if 'sm_noise' in ssm_ts.dtype.fields:
+        if gain_in['nom_noise'] is not None:
+            nom_noise = gain_in['nom_noise']
 
-    nom = gain['nom']
-    denom = gain['denom']
-
-    nom_ns = np.ones(len(ctime))
-
-    swi_ts['swi'] = np.zeros([len(swi_ts['jd']), len(ctime)], dtype=np.float32)
-
-    if ssm_noise is None:
-        swi_ts['qflag'] = np.zeros([len(swi_ts['jd']), len(ctime)],
-                                   dtype=np.float32)
-
-        swi_ts['swi'], swi_ts['qflag'], nom, denom, last_jd_var = \
-            swi_calc_cy(juldate, ssm, ctime, swi_ts['jd'], swi_ts['swi'],
-                        swi_ts['qflag'], nom, denom, last_jd_var,
-                        norm_factor, nan)
+        swi, swi_noise, nom, denom, last_jd_var, nom_ns = \
+            swi_calc_cy_noise(ssm_ts['jd'], ssm_ts['sm'], t_value, swi_jd,
+                              gain_in['nom'], gain_in['denom'], last_jd_var,
+                              ssm_ts['sm_noise'], nom_noise)
+        swi_qflag = np.zeros_like(swi)
     else:
-        swi_ts['swi_noise'] = np.zeros([len(swi_ts['jd']), len(ctime)],
-                                       dtype=np.float32)
-
-        swi_noise = np.zeros((len(swi_ts['jd']), len(ctime)), dtype=np.float32)
-
-        if gain['nom_ns'] is not None:
-            nom_ns = gain['nom_ns']
-
-        swi_ts['swi'], swi_ts['swi_noise'], nom, denom, last_jd_var, nom_ns = \
-            swi_calc_cy_noise(juldate, ssm, ctime, swi_ts['jd'], swi_ts['swi'],
-                              nom, denom, last_jd_var, ssm_noise, swi_noise,
-                              nom_ns)
+        swi, swi_qflag, nom, denom, last_jd_var = \
+            swi_calc_cy(ssm_ts['jd'], ssm_ts['sm'], t_value, swi_jd,
+                        gain_in['nom'], gain_in['denom'], last_jd_var,
+                        norm_factor, nan)
+        swi_noise = np.zeros_like(swi)
 
     gain_out = {'denom': denom, 'nom': nom,
-                'last_jd': last_jd_var, 'nom_ns': nom_ns}
+                'last_jd': last_jd_var, 'nom_noise': nom_noise}
+
+    dtype_list = [('jd', np.float64)]
+
+    for t in t_value:
+        dtype_list.append(('swi_{}'.format(t), np.float32))
+        dtype_list.append(('swi_noise_{}'.format(t), np.float32))
+        dtype_list.append(('swi_qflag_{}'.format(t), np.float32))
+
+    swi_ts = np.zeros(swi_jd.size, dtype=np.dtype(dtype_list))
+
+    swi_ts['jd'] = swi_jd
+    for i, t in enumerate(t_value):
+        swi_ts['swi_{}'.format(t)] = swi[:, i]
+        swi_ts['swi_noise_{}'.format(t)] = swi_noise[:, i]
+        swi_ts['swi_qflag_{}'.format(t)] = swi_qflag[:, i]
 
     return swi_ts, gain_out
 
 
-def calc_noise(ssm_noise, jd, ctime=[1, 5]):
+def calc_swi_noise(ssm_ts, t_value):
     """
-    Calculation of surface soil water index noise.
-    Much slower than the reccurence approach.
+    Calculation of Soil Water Index (SWI) noise.
+    (Slower than the recursive approach).
 
     Parameters
     ----------
-    ssm_noise : numpy.ndarray
-        Surface Soil Moisture Noise time series.
-    jd : numpy.ndarray
-        Array of the julian dates.
-    tvalue : numpy.ndarray
-        Integer values for the tvalue variations.
+    ssm_ts : numpy.ndarray
+        Surface soil moisture time series with fields: jd, sm, sm_noise
+    t_value : numpy.ndarray
+        Characteristic time length.
 
     Returns
     -------
-    swi_noise_ts : dict
-        Soil water index noise series.
-        fields jd, nom_sn, den_sn, swi_noise
+    swi_noise_ts : numpy.ndarray
+        Soil Water Index noise time series.
     """
-    len_sm = len(jd)
-    len_ctime = len(ctime)
+    len_sm = len(ssm_ts)
+    len_t_value = len(t_value)
 
-    # var{n_swi} calculation
-    nom_db = np.zeros((len_sm, len_ctime))
-    den_db = np.zeros((len_sm, len_ctime))
-    n_swi = np.zeros((len_sm, len_ctime))
+    nom_db = np.zeros((len_sm, len_t_value))
+    den_db = np.zeros((len_sm, len_t_value))
+    swi_noise = np.zeros((len_sm, len_t_value))
 
     for i in range(0, len_sm):
-        nom = np.zeros(len_ctime)
-        den = np.zeros(len_ctime)
-        for c in range(0, len_ctime):
+        nom = np.zeros(len_t_value)
+        den = np.zeros(len_t_value)
+        for c in range(0, len_t_value):
             for j in range(0, i+1):
-                exp_term = exp(((-2)*(jd[i] - jd[j])) / ctime[c])
-                nom[c] += ssm_noise[i] * exp_term
-                den[c] += exp(((-1)*(jd[i] - jd[j])) / ctime[c])
+                jd_diff = ssm_ts['jd'][i] - ssm_ts['jd'][j]
+                exp_term = exp(((-2)*(jd_diff)) / t_value[c])
+                nom[c] += ssm_ts['sm_noise'][i] * exp_term
+                den[c] += exp(((-1)*(jd_diff)) / t_value[c])
 
             nom_db[i][c] = nom[c]
             den_db[i][c] = den[c]
-            n_swi[i][c] = (nom[c] / (den[c] ** 2))
+            swi_noise[i][c] = (nom[c] / (den[c] ** 2))
 
-    inputdict = {'nom_sn': nom_db,
-                 'den_sn': den_db,
-                 'swi_noise': n_swi,
-                 'jd': jd}
+    gain_out = {'denom': den, 'nom': nom, 'last_jd': ssm_ts['jd'][-1],
+                'nom_noise': 0}
 
-    variables_ctimedep = ['nom_sn', 'den_sn', 'swi_noise']
-    variables_other = ['jd']
+    dtype_list = [('jd', np.float64)]
 
-    swi_noise_ts = dict_to_outputdict(inputdict, variables_ctimedep, ctime,
-                                      variables_other=variables_other)
+    for t in t_value:
+        dtype_list.append(('swi_noise_{}'.format(t), np.float32))
 
-    return swi_noise_ts
+    swi_ts = np.zeros(ssm_ts.size, dtype=np.dtype(dtype_list))
+
+    swi_ts['jd'] = ssm_ts['jd']
+
+    for i, t in enumerate(t_value):
+        swi_ts['swi_noise_{}'.format(t)] = swi_noise[:, i]
+
+    return swi_ts, gain_out
 
 
-def calc_noise_rec(ssm_noise, jd, ctime=[1, 5], last_den=1, last_nom=0):
+def calc_swi_noise_rec(ssm_ts, t_value, last_den=1, last_nom=0):
     """
-    Calculation of surface soil water index noise.
-    Recurrence approach of calculation.
-    Faster than calc_noise
+    Recursive calculation of Soil Water Index (SWI) noise.
 
     Parameters
     ----------
-    ssm_noise : numpy.ndarray
-        Surface Soil Moisture Noise time series.
-    jd : numpy.ndarray
-        Array of the julian dates.
-    tvalue : numpy.ndarray
-        Integer values for the tvalue variations.
-    last_den : float
+    ssm_ts : numpy.ndarray
+        Surface soil moisture time series with fields: jd, sm, sm_noise
+    t_value : numpy.ndarray
+        Characteristic time length.
+    denom : float
         denom value of the last calculation and starting point for
         the calculation.
-    last_nom : numpy.ndarray
+    nom : float
         nom value of the last calculation and starting point for
         the calculation.
 
     Returns
     -------
-    swi_noise_ts : dict
-        Soil water index noise series.
-        fields jd, nom_sn, den_sn, swi_noise
+    swi_noise_ts : numpy.ndarray
+        Soil Water Index noise time series.
     """
-    len_sm = len(jd)
-    len_ctime = len(ctime)
+    len_sm = len(ssm_ts)
+    len_t_value = len(t_value)
 
     # var{n_swi} calculation
-    nom_sn = np.zeros((len_sm, len_ctime))
-    den = np.zeros((len_sm, len_ctime))
-    n_swi = np.zeros((len_sm, len_ctime))
+    nom_sn = np.zeros((len_sm, len_t_value))
+    den = np.zeros((len_sm, len_t_value))
+    swi_noise = np.zeros((len_sm, len_t_value))
 
-    last_jd = jd[0]
-    den_values = np.ones(len_ctime)
-    nom_values = np.zeros(len_ctime)
+    last_jd = ssm_ts['jd'][0]
+    den_values = np.ones(len_t_value)
+    nom_values = np.zeros(len_t_value)
 
     den_values.fill(last_den)
     nom_values.fill(last_nom)
 
     for i in range(0, len_sm):
-        for c in range(0, len_ctime):
-            tdiff = (jd[i]-last_jd) / ctime[c]
+        for c in range(0, len_t_value):
+            tdiff = (ssm_ts['jd'][i]-last_jd) / t_value[c]
             fn = exp((-1) * tdiff)
             den[i][c] = 1 + fn * den_values[c]
             den_sn = den[i][c] ** 2
 
             exp_term = exp((-2)*tdiff)
-            nom_sn[i][c] = nom_values[c] * exp_term + ssm_noise[i]
+            nom_sn[i][c] = nom_values[c] * exp_term + ssm_ts['sm_noise'][i]
 
-            n_swi[i][c] = nom_sn[i][c] / den_sn
+            swi_noise[i][c] = nom_sn[i][c] / den_sn
             den_values[c] = den[i][c]
             nom_values[c] = nom_sn[i][c]
-        last_jd = jd[i]
+        last_jd = ssm_ts['jd'][i]
 
-    inputdict = {'nom_sn': nom_sn,
-                 'den_sn': den,
-                 'swi_noise': n_swi,
-                 'jd': jd}
+    gain_out = {'denom': den_values, 'nom': nom_values, 'last_jd': last_jd,
+                'nom_noise': 0}
 
-    variables_ctimedep = ['nom_sn', 'den_sn', 'swi_noise']
-    variables_other = ['jd']
+    dtype_list = [('jd', np.float64)]
+    for t in t_value:
+        dtype_list.append(('swi_noise_{}'.format(t), np.float32))
 
-    outputdict = dict_to_outputdict(inputdict, variables_ctimedep, ctime,
-                                    variables_other=variables_other)
+    swi_ts = np.zeros(ssm_ts.size, dtype=np.dtype(dtype_list))
 
-    return outputdict
+    swi_ts['jd'] = ssm_ts['jd']
+    for i, t in enumerate(t_value):
+        swi_ts['swi_noise_{}'.format(t)] = swi_noise[:, i]
+
+    return swi_ts, gain_out
 
 
-def iterative_swi(ssm, ssm_jd, ctime, prev_swi, prev_gain, prev_qflag, prev_jd):
+def iterative_swi(ssm, ssm_jd, t_value, prev_swi, prev_gain,
+                  prev_qflag, prev_jd):
     """
     Takes input data and previous data and calculates SWI
     values for next dates. All arrays have to be the same shape
@@ -447,7 +255,7 @@ def iterative_swi(ssm, ssm_jd, ctime, prev_swi, prev_gain, prev_qflag, prev_jd):
         surface soil moisture
     ssm_jd : numpy.array
         observation time of ssm given as julian date
-    tvalue : int
+    t_value : int
         T-value for SWI calculation
     prev_swi : numpy.array
         values of SWI at previous iteration
@@ -460,291 +268,23 @@ def iterative_swi(ssm, ssm_jd, ctime, prev_swi, prev_gain, prev_qflag, prev_jd):
 
     Returns
     -------
-    swi : numpy.array
+    swi : float
         swi results
-    qflag : numpy.array
+    qflag : float
         quality flag results
-    gain : numpy.array
+    gain : float
         gain for next iteration
     """
-    # Calculate time diff
+    # calculate time diff
     time_diff = (ssm_jd - prev_jd).astype(np.float)
 
     # calculate qflag and gain based on previous values
-    qflag = 1.0 + np.exp(-(time_diff / float(ctime))) * prev_qflag
+    qflag = 1. + np.exp(-(time_diff / float(t_value))) * prev_qflag
 
     gain = (prev_gain / (prev_gain.astype(np.float) +
-                         np.exp(-(time_diff / float(ctime)))))
+                         np.exp(-(time_diff / float(t_value)))))
 
     # calculate SWI
     swi = prev_swi + gain * (ssm - prev_swi)
 
     return swi, qflag, gain
-
-
-def pd_datetime_to_juldate(pd_datetimes):
-    """
-    Converts panda.DatetimeIndex list format to a julian dates list.
-
-    Parameters
-    ----------
-    pd_datetimes : numpy.ndarray
-        Pandas Datetime array
-
-    Returns
-    -------
-    juldates : numpy.ndarray
-        Julian dates.
-    """
-    date_buffer = pd.DatetimeIndex(pd_datetimes)
-
-    return date_buffer.to_julian_date()
-
-
-def swi_outputdict_to_dataframe(swi_dict, ctime):
-    """
-    Converts a swi_img dictionary format to a pandas DataFrame format.
-
-    Parameters
-    ----------
-    swi_dict : dict
-        Soil Water Index time series as a dictionary.
-        fields gpi, jd, swi_img, qflag
-    tvalue : numpy.ndarray
-        Integer values for the tvalue variations.
-
-    Returns
-    -------
-    swi_ts_df : pandas.DataFrame
-        Soil Water Index time series. Each field is for a tvalue value.
-        fields jd, SWI_xxx, QFLAG_xxx (e.g. SWI_010 for tvalue value 10)
-    """
-
-    dates = pd.to_datetime(swi_dict['jd'] - pd.Timestamp(0).to_julian_date(),
-                           unit='D')
-
-    jd = swi_dict['jd']
-    dataframe_dict = {'jd': jd}
-
-    for t in ctime:
-        dataframe_dict["SWI_%03d" % (t,)] = swi_dict["SWI_%03d" % (t,)]
-        dataframe_dict["QFLAG_%03d" % (t,)] = swi_dict["QFLAG_%03d" % (t,)]
-
-    swi_ts_df = pd.DataFrame(dataframe_dict, index=dates)
-
-    return swi_ts_df
-
-
-def dict_to_outputdict(inputdict, variables_ctimedep, ctime,
-                       variables_other=[]):
-    """
-    Converts a processed dictionary format to a usable output dictionary
-    with names e.g. SWI_010 for swi as keys.
-
-    Parameters
-    ----------
-    inputdict : dict
-        Dictionary with variables that have different values per tvalue.
-        e.g. {swi : [[1,2,3], [1,2,3]]] for 3 different tvalue values.
-    variables_tvaluedep: list
-        List of variable names (inputdict key values) that have for every tvalue
-        different values
-    tvalue : numpy.ndarray
-        Integer values for the tvalue variations.
-    variables_other: list
-        Optional variables that are independent of the tvalue values and
-        are just added to the output dictionary without changes.
-
-    Returns
-    -------
-    output_dict : dict
-        Dictionary with tvalue related key names for all variables_tvaluedep.
-        Each field is for a tvalue value.
-        (e.g. SWI_010 for tvalue value 10)
-    """
-    depvar_buffer = {}
-
-    for var in variables_ctimedep:
-        depvar_buffer[var] = inputdict[var]
-
-    output_dict = {}
-
-    for var in variables_other:
-        output_dict[var] = inputdict[var]
-
-    for name, value in depvar_buffer.items():
-        for i in range(0, len(ctime)):
-            if value is None:
-                output_dict[name.upper()+"_%03d" % (ctime[i],)] = None
-            elif np.isscalar(value[i]):
-                output_dict[name.upper()+"_%03d" % (ctime[i],)] = value[i]
-            else:
-                output_dict[name.upper()+"_%03d" % (ctime[i],)] = \
-                    np.array([item[i] for item in value])
-
-    return output_dict
-
-
-def swi_dict_to_outputdict(swi_dict, ctime):
-    """
-    Converts a swi_img dictionary format to a usable output dictionary
-    with names like SWI_010 as keys.
-
-    Parameters
-    ----------
-    swi_dict : dict
-        Soil Water Index time series as a dictionary.
-        fields gpi, jd, swi_img, qflag
-    tvalue : numpy.ndarray
-        Integer values for the tvalue variations.
-
-    Returns
-    -------
-    swi_ts_dict : dict
-        Soil Water Index time series. Each field is for a tvalue value.
-        fields jd, SWI_xxx, QFLAG_xxx (e.g. SWI_010 for tvalue value 10)
-    """
-    variables_ctimedep = ['swi']
-
-    if 'qflag' in swi_dict:
-        variables_ctimedep.append('qflag')
-
-    if 'swi_noise' in swi_dict:
-        variables_ctimedep.append('swi_noise')
-
-    variables_other = ['jd']
-
-    return dict_to_outputdict(swi_dict, variables_ctimedep, ctime,
-                              variables_other=variables_other)
-
-
-def gain_dict_to_outputdict(gain_dict, ctime):
-    """
-    Converts a gain(_out) dictionary format to an usable output format
-    with keyvalues for each tvalue.
-
-    Parameters
-    ----------
-    gain_dict : dict
-        Gain parameters of last calculation.
-        fields gpi, last_jd, nom, denom
-    tvalue : numpy.ndarray
-        Integer values for the tvalue variations.
-
-    Returns
-    -------
-    gain_dict : dict
-        Gain parameters of last calculation. Each field is for a tvalue value.
-        fields last_jd, NOM_xxx, DENOM_xxx (e.g. NOM_010 for tvalue value 10)
-    """
-    variables_ctimedep = ['nom', 'denom', 'nom_ns']
-    variables_other = ['last_jd']
-
-    return dict_to_outputdict(gain_dict, variables_ctimedep, ctime,
-                              variables_other=variables_other)
-
-
-def inputdict_to_gain_dict(gain_in, ctime):
-    """
-    Converts an input gain dictionary format to
-    an algorithmusable gain dict format.
-    There the tvalue index equals the gain index fot that tvalue.
-
-    Parameters
-    ----------
-    gain_in : dict
-        Gain parameters of last calculation.
-        fields gpi, last_jd, nom, denom
-    tvalue : numpy.ndarray
-        Integer values for the tvalue variations.
-
-    Returns
-    -------
-    gain_dict : dict
-        Gain parameters of last calculation.
-        fields last_jd, nom, denom
-    """
-    gain_dict = {'last_jd': gain_in['last_jd'], 'nom': np.zeros(len(ctime)),
-                 'denom': np.zeros(len(ctime)), 'nom_ns': np.zeros(len(ctime))}
-
-    for i in range(0, len(ctime)):
-        gain_dict['nom'][i] = gain_in["NOM_%03d" % (ctime[i],)]
-        gain_dict['denom'][i] = gain_in["DENOM_%03d" % (ctime[i],)]
-        if "NOM_NS_%03d" % (ctime[i],) in gain_in:
-            gain_dict['nom_ns'][i] = gain_in["NOM_NS_%03d" % (ctime[i],)]
-
-    return gain_dict
-
-
-def gain_outputdict_to_dataframe(gain_dict, ctime):
-    """
-    Converts a gain(_out) dictionary format to a pandas DataFrame format.
-
-    Parameters
-    ----------
-    gain_dict : dict
-        Gain parameters of last calculation.
-        fields gpi, last_jd, nom, denom
-    tvalue : numpy.ndarray
-        Integer values for the tvalue variations.
-
-    Returns
-    -------
-    gain_dataframe : pandas.DataFrame
-        Gain parameters of last calculation. Each field is for a tvalue value.
-        fields last_jd(= date index), NOM_xxx, DENOM_xxx
-        (e.g. NOM_010 for tvalue value 10)
-    """
-    last_jd = pd.to_datetime([gain_dict['last_jd'],
-                              gain_dict['last_jd']] -
-                             pd.Timestamp(0).to_julian_date(), unit='D')
-
-    dataframe_dict = {}
-
-    for i in range(0, len(ctime)):
-        dataframe_dict["NOM_%03d" % (ctime[i],)] = \
-            gain_dict["NOM_%03d" % (ctime[i],)]
-        dataframe_dict["DENOM_%03d" % (ctime[i],)] = \
-            gain_dict["DENOM_%03d" % (ctime[i],)]
-
-    gain_df = pd.DataFrame(dataframe_dict, index=last_jd)
-
-    return gain_df
-
-
-def gain_dataframe_to_inputdict(gain_dataframe, ctime):
-    """
-    Converts a gain(_in) pandas dataframe to a dictionary format.
-
-    Parameters
-    ----------
-    gain_dataframe : pandas.DataFrame
-        Gain parameters of last calculation. Each field is for a tvalue value.
-        fields gpi, last_jd(= date index), NOM_xxx, DENOM_xxx
-        (e.g. NOM_010 for tvalue value 10)
-    tvalue : numpy.ndarray
-        Integer values for the tvalue variations.
-
-    Returns
-    -------
-    gain_dict : dict
-        Gain parameters of last calculation.
-        fields last_jd, nom, denom
-    """
-
-    gain_dict = {}
-    last_jd = gain_dataframe.index[0]
-    gain_dict['last_jd'] = julian.julday(last_jd.month, last_jd.day,
-                                         last_jd.year, last_jd.hour,
-                                         last_jd.minute, last_jd.second)
-
-    for i in range(0, len(ctime)):
-        gain_dict["NOM_%03d" % (ctime[i],)] = \
-            gain_dataframe["NOM_%03d" % (ctime[i],)].values[0]
-        gain_dict["DENOM_%03d" % (ctime[i],)] = \
-            gain_dataframe["DENOM_%03d" % (ctime[i],)].values[0]
-        if "NOM_NS_%03d" % (ctime[i],) in gain_dataframe:
-            gain_dict["NOM_NS_%03d" % (ctime[i],)] = \
-                gain_dataframe["NOM_NS_%03d" % (ctime[i],)].values[0]
-
-    return gain_dict

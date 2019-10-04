@@ -27,8 +27,6 @@ def swi_calc_cy(np.ndarray[np.double_t] juldate,
                 np.ndarray[np.float32_t] ssm,
                 np.ndarray[np.int_t] ctime,
                 np.ndarray[np.double_t] swi_jd,
-                np.ndarray[np.float32_t, ndim=2] swi_ts,
-                np.ndarray[np.float32_t, ndim=2] swi_qflag,
                 np.ndarray[np.float_t] nom,
                 np.ndarray[np.float_t] denom,
                 double last_jd_var,
@@ -44,6 +42,8 @@ def swi_calc_cy(np.ndarray[np.double_t] juldate,
     cdef int len_swi = len(swi_jd)
     cdef int len_jd = len(juldate)
     cdef int len_ctime = len(ctime)
+    cdef np.ndarray[np.float32_t, ndim = 2] swi_ts = np.empty((len_swi, len_ctime), dtype=np.float32)
+    cdef np.ndarray[np.float32_t, ndim = 2] swi_qflag = np.empty((len_swi, len_ctime), dtype=np.float32)
 
     for i in range(len_swi):
 
@@ -84,12 +84,10 @@ def swi_calc_cy_noise(np.ndarray[np.double_t] juldate,
                       np.ndarray[np.float32_t] ssm,
                       np.ndarray[np.int_t] ctime,
                       np.ndarray[np.double_t] swi_jd,
-                      np.ndarray[np.float32_t, ndim=2] swi_ts,
                       np.ndarray[np.float_t] nom,
                       np.ndarray[np.float_t] denom,
                       double last_jd_var,
-                      np.ndarray[np.double_t] ssm_noise,
-                      np.ndarray[np.float32_t, ndim=2] swi_noise,
+                      np.ndarray[np.float32_t] ssm_noise,
                       np.ndarray[np.double_t] nom_noise):
 
     cdef int i = 0
@@ -100,6 +98,8 @@ def swi_calc_cy_noise(np.ndarray[np.double_t] juldate,
     cdef int len_swi = len(swi_jd)
     cdef int len_jd = len(juldate)
     cdef int len_ctime = len(ctime)
+    cdef np.ndarray[np.float32_t, ndim = 2] swi_ts = np.empty((len_swi, len_ctime), dtype=np.float32)
+    cdef np.ndarray[np.float32_t, ndim = 2] swi_noise = np.empty((len_swi, len_ctime), dtype=np.float32)
 
     for i in range(len_swi):
 
