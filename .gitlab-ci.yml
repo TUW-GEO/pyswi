@@ -24,7 +24,7 @@ test_py27:
     - conda config --set always_yes yes --set changeps1 no
     - conda create -q -n swi_env cython numpy pandas netCDF4 pyproj scipy future
     - source activate swi_env
-    - pip install pygeobase pygeogrids pykdtree pytesmo iterative storage
+    - pip install pygeobase pygeogrids pykdtree pytesmo iterative_storage
     - python setup.py test
   except:
     - tags
@@ -38,7 +38,7 @@ test_py36:
     - conda config --set always_yes yes --set changeps1 no
     - conda create -q -n swi_env cython numpy pandas netCDF4 pyproj scipy future
     - source activate swi_env
-    - pip install pygeobase pygeogrids pykdtree pytesmo iterative storage
+    - pip install pygeobase pygeogrids pykdtree pytesmo iterative_storage
     - pip install iterative_storage
     - python setup.py test
   except:
@@ -53,7 +53,7 @@ release_job:
     - conda config --set always_yes yes --set changeps1 no
     - conda create -q -n swi_env cython numpy pandas netCDF4 pyproj scipy future
     - source activate swi_env
-    - pip install pygeobase pygeogrids pykdtree pytesmo iterative storage
+    - pip install pygeobase pygeogrids pykdtree pytesmo iterative_storage
     - python setup.py test
     - python setup.py sdist
   artifacts:
