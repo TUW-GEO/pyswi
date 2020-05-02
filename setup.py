@@ -32,7 +32,7 @@ class Cythonize(Command):
         # Make sure the compiled Cython files in the distribution are
         # up-to-date
         from Cython.Build import cythonize
-        cythonize(['pyswi/swi_ts/swi_calc_routines.pyx'])
+        cythonize(['src/pyswi/swi_ts/swi_calc_routines.pyx'])
 
 
 class NumpyBuildExt(_build_ext):
@@ -47,7 +47,8 @@ class NumpyBuildExt(_build_ext):
 
 
 ext_modules = [Extension("pyswi.swi_ts.swi_calc_routines",
-                         ["pyswi/swi_ts/swi_calc_routines.c"], include_dirs=[]), ]
+                         ["src/pyswi/swi_ts/swi_calc_routines.c"],
+                         include_dirs=[]), ]
 
 
 try:
