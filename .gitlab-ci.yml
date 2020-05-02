@@ -15,20 +15,6 @@ stages:
 - test
 - release
 
-test_py27:
-  stage: test
-  script:
-    - wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh
-    - bash miniconda.sh -b -p $HOME/miniconda
-    - export PATH="$HOME/miniconda/bin:$PATH"
-    - conda config --set always_yes yes --set changeps1 no
-    - conda create -q -n swi_env cython numpy pandas netCDF4 pyproj scipy future
-    - source activate swi_env
-    - pip install pygeobase pygeogrids pykdtree pytesmo iterative_storage
-    - python setup.py test
-  except:
-    - tags
-
 test_py36:
   stage: test
   script:
@@ -36,7 +22,7 @@ test_py36:
     - bash miniconda.sh -b -p $HOME/miniconda
     - export PATH="$HOME/miniconda/bin:$PATH"
     - conda config --set always_yes yes --set changeps1 no
-    - conda create -q -n swi_env cython numpy pandas netCDF4 pyproj scipy future
+    - conda create -q -n swi_env python=3.6 cython numpy pandas netCDF4 pyproj scipy
     - source activate swi_env
     - pip install pygeobase pygeogrids pykdtree pytesmo iterative_storage
     - pip install iterative_storage
@@ -47,11 +33,11 @@ test_py36:
 release_job:
   stage: release
   script:
-    - wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh
+    - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
     - bash miniconda.sh -b -p $HOME/miniconda
     - export PATH="$HOME/miniconda/bin:$PATH"
     - conda config --set always_yes yes --set changeps1 no
-    - conda create -q -n swi_env cython numpy pandas netCDF4 pyproj scipy future
+    - conda create -q -n swi_env python=3.6 cython numpy pandas netCDF4 pyproj scipy
     - source activate swi_env
     - pip install pygeobase pygeogrids pykdtree pytesmo iterative_storage
     - python setup.py test

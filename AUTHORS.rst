@@ -1,6 +1,6 @@
-==========
-Developers
-==========
+============
+Contributors
+============
 
 * Bernhard Bauer-Marschallinger <bernhard.bauer-marschallinger@geo.tuwien.ac.at>
 * Bernhard Gößwein <bernhard.goesswein@geo.tuwien.ac.at>

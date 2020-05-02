@@ -2,6 +2,12 @@
 Changelog
 =========
 
+Version 0.5.0
+=============
+
+- Python compatibility >= 3.6
+- Update pyscaffold v3.2.3
+
 Version 0.4.0
 =============
 
