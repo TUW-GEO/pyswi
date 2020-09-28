@@ -2,6 +2,13 @@
 Changelog
 =========
 
+Version 0.6.0
+=============
+- Merged calc.py and iterative_swi.py into a single file
+- Weights now optional in the original code (weighted functions removed)
+- Unified variable names
+- Updated the environment for py3, dropped py2 support
+
 Version 0.5.0
 =============
 
