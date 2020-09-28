@@ -1,4 +1,4 @@
-# Copyright (c) 2017, Vienna University of Technology (TU Wien), Department
+# Copyright (c) 2020, Vienna University of Technology (TU Wien), Department
 # of Geodesy and Geoinformation (GEO).
 # All rights reserved.
 
@@ -22,9 +22,7 @@ from tempfile import mkdtemp
 
 import numpy as np
 
-from pyswi.swi_img.iterative_swi import IterativeSWI
-from pyswi.swi_img.iterative_swi import IterativeMultiSWI
-from pyswi.swi_img.calc import iterative_swi
+from pyswi.swi_img.iterative_swi import IterativeMultiSWI, IterativeSWI, calc_swi
 
 
 class IterativeSwiTest(unittest.TestCase):
@@ -43,23 +41,20 @@ class IterativeSwiTest(unittest.TestCase):
         output.
         """
 
-        ssm = np.array([20., 20., 20.])
-        ssm_jd = np.array([1, 2, 3])
-        time_scale = 5
-        prev_swi = np.array([10, 10, 10])
-        prev_gain = np.array([1., 1., 1.])
-        prev_qflag = np.array([40., 40., 40.])
-        prev_jd = np.array([0, 0, 0])
+        next_ssm = np.array([20., 20., 20.])
+        next_ssm_jd = np.array([1, 2, 3])
+        tvalue = 5
+        swi = np.array([10, 10, 10])
+        gain = np.array([1., 1., 1.])
+        jd = np.array([0, 0, 0])
 
         swi_ref = np.array([15.49833997, 15.9868766, 16.45656306])
-        qflag_ref = np.array([33.74923012, 27.81280184, 22.95246544])
         gain_ref = np.array([0.549834, 0.59868766, 0.64565631])
 
-        swi, qflag, gain = iterative_swi(ssm, ssm_jd, time_scale, prev_swi,
-                                         prev_gain, prev_qflag, prev_jd)
+        swi, gain = calc_swi(next_ssm, next_ssm_jd, tvalue, swi,
+                                         jd, gain)
 
         np.testing.assert_array_almost_equal(swi, swi_ref, decimal=6)
-        np.testing.assert_array_almost_equal(qflag, qflag_ref, decimal=6)
         np.testing.assert_array_almost_equal(gain, gain_ref, decimal=6)
 
     def test_iterative_swi(self):
@@ -78,7 +73,7 @@ class IterativeSwiTest(unittest.TestCase):
              2456597.64583333, 2456597.64583333, 2456597.64583333,
              2456598.64583333, 2456598.64583333, 2456599.64583333,
              2456599.64583333, 2456599.64583333])
-        ctime = 5
+        tvalue = 5
 
         swi_ref = np.array([24.7425298791, 25.2923638764, 17.594687914,
                             28.0415338629, 35.7392098253, 12.6461819382,
@@ -90,7 +85,7 @@ class IterativeSwiTest(unittest.TestCase):
 
         iter_swi = IterativeSWI(ssm, os.path.join(self.curpath(),
                                                   'data',
-                                                  'iterative_swi'), ctime)
+                                                  'iterative_swi'), tvalue)
 
         swi = iter_swi.calc_iter(ssm_jd, ssm)
 
@@ -113,7 +108,8 @@ class IterativeSwiTest(unittest.TestCase):
              2456597.64583333, 2456597.64583333, 2456597.64583333,
              2456598.64583333, 2456598.64583333, 2456599.64583333,
              2456599.64583333, 2456599.64583333])
-        ctime = 5
+
+        tvalue = 5
 
         swi_ref = np.array([24.7425298791, 25.2923638764, 17.594687914,
                             28.0415338629, 35.7392098253, 12.6461819382,
@@ -125,7 +121,7 @@ class IterativeSwiTest(unittest.TestCase):
 
         iter_swi = IterativeSWI(ssm, os.path.join(self.curpath(),
                                                   'data',
-                                                  'iterative_swi'), ctime)
+                                                  'iterative_swi'), tvalue)
 
         swi = iter_swi.calc_iter(ssm_jd, ssm)
 
@@ -135,7 +131,7 @@ class IterativeSwiTest(unittest.TestCase):
 
         np.testing.assert_array_almost_equal(swi, swi_ref, decimal=6)
 
-        iter_swi2 = IterativeSWI(ssm, out_path, ctime)
+        iter_swi2 = IterativeSWI(ssm, out_path, tvalue)
 
         ssm2 = np.array([45., 46., 32., 51., 65., 23., 54., 44., 23., 42., 46.,
                         75., 43., 23., 12., 23., 11., 9., 23., 24.])
@@ -179,7 +175,7 @@ class IterativeSwiTest(unittest.TestCase):
              2456597.64583333, 2456597.64583333, 2456597.64583333,
              2456598.64583333, 2456598.64583333, 2456599.64583333,
              2456599.64583333, 2456599.64583333])
-        ctimes = np.array([5, 50, 75])
+        tvalues = np.array([5, 50, 75])
 
         swi_005_ref = np.array([24.7425298791, 25.2923638764, 17.594687914,
                                 28.0415338629, 35.7392098253, 12.6461819382,
@@ -206,7 +202,7 @@ class IterativeSwiTest(unittest.TestCase):
                                 11.7299693382, 12.2399680051])
 
         iter_swi = IterativeMultiSWI(ssm, os.path.join(self.curpath(),
-                                     'data', 'iterative_swi'), ctimes)
+                                     'data', 'iterative_swi'), tvalues)
 
         swi = iter_swi.calc_iter(ssm_jd, ssm)
 
@@ -234,19 +230,19 @@ class IterativeSwiTest(unittest.TestCase):
              2456597.64583333, 2456597.64583333, 2456597.64583333,
              2456598.64583333, 2456598.64583333, 2456599.64583333,
              2456599.64583333, 2456599.64583333])
-        ctimes = np.array([5, 50, 75])
+        tvalues = np.array([5, 50, 75])
 
         iter_swi = IterativeMultiSWI(ssm, os.path.join(self.curpath(),
-                                     'data', 'iterative_swi'), ctimes)
+                                     'data', 'iterative_swi'), tvalues)
 
         iter_swi.calc_iter(ssm_jd, ssm)
 
-        for iter in iter_swi.iterative_swi:
+        for iter in iter_swi.calc_swi:
             iter.iterstepdata.path = out_path
 
         iter_swi.store_iter_data()
 
-        iter_swi2 = IterativeMultiSWI(ssm, out_path, ctimes)
+        iter_swi2 = IterativeMultiSWI(ssm, out_path, tvalues)
 
         ssm2 = np.array([45., 46., 32., 51., 65., 23., 54., 44., 23., 42., 46.,
                         75., 43., 23., 12., 23., 11., 9., 23., 24.])
