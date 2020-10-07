@@ -5,8 +5,7 @@ SWI method was originally developed at TU Wien (Wagner et al. 1999; https://www.
 SWI is calculated for a given time length *T* using the formula:
 
 .. math::
-
-    SWI\ :sup:`T` (t\ :sup:`n`) = SWI_T(t_n _- _1) + gain_T(t_n)(SSM(t_n) - (SWI_T(t_n _- _1))
+    SWI(t_n) = SWI_T(t_n _- _1) + gain_T(t_n)(SSM(t_n) - (SWI_T(t_n _- _1))
 
 Where T-value is a temporal length ruling the infiltration; depending on the soil characteristics it translates into different soil depths.
 
