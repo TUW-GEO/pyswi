@@ -19,7 +19,7 @@ SWI is calculated for a given *T-value* using the formula (where :math:`_n` refe
 Pyswi allows for calculation of SWI from SSM datasets, the process can be initialized at any time when SSM observations become available with the following values: :math:`SWI_T(t_n) = SSM(t_n), gain_T(t_n) = 1, t_{n-1} = t_n`
 
 Features
-=========
+========
     * Calculation of SWI from SSM images with regular (*by default*), and irregular (parameter *weighted*; Bauer-Marschalinger and Paulik, 2019) timestamps.
 
     * Calculation of SWI from SSM time series.
