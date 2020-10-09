@@ -13,6 +13,13 @@ The package includes the following features:
 * Recursive SWI approach to calculate SWI for a single or a set of T-values in near-real time
     * Recursive *Weighted* calculation of the SWI, allowing for custom weight assignment to individual observations
 
+Description
+===========
+This package should be installable through pip:
+
+.. code::
+    pip install pyswi
+
 Note
 ====
 
