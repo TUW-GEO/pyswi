@@ -18,6 +18,7 @@ Installation
 This package should be installable through pip:
 
 .. code::
+
     pip install pyswi
 
 Note
