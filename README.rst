@@ -14,10 +14,10 @@ The package includes the following features:
     * Recursive *Weighted* calculation of the SWI, allowing for custom weight assignment to individual observations
 
 Installation
-===========
+============
 This package should be installable through pip:
 
-.. code::
+.. code-block:: python
 
     pip install pyswi
 
