@@ -113,17 +113,24 @@ def test_process_swi_gain():
                                    t_value=t_value, gain_in=gain_1,
                                    nan=999)
 
+    swi_ref = {
+        'swi_5': np.array([10., 15.49834, 21.32452, 27.472094, 33.93228, 40.69421,
+                           np.nan, 51.660824, 41.072067]),
+        'swi_50': np.array([10., 15.049998, 20.133324, 25.249971, 30.399931, 35.58319,
+                            np.nan, 42.430466, 38.023155]),
+        'swi_100': ([10., 15.025, 20.066666, 25.124996, 30.199991, 35.29165,
+                     np.nan, 41.928066, 37.76523])
+    }
+
     for t in t_value:
         comb_swi_ts = swi_ts_1['swi_{}'.format(t)].tolist() + \
-            swi_ts_2['swi_{}'.format(t)].tolist()
-        pytesmo_swi = exp_filter(sm.astype(np.float64), swi_jd, t, nan=999)
-        np.testing.assert_array_almost_equal(comb_swi_ts,
-                                             pytesmo_swi, 4)
-
+                      swi_ts_2['swi_{}'.format(t)].tolist()
+        np.testing.assert_array_almost_equal(comb_swi_ts, swi_ref['swi_{}'.format(t)], 4)
 
 def test_process_swi_not_daily_out():
     """
-    Test correct calculation of SWI, compared to the pytesmo calculation.
+    Test correct calculation of SWI with irregular timestamps,
+    compared to the a hardcoded calculation output.
     """
     t_value = [5, 50, 100]
 
@@ -141,11 +148,18 @@ def test_process_swi_not_daily_out():
 
     swi_ts, gain_out = calc_swi_ts(ssm_ts, swi_jd, t_value=t_value)
 
-    for t in t_value:
-        pytesmo_swi = exp_filter(sm.astype(np.float64), swi_jd, t)
-        np.testing.assert_array_almost_equal(swi_ts['swi_{}'.format(t)],
-                                             pytesmo_swi, 4)
+    swi_ref = {
+        'swi_5': np.array([84., 86.21024, 83.47359, 84.59898, 86.39057, 87.93006,
+                           88.829475, 88.008446, 87.43135, 87.9233]),
+        'swi_50': np.array([84., 86.0211, 83.64838, 84.50836, 85.854836, 87.090576,
+                            87.826706, 87.45131, 87.16135, 87.46732]),
+        'swi_100': np.array([84., 86.01055, 83.65755, 84.50414, 85.827286, 87.04517,
+                             87.77045, 87.41343, 87.13668, 87.434044])
+    }
 
+    for t in t_value:
+        np.testing.assert_array_almost_equal(swi_ts['swi_{}'.format(t)],
+                                             swi_ref['swi_{}'.format(t)], 4)
 
 def test_swi_noise_calc():
     """
@@ -206,10 +220,9 @@ def test_process_swi_noise():
             swi_ts1['swi_noise_{}'.format(t)],
             swi_ts2['swi_noise_{}'.format(t)], 4)
 
-
 def test_swi_gain_noise():
     """
-    Test correct calculation of SWI Noise gain.
+    Test correct calculation of SWI noise gain.
     """
     t_value = [5, 50, 100]
 
