@@ -9,7 +9,8 @@ Description
 
 The package includes the following features:
 
-* SWI time series calculation
+* SWI time series calculation from SSM time series
+    * Two methods for SWI noise calculation (regular and recursive) 
 * Recursive SWI approach to calculate SWI for a single or a set of T-values in near-real time
     * Recursive *Weighted* calculation of the SWI, allowing for custom weight assignment to individual observations
 
