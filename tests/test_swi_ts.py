@@ -22,7 +22,7 @@ import numpy as np
 from numpy.lib.recfunctions import unstructured_to_structured
 import pandas as pd
 
-from pyswi.src.pyswi.swi_ts.swi_ts import calc_swi_ts, calc_swi_noise, calc_swi_noise_rec
+from pyswi.swi_ts.swi_ts import calc_swi_ts, calc_swi_noise, calc_swi_noise_rec
 
 
 def test_process_swi_calc():
