@@ -18,7 +18,6 @@ Contents
    Module Reference <api/modules>
 
 
-
 Indices and tables
 ==================
 
