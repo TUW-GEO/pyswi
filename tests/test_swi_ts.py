@@ -15,7 +15,7 @@
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """
-This module tests the soil water index calculation.
+This module tests the soil water index calculation from SSM time series.
 """
 
 import numpy as np
