@@ -13,10 +13,6 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""
-This module represents the WARP Processing step Soil Water Index (SWI).
-"""
-
 from math import exp
 
 import pyximport
