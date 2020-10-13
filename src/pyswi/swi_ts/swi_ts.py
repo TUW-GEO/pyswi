@@ -1,4 +1,4 @@
-# Copyright (c) 2019, TU Wien, Department of Geodesy and Geoinformation (GEO).
+# Copyright (c) 2020, TU Wien, Department of Geodesy and Geoinformation (GEO).
 # All rights reserved.
 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -25,9 +25,7 @@ import numpy as np
 pyximport.install(setup_args={'include_dirs': [
                   np.get_include()]}, inplace=True)
 
-from pyswi.swi_ts.swi_calc_routines import swi_calc_cy
-from pyswi.swi_ts.swi_calc_routines import swi_calc_cy_noise
-
+from pyswi.swi_ts.swi_calc_routines import swi_calc_cy, swi_calc_cy_noise
 
 def calc_swi_ts(ssm_ts, swi_jd, gain_in=None, t_value=[1, 5, 10, 15, 20],
                 nom_init=0, denom_init=0, nan=-9999.):
@@ -60,6 +58,7 @@ def calc_swi_ts(ssm_ts, swi_jd, gain_in=None, t_value=[1, 5, 10, 15, 20],
         Gain parameters of last calculation.
         fields gpi, last_jd, nom, denom, nom_ns
     """
+
     t_value = np.asarray(t_value)
 
     if gain_in is None:
