@@ -91,7 +91,7 @@ def test_process_swi_gain():
     Test gain in/out of the SWI calculation.
     It calculates the first 4 days and returns the value and gain and
     then starts the calculation of day 5 to 9 and
-    compares it with pytesmo over the whole period.
+    compares it with hardcoded output over the whole period.
     """
     t_value = [5, 50, 100]
 
