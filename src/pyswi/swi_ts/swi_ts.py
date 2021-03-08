@@ -1,4 +1,4 @@
-# Copyright (c) 2019, TU Wien, Department of Geodesy and Geoinformation (GEO).
+# Copyright (c) 2020, TU Wien, Department of Geodesy and Geoinformation (GEO).
 # All rights reserved.
 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -13,10 +13,6 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""
-This module represents the WARP Processing step Soil Water Index (SWI).
-"""
-
 from math import exp
 
 import pyximport
@@ -25,9 +21,7 @@ import numpy as np
 pyximport.install(setup_args={'include_dirs': [
                   np.get_include()]}, inplace=True)
 
-from pyswi.swi_ts.swi_calc_routines import swi_calc_cy
-from pyswi.swi_ts.swi_calc_routines import swi_calc_cy_noise
-
+from pyswi.swi_ts.swi_calc_routines import swi_calc_cy, swi_calc_cy_noise
 
 def calc_swi_ts(ssm_ts, swi_jd, gain_in=None, t_value=[1, 5, 10, 15, 20],
                 nom_init=0, denom_init=0, nan=-9999.):
@@ -60,6 +54,7 @@ def calc_swi_ts(ssm_ts, swi_jd, gain_in=None, t_value=[1, 5, 10, 15, 20],
         Gain parameters of last calculation.
         fields gpi, last_jd, nom, denom, nom_ns
     """
+
     t_value = np.asarray(t_value)
 
     if gain_in is None:
@@ -238,53 +233,3 @@ def calc_swi_noise_rec(ssm_ts, t_value, last_den=1, last_nom=0):
         swi_ts['swi_noise_{}'.format(t)] = swi_noise[:, i]
 
     return swi_ts, gain_out
-
-
-def iterative_swi(ssm, ssm_jd, t_value, prev_swi, prev_gain,
-                  prev_qflag, prev_jd):
-    """
-    Takes input data and previous data and calculates SWI
-    values for next dates. All arrays have to be the same shape
-    so that the whole batch can be calculated at once
-    initializing and masking has to be done outside of this basic
-    function
-
-    Parameters
-    ----------
-    ssm : numpy.array
-        surface soil moisture
-    ssm_jd : numpy.array
-        observation time of ssm given as julian date
-    t_value : int
-        T-value for SWI calculation
-    prev_swi : numpy.array
-        values of SWI at previous iteration
-    prev_gain : numpy.array
-        values of gain from previous iteration
-    prev_qflag : numpy.array
-        values of qflag from previous iteration
-    prev_jd : numpy.array
-        values of julian date from previous iteration
-
-    Returns
-    -------
-    swi : float
-        swi results
-    qflag : float
-        quality flag results
-    gain : float
-        gain for next iteration
-    """
-    # calculate time diff
-    time_diff = (ssm_jd - prev_jd).astype(np.float)
-
-    # calculate qflag and gain based on previous values
-    qflag = 1. + np.exp(-(time_diff / float(t_value))) * prev_qflag
-
-    gain = (prev_gain / (prev_gain.astype(np.float) +
-                         np.exp(-(time_diff / float(t_value)))))
-
-    # calculate SWI
-    swi = prev_swi + gain * (ssm - prev_swi)
-
-    return swi, qflag, gain
