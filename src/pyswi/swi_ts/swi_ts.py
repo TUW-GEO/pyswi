@@ -1,4 +1,4 @@
-# Copyright (c) 2020, TU Wien, Department of Geodesy and Geoinformation (GEO).
+# Copyright (c) 2021, TU Wien, Department of Geodesy and Geoinformation (GEO).
 # All rights reserved.
 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"

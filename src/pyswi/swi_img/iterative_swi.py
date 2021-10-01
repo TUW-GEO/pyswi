@@ -240,8 +240,10 @@ class IterativeSWI(object):
     Class for calculation of the SWI in iterative mode.
 
     This means that the previous: swi, julian dates, qflags and/or gain, denominator, weights
-    have to be stored for a successful
-    restart after a break.
+    have to be stored for a successful restart after a break. On the first iteration the swi
+    values are initialized as equal to the surface soil moisture, and gain is initialized as 1.0
+    following Albergel et al (2008) https://doi.org/10.5194/hess-12-1323-2008
+
     This class only works with a single tvalue value.
 
     This is suitable if the SWI is calculated from a series of swaths/images.
