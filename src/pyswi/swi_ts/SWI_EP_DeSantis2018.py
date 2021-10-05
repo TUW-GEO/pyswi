@@ -44,7 +44,7 @@ def swi_ep_rec(ssm, T_value, T_noise):
 
     for i in range(1, len_ssm):
         for c in range(0, len_T):
-            time_diff = ssm['sm_jd'][i]-last_jd
+            time_diff = ssm['sm_jd'][i]-last_jd # todo move up?
             Esponenz = np.exp(-time_diff / T_value[c]) # exp_term?
             gain_old = gain_curr
             contr1_old = contr1_curr
