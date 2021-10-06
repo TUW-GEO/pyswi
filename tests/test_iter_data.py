@@ -38,7 +38,6 @@ class TestIterStepData(unittest.TestCase):
         self.itersavepath = tempfile.mkdtemp()
 
     def test_metadata_extraction(self):
-        #todo added "iterative_storage" to path to adapt the test
         path = os.path.join(curpath(), 'data', 'iterative_storage', 'metadata_from_filename')
         data_coll = IterStepData(path, 100, {})
 

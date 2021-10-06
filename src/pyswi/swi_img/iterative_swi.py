@@ -16,7 +16,7 @@ import os
 from datetime import datetime
 
 import numpy as np
-from pyswi.swi_img.iter_data import IterStepData
+from src.pyswi.swi_img.iter_data import IterStepData
 from cadati.jd_date import julian2datetime
 
 def calc_swi(next_ssm, next_ssm_jd, tvalue, swi, jd,
