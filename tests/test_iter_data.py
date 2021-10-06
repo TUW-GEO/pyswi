@@ -15,7 +15,6 @@
 Test for the iteration data storage
 '''
 
-
 import os
 import unittest
 import glob
@@ -39,7 +38,8 @@ class TestIterStepData(unittest.TestCase):
         self.itersavepath = tempfile.mkdtemp()
 
     def test_metadata_extraction(self):
-        path = os.path.join(curpath(), 'data', 'metadata_from_filename')
+        #todo added "iterative_storage" to path to adapt the test
+        path = os.path.join(curpath(), 'data', 'iterative_storage', 'metadata_from_filename')
         data_coll = IterStepData(path, 100, {})
 
         assert data_coll.metadata['sensing_start'] == [
@@ -50,14 +50,14 @@ class TestIterStepData(unittest.TestCase):
             datetime(2013, 11, 25, 17, 47, 33)]
 
     def test_get_latest_sensing_time(self):
-        path = os.path.join(curpath(), 'data', 'metadata_from_filename')
+        path = os.path.join(curpath(), 'data', 'iterative_storage', 'metadata_from_filename')
         data_coll = IterStepData(path, 100, {})
 
         max_sensing_time = data_coll.get_latest_sensing_time()
         assert max_sensing_time == datetime(2013, 11, 24, 12, 2, 58)
 
     def test_construct_filename(self):
-        path = os.path.join(curpath(), 'data', 'metadata_from_filename')
+        path = os.path.join(curpath(), 'data', 'iterative_storage', 'metadata_from_filename')
         data_coll = IterStepData(path, 100, {}, prefix='ASCA_SWI25_03_M02')
 
         filename = data_coll._construct_file_name(datetime(2013, 11, 24, 12),
