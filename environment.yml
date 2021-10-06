@@ -8,8 +8,9 @@ dependencies:
 - scipy
 - pip
 - pip:
+  - cadati
   - pygeobase
   - pygeogrids
   - pykdtree
   - pyparsing
-  - iterative_storage
+  - trollsift
