@@ -23,9 +23,10 @@ pyximport.install(setup_args={'include_dirs': [
 
 from pyswi.swi_ts.swi_calc_routines import swi_calc_cy, swi_calc_cy_noise
 
+
 def swi_error_prop(ssm, T_value, T_noise):
     """
-    Recursive SWI error propagation function based on DeSantis and Biondi (2018)
+    Recursive SWI calculation and error propagation function based on DeSantis and Biondi (2018)
     "Error propagation from remotely sensed surface soil moisture
     into soil water index using an exponential filter",
     https://doi.org/10.29007/kvhb
