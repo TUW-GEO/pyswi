@@ -18,16 +18,16 @@ The package includes the following features:
 iterative_storage
 *****
 
-Storage of Iteration data between processing runs.
+Storage of iteration data between processing runs.
 
 Description
 ===========
 
 In a process that works iteratively and needs to store some data
 between processing runs, the classes in this package can be used to store
-the data as netCDF files of any format. The main functionality of this package
+that data as netCDF files of any format. The main functionality of this package
 is in the building of the storage filenames and in reading the correct iteration
-data from disk when the process is started again.
+data from the disk when the process is started again.
 
 
 Installation
