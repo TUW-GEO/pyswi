@@ -13,7 +13,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from math import exp
+from math import exp, sqrt
 
 import pyximport
 import numpy as np
@@ -22,6 +22,83 @@ pyximport.install(setup_args={'include_dirs': [
                   np.get_include()]}, inplace=True)
 
 from pyswi.swi_ts.swi_calc_routines import swi_calc_cy, swi_calc_cy_noise
+
+def swi_error_prop(ssm, T_value, T_noise):
+    """
+    Recursive SWI error propagation function based on DeSantis and Biondi (2018)
+    "Error propagation from remotely sensed surface soil moisture
+    into soil water index using an exponential filter",
+    https://doi.org/10.29007/kvhb
+    Translated from MatLab code obtained from the authors.
+
+    Parameters
+    ----------
+    ssm: numpy.ndarray
+        Surface soil moisture time series with fields 'sm', 'sm_uncertainty' and 'sm_jd'
+    T_value: numpy.ndarray
+        Exponential filter characteristic T-value parameter
+    T_noise: numpy.ndarray
+        T-value standard error. Baseed on empirical experiments
+        author suggests 10% of T for calibrated T-values.
+
+    Returns
+    -------
+    swi: numpy.ndarray
+        Soil water index time series
+    swi_noise:numpy.ndarray
+        Soil water index noise time series
+    """
+
+    len_ssm = len(ssm)
+    len_T = len(T_value)
+
+    swi = np.zeros((len_ssm, len_T))
+    swi_noise = np.zeros((len_ssm, len_T))
+
+    swi[0] = ssm['sm'][0]
+    swi_noise[0] = ssm['sm_uncertainty'][0]
+
+    last_jd = ssm['sm_jd'][0]
+    gain_curr = 1
+    contr1_curr = ssm['sm_uncertainty'][0]**2
+    G_curr = 0
+    JT_curr = 0 # Jacobian term
+
+    for i in range(1, len_ssm):
+        time_diff = ssm['sm_jd'][i] - last_jd
+
+        for c in range(0, len_T):
+            # time_diff = ssm['sm_jd'][i]-last_jd
+            ef = np.exp(-time_diff / T_value[c])
+            gain_old = gain_curr
+            contr1_old = contr1_curr
+            gain_curr = gain_old / (gain_old + ef)
+            swi[i][c] = swi[i-1][c] + gain_curr * (ssm['sm'][i] - swi[i-1][c])
+            contr1_curr = ((1 - gain_curr)**2) * contr1_old + (gain_curr * ssm['sm_uncertainty'][i])**2
+            G_old = G_curr
+            JT_old = JT_curr
+            G_curr = ef * (G_old + time_diff / T_value[c] / gain_old)
+            JT_curr = gain_curr / T_value[c] * (G_curr * (swi[i-1][c] - swi[i][c])
+                                                + ef * T_value[c] / gain_old * JT_old)
+            contr2 = (JT_curr * T_noise[c])**2
+            swi_noise[i][c] = sqrt(contr1_curr + contr2)
+
+        last_jd = ssm['sm_jd'][i]
+
+    dtype_list = [('swi_jd', np.float64)]
+    for t in T_value:
+        dtype_list.append(('swi_noise_{}'.format(t), np.float32))
+        dtype_list.append(('swi_{}'.format(t), np.float32))
+
+    swi_ts = np.zeros(ssm.size, dtype=np.dtype(dtype_list))
+
+    swi_ts['swi_jd'] = ssm['sm_jd']
+    for i, t in enumerate(T_value):
+        swi_ts['swi_{}'.format(t)] = swi[:, i]
+        swi_ts['swi_noise_{}'.format(t)] = swi_noise[:, i]
+
+    return swi_ts
+
 
 def calc_swi_ts(ssm_ts, swi_jd, gain_in=None, t_value=[1, 5, 10, 15, 20],
                 nom_init=0, denom_init=0, nan=-9999.):
@@ -109,63 +186,6 @@ def calc_swi_ts(ssm_ts, swi_jd, gain_in=None, t_value=[1, 5, 10, 15, 20],
         swi_ts['swi_qflag_{}'.format(t)] = swi_qflag[:, i]
 
     return swi_ts, gain_out
-
-
-def calc_swi_noise(ssm_ts, t_value):
-    """
-    Calculation of Soil Water Index (SWI) noise.
-    (Slower than the recursive approach).
-
-    Parameters
-    ----------
-    ssm_ts : numpy.ndarray
-        Surface soil moisture time series with fields: jd, sm, sm_noise
-    t_value : numpy.ndarray
-        Characteristic time length.
-
-    Returns
-    -------
-    swi_noise_ts : numpy.ndarray
-        Soil Water Index noise time series.
-    """
-    len_sm = len(ssm_ts)
-    len_t_value = len(t_value)
-
-    nom_db = np.zeros((len_sm, len_t_value))
-    den_db = np.zeros((len_sm, len_t_value))
-    swi_noise = np.zeros((len_sm, len_t_value))
-
-    for i in range(0, len_sm):
-        nom = np.zeros(len_t_value)
-        den = np.zeros(len_t_value)
-        for c in range(0, len_t_value):
-            for j in range(0, i+1):
-                jd_diff = ssm_ts['jd'][i] - ssm_ts['jd'][j]
-                exp_term = exp(((-2)*(jd_diff)) / t_value[c])
-                nom[c] += ssm_ts['sm_noise'][i] * exp_term
-                den[c] += exp(((-1)*(jd_diff)) / t_value[c])
-
-            nom_db[i][c] = nom[c]
-            den_db[i][c] = den[c]
-            swi_noise[i][c] = (nom[c] / (den[c] ** 2))
-
-    gain_out = {'denom': den, 'nom': nom, 'last_jd': ssm_ts['jd'][-1],
-                'nom_noise': 0}
-
-    dtype_list = [('jd', np.float64)]
-
-    for t in t_value:
-        dtype_list.append(('swi_noise_{}'.format(t), np.float32))
-
-    swi_ts = np.zeros(ssm_ts.size, dtype=np.dtype(dtype_list))
-
-    swi_ts['jd'] = ssm_ts['jd']
-
-    for i, t in enumerate(t_value):
-        swi_ts['swi_noise_{}'.format(t)] = swi_noise[:, i]
-
-    return swi_ts, gain_out
-
 
 def calc_swi_noise_rec(ssm_ts, t_value, last_den=1, last_nom=0):
     """
