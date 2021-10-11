@@ -9,8 +9,11 @@ Description
 
 The package includes the following features:
 
-* SWI time series calculation from SSM time series
-    * including two methods for SWI noise calculation (regular and recursive)
+* SWI time series calculation and error propagation from SSM time series
+    * a recursive approach to SWI and its noise with calculation routines in Cython
+    * an equivalent SWI calculation in Python with an exponential-filter-based
+    error propagation scheme
+
 * Recursive SWI approach to calculate SWI for a single or a set of T-values in near-real time
     * also *Weighted* calculation of the SWI, allowing for custom weight assignment to individual observations
 
