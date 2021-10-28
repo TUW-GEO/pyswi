@@ -39,7 +39,7 @@ def swi_error_prop(ssm, T_value, T_noise):
     T_value: numpy.ndarray
         Exponential filter characteristic T-value parameter
     T_noise: numpy.ndarray
-        T-value standard error. Baseed on empirical experiments
+        T-value standard error. Based on empirical experiments
         author suggests 10% of T for calibrated T-values.
 
     Returns
@@ -60,29 +60,34 @@ def swi_error_prop(ssm, T_value, T_noise):
     swi_noise[0] = ssm['sm_uncertainty'][0]
 
     last_jd = ssm['sm_jd'][0]
-    gain_curr = 1
-    contr1_curr = ssm['sm_uncertainty'][0]**2
-    G_curr = 0
-    JT_curr = 0 # Jacobian term
+    gain_curr = [1] * len_T
+    contr1_curr = [ssm['sm_uncertainty'][0]**2] * len_T
+    G_curr = [0] * len_T
+    JT_curr = [0] * len_T # Jacobian term
+
+    gain_old = [None] * len_T
+    G_old = [None] * len_T
+    JT_old = [None] * len_T
+    contr1_old = [None] * len_T
+    contr2 = [None] * len_T
 
     for i in range(1, len_ssm):
         time_diff = ssm['sm_jd'][i] - last_jd
 
         for c in range(0, len_T):
-            # time_diff = ssm['sm_jd'][i]-last_jd
             ef = np.exp(-time_diff / T_value[c])
-            gain_old = gain_curr
-            contr1_old = contr1_curr
-            gain_curr = gain_old / (gain_old + ef)
-            swi[i][c] = swi[i-1][c] + gain_curr * (ssm['sm'][i] - swi[i-1][c])
-            contr1_curr = ((1 - gain_curr)**2) * contr1_old + (gain_curr * ssm['sm_uncertainty'][i])**2
-            G_old = G_curr
-            JT_old = JT_curr
-            G_curr = ef * (G_old + time_diff / T_value[c] / gain_old)
-            JT_curr = gain_curr / T_value[c] * (G_curr * (swi[i-1][c] - swi[i][c])
-                                                + ef * T_value[c] / gain_old * JT_old)
-            contr2 = (JT_curr * T_noise[c])**2
-            swi_noise[i][c] = sqrt(contr1_curr + contr2)
+            gain_old[c] = gain_curr[c]
+            contr1_old[c] = contr1_curr[c]
+            gain_curr[c] = gain_old[c] / (gain_old[c] + ef)
+            swi[i][c] = swi[i-1][c] + gain_curr[c] * (ssm['sm'][i] - swi[i-1][c])
+            contr1_curr[c] = ((1 - gain_curr[c])**2) * contr1_old[c] + (gain_curr[c] * ssm['sm_uncertainty'][i])**2
+            G_old[c] = G_curr[c]
+            JT_old[c] = JT_curr[c]
+            G_curr[c] = ef * (G_old[c] + time_diff / T_value[c] / gain_old[c])
+            JT_curr[c] = gain_curr[c] / T_value[c] * (G_curr[c] * (swi[i-1][c] - swi[i][c])
+                                                + ef * T_value[c] / gain_old[c] * JT_old[c])
+            contr2[c] = (JT_curr[c] * T_noise[c])**2
+            swi_noise[i][c] = sqrt(contr1_curr[c] + contr2[c])
 
         last_jd = ssm['sm_jd'][i]
 

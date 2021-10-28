@@ -60,16 +60,17 @@ dtype = np.dtype([('sm_jd', np.float64), ('sm', np.float32), ('sm_uncertainty', 
 ssm = unstructured_to_structured(np.hstack((ssm['sm_jd'][:, np.newaxis], ssm['sm'][:, np.newaxis],
                                                ssm['sm_uncertainty'][:, np.newaxis])), dtype=dtype)
 
-swi_new = swi_error_prop(ssm, T_value=[10], T_noise=[.1])
+swi_new = swi_error_prop(ssm, T_value=[5], T_noise=[.5])
+swi_multi = swi_error_prop(ssm, T_value=[5,10], T_noise=[.5, 1.])
 
 print("Bazinga!")
 
-plt.plot(ssm['sm'])
-plt.plot(swi_old['swi_10'])
-plt.plot(swi_new['swi_10'])
-plt.legend(['sm', 'calc_swi_ts(t=10)', 'DeSantis&Biondi2018_(t=10)'], fontsize=20, loc='best')
+# plt.plot(ssm['sm'])
+plt.plot(ssm['sm_uncertainty'])
+plt.plot(swi_new['swi_noise_5'])
+plt.legend(['C3S SSM uncertainty', 'DeSantis&Biondi2018 (t=5, \u03C3T=10%)'], fontsize=20, loc='best')
 
-plt.title("SWI processing for a single T-value", fontsize=20)
+plt.title("SWI (T=5) error propagation for a point in Southeastern Australia", fontsize=20)
 #
 # plt.plot(results['sm_uncertainty'])
 # plt.plot(results['swi_noise_5'])
@@ -82,10 +83,12 @@ plt.title("SWI processing for a single T-value", fontsize=20)
 #
 # plt.title("Comparison of SWI noise caluclating functions, T=5", size=20)
 #
-# plt.ylabel('uncertainty [m3/m3]', fontsize=20, labelpad=20)
-# plt.yticks(fontsize=20)
+plt.ylabel('uncertainty [m3/m3]', fontsize=20, labelpad=20)
+plt.xlabel('day of year [2020]', fontsize=20, labelpad=20)
 # plt.ylim((0.001, 0.008))
-# plt.xticks(fontsize=20)
+
+plt.yticks(fontsize=20)
+plt.xticks(fontsize=20)
 
 
 fig, [ax1, ax2] = plt.subplots(1,2)
