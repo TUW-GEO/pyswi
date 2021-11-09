@@ -19,6 +19,8 @@ c3s_reader = C3STs(c3s_path, remove_nans=True)
 c3s = c3s_reader.read(gpi)
 c3s.index = CFTimeIndex(c3s.index).to_datetimeindex()
 c3s = c3s.loc['2020-01-01':'2020-12-31']
+c3s1 = c3s.loc['2020-01-01':'2020-06-30']
+c3s2 = c3s.loc['2020-07-01':'2020-12-31']
 c3s_reader.close()
 
 # ssm = {}
@@ -41,33 +43,77 @@ c3s_reader.close()
 
 ssm = {}
 ssm['sm'] = c3s['sm']
-ssm['sm_noise'] = c3s['sm_uncertainty']
-ssm['sm_uncertainty'] = c3s['sm_uncertainty']
-ssm['jd'] = c3s.index.to_julian_date().values.astype(np.float64)
-
-dtype = np.dtype([('jd', np.float64), ('sm', np.float32), ('sm_noise', np.float32)])
-ssm = unstructured_to_structured(np.hstack((ssm['jd'][:, np.newaxis], ssm['sm'][:, np.newaxis],
-                                               ssm['sm_noise'][:, np.newaxis])), dtype=dtype)
-
-swi_old, gain_out = calc_swi_ts(ssm, ssm['jd'], t_value=[10])
-
-ssm = {}
-ssm['sm'] = c3s['sm']
 ssm['sm_uncertainty'] = c3s['sm_uncertainty']
 ssm['sm_jd'] = c3s.index.to_julian_date().values.astype(np.float64)
 
 dtype = np.dtype([('sm_jd', np.float64), ('sm', np.float32), ('sm_uncertainty', np.float32)])
 ssm = unstructured_to_structured(np.hstack((ssm['sm_jd'][:, np.newaxis], ssm['sm'][:, np.newaxis],
-                                               ssm['sm_uncertainty'][:, np.newaxis])), dtype=dtype)
+                   ssm['sm_uncertainty'][:, np.newaxis])), dtype=dtype)
 
-swi_new = swi_error_prop(ssm, T_value=[5], T_noise=[.5])
-swi_multi = swi_error_prop(ssm, T_value=[5,10], T_noise=[.5, 1.])
+ssm1 = {}
+ssm1['sm'] = c3s1['sm']
+ssm1['sm_uncertainty'] = c3s1['sm_uncertainty']
+ssm1['sm_jd'] = c3s1.index.to_julian_date().values.astype(np.float64)
+
+dtype = np.dtype([('sm_jd', np.float64), ('sm', np.float32), ('sm_uncertainty', np.float32)])
+ssm1 = unstructured_to_structured(np.hstack((ssm1['sm_jd'][:, np.newaxis], ssm1['sm'][:, np.newaxis],
+                   ssm1['sm_uncertainty'][:, np.newaxis])), dtype=dtype)
+
+ssm2 = {}
+ssm2['sm'] = c3s2['sm']
+ssm2['sm_uncertainty'] = c3s2['sm_uncertainty']
+ssm2['sm_jd'] = c3s2.index.to_julian_date().values.astype(np.float64)
+
+dtype = np.dtype([('sm_jd', np.float64), ('sm', np.float32), ('sm_uncertainty', np.float32)])
+ssm2 = unstructured_to_structured(np.hstack((ssm2['sm_jd'][:, np.newaxis], ssm2['sm'][:, np.newaxis],
+                   ssm2['sm_uncertainty'][:, np.newaxis])), dtype=dtype)
+
+# swi_old, gain_out = calc_swi_ts(ssm, ssm['jd'], t_value=[10])
+
+# ssm = {}
+# ssm['sm'] = c3s['sm']
+#
+# ssm['sm_uncertainty'] = c3s['sm_uncertainty']
+# ssm['sm_jd'] = c3s.index.to_julian_date().values.astype(np.float64)
+#
+# dtype = np.dtype([('sm_jd', np.float64), ('sm', np.float32), ('sm_uncertainty', np.float32)])
+# ssm = unstructured_to_structured(np.hstack((ssm['sm_jd'][:, np.newaxis], ssm['sm'][:, np.newaxis],
+#                                                ssm['sm_uncertainty'][:, np.newaxis])), dtype=dtype)
+
+# swi_new = swi_error_prop(ssm, T_value=[5], T_noise=[.5])
+swi_multi, gain_out = swi_error_prop(ssm, t_value=[5,10], t_noise=[.5, 1])
+df = pd.DataFrame(swi_multi, columns=['swi_jd', 'swi_noise_5', 'swi_5', 'swi_noise_10', 'swi_10'], index=c3s.index)
+
+swi_split1, gain_out1 = swi_error_prop(ssm1, t_value=[5, 10], t_noise=[.5, 1])
+df1 = pd.DataFrame(swi_split1, columns=['swi_jd', 'swi_noise_5', 'swi_5', 'swi_noise_10', 'swi_10'], index=c3s1.index)
+
+swi_split2, gain_out2 = swi_error_prop(ssm2, gain_in=gain_out1, t_value=[5, 10], t_noise=[.5, 1])
+df2 = pd.DataFrame(swi_split2, columns=['swi_jd', 'swi_noise_5', 'swi_5', 'swi_noise_10', 'swi_10'], index=c3s2.index)
+
+swi_split3, gain_out3 = swi_error_prop(ssm2, t_value=[5, 10], t_noise=[.5, 1])
+df3 = pd.DataFrame(swi_split3, columns=['swi_jd', 'swi_noise_5', 'swi_5', 'swi_noise_10', 'swi_10'], index=c3s2.index)
+
+
+#######################
+# swi_new = swi_error_prop(ssm, T_value=[5], T_noise=[.5])
+# swi_multi, gain_out = calc_swi_ts(ssm, ssm['sm_jd'], t_value=[5,10])
+# df = pd.DataFrame(swi_multi, columns=['swi_jd', 'swi_noise_5', 'swi_5', 'swi_noise_10', 'swi_10'], index=c3s.index)
+# 
+# swi_split1, gain_out1 = calc_swi_ts(ssm1, ssm1['sm_jd'], gain_in=None, t_value=[5,10])
+# df1 = pd.DataFrame(swi_split1, columns=['swi_jd', 'swi_noise_5', 'swi_5', 'swi_noise_10', 'swi_10'], index=c3s1.index)
+# 
+# swi_split2, gain_out2 = calc_swi_ts(ssm2, ssm2['sm_jd'], gain_in=gain_out1, t_value=[5,10])
+# df2 = pd.DataFrame(swi_split2, columns=['swi_jd', 'swi_noise_5', 'swi_5', 'swi_noise_10', 'swi_10'], index=c3s2.index)
 
 print("Bazinga!")
 
+df['swi_noise_5'].plot()
+df1['swi_noise_5'].plot()
+df2['swi_noise_5'].plot()
+
 # plt.plot(ssm['sm'])
 plt.plot(ssm['sm_uncertainty'])
-plt.plot(swi_new['swi_noise_5'])
+# plt.plot(swi_new['swi_noise_5'])
 plt.legend(['C3S SSM uncertainty', 'DeSantis&Biondi2018 (t=5, \u03C3T=10%)'], fontsize=20, loc='best')
 
 plt.title("SWI (T=5) error propagation for a point in Southeastern Australia", fontsize=20)
