@@ -36,7 +36,7 @@ def test_process_swi_calc():
 
     sm = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90], dtype=np.float32)
 
-    dtype = np.dtype([('jd', np.float64), ('sm', np.float32)])
+    dtype = np.dtype([('sm_jd', np.float64), ('sm', np.float32)])
     ssm_ts = unstructured_to_structured(
         np.hstack((swi_jd[:, np.newaxis], sm[:, np.newaxis])), dtype=dtype)
 
