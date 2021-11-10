@@ -22,7 +22,7 @@ import numpy as np
 from numpy.lib.recfunctions import unstructured_to_structured
 import pandas as pd
 
-from pyswi.swi_ts.swi_ts import calc_swi_ts, calc_swi_noise, calc_swi_noise_rec
+from pyswi.swi_ts.swi_ts import calc_swi_ts, calc_swi_noise_rec
 
 
 def test_process_swi_calc():
@@ -160,34 +160,6 @@ def test_process_swi_not_daily_out():
     for t in t_value:
         np.testing.assert_array_almost_equal(swi_ts['swi_{}'.format(t)],
                                              swi_ref['swi_{}'.format(t)], 4)
-
-def test_swi_noise_calc():
-    """
-    Test correct calculation of SWI Noise, comparing the two different
-    approaches.
-    """
-    t_value = [5, 50, 100]
-
-    swi_jd = pd.date_range('2007-01-01', periods=99).to_julian_date().values
-
-    sm_noise = np.zeros(99)
-    sm_noise.fill(3)
-
-    dtype = np.dtype([('jd', np.float64), ('sm_noise', np.float32)])
-    ssm_ts = unstructured_to_structured(
-        np.hstack((swi_jd[:, np.newaxis],
-                   sm_noise[:, np.newaxis])), dtype=dtype)
-
-    swi_ts1, gain1 = calc_swi_noise(ssm_ts, t_value)
-    swi_ts2, gain2 = calc_swi_noise_rec(ssm_ts, t_value, last_den=0)
-
-    for t in t_value:
-        np.testing.assert_array_almost_equal(
-            swi_ts1['swi_noise_{}'.format(t)],
-            swi_ts2['swi_noise_{}'.format(t)], 4)
-        for f in ['denom', 'nom', 'last_jd', 'nom_noise']:
-            np.testing.assert_array_almost_equal(gain1[f], gain2[f])
-
 
 def test_process_swi_noise():
     """
