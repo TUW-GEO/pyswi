@@ -68,13 +68,13 @@ def swi_error_prop(ssm, t_value, t_noise, gain_in=None):
         last_jd = gain_in['last_jd']
         time_diff = ssm['sm_jd'][0] - gain_in['last_jd']
         ef = [np.exp(-time_diff / t_value[i]) for i in range(0, len(t_value))]
-        swi[0] = gain_in['last_swi'] + gain_in['gain_curr'] * (ssm['sm'][0] - gain_in['last_swi'])
-        gain_curr = [gain_in['gain_curr'][i] / (gain_in['gain_curr'][i] + ef[i]) for i in range(0, len(t_value))]
-        contr1_curr = [((1 - gain_curr[i])**2) * gain_in['contr1_curr'][i] + (gain_curr[i] * ssm['sm_uncertainty'][0])**2
+        swi[0] = gain_in['last_swi'] + gain_in['last_gain'] * (ssm['sm'][0] - gain_in['last_swi'])
+        gain_curr = [gain_in['last_gain'][i] / (gain_in['last_gain'][i] + ef[i]) for i in range(0, len(t_value))]
+        contr1_curr = [((1 - gain_curr[i])**2) * gain_in['last_contr1'][i] + (gain_curr[i] * ssm['sm_uncertainty'][0])**2
                        for i in range(0, len(t_value))]
-        G_curr = [ef[i] * (gain_in['G_curr'][i] + time_diff / t_value[i] / gain_in['gain_curr'][i]) for i in range(0, len(t_value))]
+        G_curr = [ef[i] * (gain_in['last_G'][i] + time_diff / t_value[i] / gain_in['last_gain'][i]) for i in range(0, len(t_value))]
         JT_curr = [gain_curr[i] / t_value[i] * (G_curr[i] * (gain_in['last_swi'][i] - swi[0][i]) + ef[i] * t_value[i]
-                                                / gain_in['gain_curr'][i] * gain_in['JT_curr'][i]) for i in range(0, len(t_value))]
+                                                / gain_in['last_gain'][i] * gain_in['last_JT'][i]) for i in range(0, len(t_value))]
         contr2 = [(JT_curr[i] * t_noise[i])**2 for i in range(0, len(t_value))]
         swi_noise[0] = [sqrt(contr1_curr[i] + contr2[i]) for i in range(0, len(t_value))]
         last_jd += 1
@@ -104,8 +104,8 @@ def swi_error_prop(ssm, t_value, t_noise, gain_in=None):
 
         last_jd = ssm['sm_jd'][i]
 
-    gain_out = {'last_jd': last_jd, 'gain_curr': gain_curr, 'contr1_curr': contr1_curr,
-                'G_curr': G_curr, 'JT_curr': JT_curr, 'last_swi': swi[-1], 'last_noise': swi_noise[-1]}
+    gain_out = {'last_jd': last_jd, 'last_gain': gain_curr, 'last_contr1': contr1_curr,
+                'last_G': G_curr, 'last_JT': JT_curr, 'last_swi': swi[-1], 'last_noise': swi_noise[-1]}
 
     dtype_list = [('swi_jd', np.float64)]
     for t in t_value:
