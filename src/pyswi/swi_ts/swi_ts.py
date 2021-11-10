@@ -264,7 +264,7 @@ def calc_swi_noise_rec(ssm_ts, t_value, last_den=1, last_nom=0):
     gain_out = {'denom': den_values, 'nom': nom_values, 'last_jd': last_jd,
                 'nom_noise': 0}
 
-    dtype_list = [('sm_jd', np.float64)]
+    dtype_list = [('swi_jd', np.float64)]
     for t in t_value:
         dtype_list.append(('swi_noise_{}'.format(t), np.float32))
 
