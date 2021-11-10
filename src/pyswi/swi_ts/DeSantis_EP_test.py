@@ -8,6 +8,33 @@ import matplotlib.pyplot as plt
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 
+####################
+t_value = [5, 50, 100]
+
+swi_jd = pd.date_range(
+    '2007-01-01', periods=9).to_julian_date().values.astype(np.float64)
+
+sm = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90], dtype=np.float32)
+
+dtype = np.dtype([('sm_jd', np.float64), ('sm', np.float32)])
+ssm_ts = unstructured_to_structured(
+    np.hstack((swi_jd[:, np.newaxis], sm[:, np.newaxis])), dtype=dtype)
+
+swi_ts, gain_out = calc_swi_ts(ssm_ts, swi_jd, t_value=t_value)
+
+swi_ref = {
+    'swi_5': np.array([10., 15.49834, 21.32452, 27.472094, 33.93228, 40.69421,
+                       47.7452, 55.07107, 62.65647]),
+    'swi_50': np.array([10., 15.049998, 20.133324, 25.249971, 30.399931, 35.58319,
+                        40.799732, 46.049545, 51.332603]),
+    'swi_100': np.array([10., 15.025, 20.066666, 25.124996, 30.199991, 35.29165,
+                         40.399967, 45.524944, 50.666576])
+}
+
+for t in t_value:
+    np.testing.assert_array_almost_equal(swi_ts['swi_{}'.format(t)],
+                                         swi_ref['swi_{}'.format(t)], 4)
+##############
 
 # path to C3S soil moisure data
 c3s_path = r"R:\Projects\C3S_312b\07_data\v202012_TCDR\063_images_to_ts\combined-daily"

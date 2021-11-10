@@ -216,7 +216,7 @@ def calc_swi_noise_rec(ssm_ts, t_value, last_den=1, last_nom=0):
     Parameters
     ----------
     ssm_ts : numpy.ndarray
-        Surface soil moisture time series with fields: jd, sm, sm_noise
+        Surface soil moisture time series with fields: sm_jd, sm, sm_noise
     t_value : numpy.ndarray
         Characteristic time length.
     denom : float
@@ -239,7 +239,7 @@ def calc_swi_noise_rec(ssm_ts, t_value, last_den=1, last_nom=0):
     den = np.zeros((len_sm, len_t_value))
     swi_noise = np.zeros((len_sm, len_t_value))
 
-    last_jd = ssm_ts['jd'][0]
+    last_jd = ssm_ts['sm_jd'][0]
     den_values = np.ones(len_t_value)
     nom_values = np.zeros(len_t_value)
 
@@ -248,7 +248,7 @@ def calc_swi_noise_rec(ssm_ts, t_value, last_den=1, last_nom=0):
 
     for i in range(0, len_sm):
         for c in range(0, len_t_value):
-            tdiff = (ssm_ts['jd'][i]-last_jd) / t_value[c]
+            tdiff = (ssm_ts['sm_jd'][i]-last_jd) / t_value[c]
             fn = exp((-1) * tdiff)
             den[i][c] = 1 + fn * den_values[c]
             den_sn = den[i][c] ** 2
@@ -259,18 +259,18 @@ def calc_swi_noise_rec(ssm_ts, t_value, last_den=1, last_nom=0):
             swi_noise[i][c] = nom_sn[i][c] / den_sn
             den_values[c] = den[i][c]
             nom_values[c] = nom_sn[i][c]
-        last_jd = ssm_ts['jd'][i]
+        last_jd = ssm_ts['sm_jd'][i]
 
     gain_out = {'denom': den_values, 'nom': nom_values, 'last_jd': last_jd,
                 'nom_noise': 0}
 
-    dtype_list = [('jd', np.float64)]
+    dtype_list = [('sm_jd', np.float64)]
     for t in t_value:
         dtype_list.append(('swi_noise_{}'.format(t), np.float32))
 
     swi_ts = np.zeros(ssm_ts.size, dtype=np.dtype(dtype_list))
 
-    swi_ts['jd'] = ssm_ts['jd']
+    swi_ts['swi_jd'] = ssm_ts['sm_jd']
     for i, t in enumerate(t_value):
         swi_ts['swi_noise_{}'.format(t)] = swi_noise[:, i]
 
