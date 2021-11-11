@@ -85,10 +85,6 @@ def swi_error_prop(ssm, t_value, t_noise, gain_in=None):
     JT_old = [None] * len_T
 
     for i in range(1, len_ssm):
-        if ssm['sm'][i] == np.nan:
-            continue
-        if swi[i] == np.nan:
-            continue
         time_diff = ssm['sm_jd'][i] - last_jd #todo should be a list also, can vary for T-values due to q_flags
 
         for c in range(0, len_T):
