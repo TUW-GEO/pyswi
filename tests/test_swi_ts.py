@@ -67,7 +67,7 @@ def test_process_swi_calc_nan_values():
 
     sm = np.array([10, 20, 30, 40, 50, 60, 999, 80, 10])
 
-    dtype = np.dtype([('jd', np.float64), ('sm', np.float32)])
+    dtype = np.dtype([('sm_jd', np.float64), ('sm', np.float32)])
     ssm_ts = unstructured_to_structured(
         np.hstack((swi_jd[:, np.newaxis], sm[:, np.newaxis])), dtype=dtype)
 
@@ -100,7 +100,7 @@ def test_process_swi_gain():
 
     sm = np.array([10, 20, 30, 40, 50, 60, 999, 80, 10])
 
-    dtype = np.dtype([('jd', np.float64), ('sm', np.float32)])
+    dtype = np.dtype([('sm_jd', np.float64), ('sm', np.float32)])
     ssm_ts_part1 = unstructured_to_structured(
         np.hstack((swi_jd[:5, np.newaxis], sm[:5, np.newaxis])), dtype=dtype)
     ssm_ts_part2 = unstructured_to_structured(
@@ -142,7 +142,7 @@ def test_process_swi_not_daily_out():
 
     sm = np.array([84, 88, 79, 87, 91, 93, 92, 85, 85, 90])
 
-    dtype = np.dtype([('jd', np.float64), ('sm', np.float32)])
+    dtype = np.dtype([('sm_jd', np.float64), ('sm', np.float32)])
     ssm_ts = unstructured_to_structured(
         np.hstack((swi_jd[:, np.newaxis], sm[:, np.newaxis])), dtype=dtype)
 
@@ -176,7 +176,7 @@ def test_process_swi_noise():
 
     sm = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90])
 
-    dtype = np.dtype([('jd', np.float64), ('sm', np.float32),
+    dtype = np.dtype([('sm_jd', np.float64), ('sm', np.float32),
                       ('sm_noise', np.float32)])
     ssm_ts = unstructured_to_structured(
         np.hstack((swi_jd[:, np.newaxis], sm[:, np.newaxis],
@@ -203,7 +203,7 @@ def test_swi_gain_noise():
     sm_noise = np.zeros(9)
     sm_noise.fill(3)
 
-    dtype = np.dtype([('jd', np.float64), ('sm', np.float32),
+    dtype = np.dtype([('sm_jd', np.float64), ('sm', np.float32),
                       ('sm_noise', np.float32)])
     ssm_ts = unstructured_to_structured(
         np.hstack((swi_jd[:, np.newaxis], sm[:, np.newaxis],

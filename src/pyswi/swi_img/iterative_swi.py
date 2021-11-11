@@ -1,4 +1,4 @@
-# Copyright (c) 2020, TU Wien, Department of Geodesy and Geoinformation (GEO).
+# Copyright (c) 2021, TU Wien, Department of Geodesy and Geoinformation (GEO).
 # All rights reserved.
 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -16,8 +16,8 @@ import os
 from datetime import datetime
 
 import numpy as np
-from iterative_storage.iter_data import IterStepData
-from pytesmo.timedate.julian import julian2datetime
+from src.pyswi.swi_img.iterative_storage import IterStepData
+from cadati.jd_date import julian2datetime
 
 def calc_swi(next_ssm, next_ssm_jd, tvalue, swi, jd,
                   gain=None, weighted=False, den=None, n=None, wsum=None, next_w=None):
