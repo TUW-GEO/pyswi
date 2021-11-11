@@ -68,7 +68,7 @@ def swi_error_prop(ssm, t_value, t_noise, gain_in=None):
         last_jd = gain_in['last_jd']
         time_diff = ssm['sm_jd'][0] - gain_in['last_jd']
         ef = [np.exp(-time_diff / t_value[i]) for i in range(0, len(t_value))]
-        swi[0] = gain_in['last_swi'] + gain_in['last_gain'] * (ssm['sm'][0] - gain_in['last_swi'])
+        swi[0] = gain_in['last_swi'] + gain_in['last_gain'] * (ssm['sm'][0] - gain_in['last_swi']) #todo swap with line below
         gain_curr = [gain_in['last_gain'][i] / (gain_in['last_gain'][i] + ef[i]) for i in range(0, len(t_value))]
         contr1_curr = [((1 - gain_curr[i])**2) * gain_in['last_contr1'][i] + (gain_curr[i] * ssm['sm_uncertainty'][0])**2
                        for i in range(0, len(t_value))]
@@ -85,6 +85,10 @@ def swi_error_prop(ssm, t_value, t_noise, gain_in=None):
     JT_old = [None] * len_T
 
     for i in range(1, len_ssm):
+        if ssm['sm'][i] == np.nan:
+            continue
+        if swi[i] == np.nan:
+            continue
         time_diff = ssm['sm_jd'][i] - last_jd #todo should be a list also, can vary for T-values due to q_flags
 
         for c in range(0, len_T):
