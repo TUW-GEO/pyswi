@@ -58,10 +58,12 @@ def swi_error_prop(ssm, t_value, t_noise, gain_in=None, nan=-9999.):
     len_T = len(t_value)
     swi = np.zeros((len_ssm, len_T))
     swi_noise = np.zeros((len_ssm, len_T))
+    qflag = np.ones((len_ssm, len_T))
 
     if gain_in is None:
         swi[0] = ssm['sm'][0]
         swi_noise[0] = ssm['sm_uncertainty'][0]
+        qflag[0] = 1.
         last_jd = ssm['sm_jd'][0]
         gain_curr = [1] * len_T
         contr1_curr = [ssm['sm_uncertainty'][0]**2] * len_T
@@ -71,7 +73,7 @@ def swi_error_prop(ssm, t_value, t_noise, gain_in=None, nan=-9999.):
         last_jd = gain_in['last_jd']
         time_diff = ssm['sm_jd'][0] - gain_in['last_jd']
         ef = [np.exp(-time_diff / t_value[i]) for i in range(0, len(t_value))]
-        swi[0] = gain_in['last_swi'] + gain_in['last_gain'] * (ssm['sm'][0] - gain_in['last_swi']) #todo swap with line below?
+        swi[0] = gain_in['last_swi'] + gain_in['last_gain'] * (ssm['sm'][0] - gain_in['last_swi'])
         gain_curr = [gain_in['last_gain'][i] / (gain_in['last_gain'][i] + ef[i]) for i in range(0, len(t_value))]
         contr1_curr = [((1 - gain_curr[i])**2) * gain_in['last_contr1'][i] + (gain_curr[i] * ssm['sm_uncertainty'][0])**2
                        for i in range(0, len(t_value))]
@@ -80,6 +82,7 @@ def swi_error_prop(ssm, t_value, t_noise, gain_in=None, nan=-9999.):
                                                 / gain_in['last_gain'][i] * gain_in['last_JT'][i]) for i in range(0, len(t_value))]
         contr2 = [(JT_curr[i] * t_noise[i])**2 for i in range(0, len(t_value))]
         swi_noise[0] = [sqrt(contr1_curr[i] + contr2[i]) for i in range(0, len(t_value))]
+        qflag[0] = gain_in['last_qflag']
         last_jd += 1
 
     gain_old = [None] * len_T
@@ -116,17 +119,21 @@ def swi_error_prop(ssm, t_value, t_noise, gain_in=None, nan=-9999.):
             if ssm['sm'][i] != nan or ssm['sm'][i] == np.nan:
                 swi[i, c] = swi[i-int(time_diff)][c] + gain_curr[c] * (ssm['sm'][i] - swi[i-int(time_diff)][c])
                 swi_noise[i, c] = sqrt(contr1_curr[c] + contr2)
+                qflag[i, c] = 1 + qflag[i-1][c] * np.exp(-(1. / float(t_value[c])))
+
             else:
                 swi[i, c] = np.nan
                 swi_noise[i, c] = np.nan
+                qflag[i, c] = qflag[i-1][c] * np.exp(-(1. / float(t_value[c])))
 
     gain_out = {'last_jd': last_jd, 'last_gain': gain_curr, 'last_contr1': contr1_curr,
-                'last_G': G_curr, 'last_JT': JT_curr, 'last_swi': swi[-1], 'last_noise': swi_noise[-1]}
+                'last_G': G_curr, 'last_JT': JT_curr, 'last_swi': swi[-1], 'last_noise': swi_noise[-1], 'last_qflag': qflag[-1]}
 
     dtype_list = [('swi_jd', np.float64)]
     for t in t_value:
-        dtype_list.append(('swi_noise_{}'.format(t), np.float32))
         dtype_list.append(('swi_{}'.format(t), np.float32))
+        dtype_list.append(('swi_noise_{}'.format(t), np.float32))
+        dtype_list.append(('qflag_{}'.format(t), np.float32))
 
     swi_ts = np.zeros(ssm.size, dtype=np.dtype(dtype_list))
 
@@ -134,6 +141,7 @@ def swi_error_prop(ssm, t_value, t_noise, gain_in=None, nan=-9999.):
     for i, t in enumerate(t_value):
         swi_ts['swi_{}'.format(t)] = swi[:, i]
         swi_ts['swi_noise_{}'.format(t)] = swi_noise[:, i]
+        swi_ts['qflag_{}'.format(t)] = qflag[:, i]
 
     return swi_ts, gain_out
 
