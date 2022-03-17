@@ -13,7 +13,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from math import exp, sqrt
+from math import sqrt
 
 import pyximport
 import numpy as np
@@ -87,6 +87,7 @@ def swi_error_prop(ssm, t_value, t_noise, gain_in=None, nan=-9999.):
 
     gain_old = [None] * len_T
     contr1_old = [None] * len_T
+    contr2 = [None] * len_T
     G_old = [None] * len_T
     JT_old = [None] * len_T
 
@@ -109,8 +110,8 @@ def swi_error_prop(ssm, t_value, t_noise, gain_in=None, nan=-9999.):
                     G_curr[c] = ef * (G_old[c] + time_diff / t_value[c] / gain_old[c])
                     JT_curr[c] = gain_curr[c] / t_value[c] * (G_curr[c] * (swi[i-int(time_diff)][c] - swi[i][c])
                                                         + ef * t_value[c] / gain_old[c] * JT_old[c])
-                    contr2 = (JT_curr[c] * t_noise[c])**2
-                    swi_noise[i][c] = sqrt(contr1_curr[c] + contr2)
+                    contr2[c] = (JT_curr[c] * t_noise[c])**2
+                    swi_noise[i][c] = sqrt(contr1_curr[c] + contr2[c])
 
                 last_jd = ssm['sm_jd'][i]
             j += 1
@@ -118,7 +119,7 @@ def swi_error_prop(ssm, t_value, t_noise, gain_in=None, nan=-9999.):
         for c in range(len_T):
             if ssm['sm'][i] != nan or ssm['sm'][i] == np.nan:
                 swi[i, c] = swi[i-int(time_diff)][c] + gain_curr[c] * (ssm['sm'][i] - swi[i-int(time_diff)][c])
-                swi_noise[i, c] = sqrt(contr1_curr[c] + contr2)
+                swi_noise[i, c] = sqrt(contr1_curr[c] + contr2[c])
                 qflag[i, c] = 1 + qflag[i-1][c] * np.exp(-(1. / float(t_value[c])))
 
             else:
@@ -131,8 +132,8 @@ def swi_error_prop(ssm, t_value, t_noise, gain_in=None, nan=-9999.):
 
     dtype_list = [('swi_jd', np.float64)]
     for t in t_value:
-        dtype_list.append(('swi_{}'.format(t), np.float32))
         dtype_list.append(('swi_noise_{}'.format(t), np.float32))
+        dtype_list.append(('swi_{}'.format(t), np.float32))
         dtype_list.append(('qflag_{}'.format(t), np.float32))
 
     swi_ts = np.zeros(ssm.size, dtype=np.dtype(dtype_list))
@@ -144,6 +145,7 @@ def swi_error_prop(ssm, t_value, t_noise, gain_in=None, nan=-9999.):
         swi_ts['qflag_{}'.format(t)] = qflag[:, i]
 
     return swi_ts, gain_out
+
 
 def calc_swi_ts(ssm_ts, swi_jd, gain_in=None, t_value=[1, 5, 10, 15, 20],
                 nom_init=0, denom_init=0, nan=-9999.):
