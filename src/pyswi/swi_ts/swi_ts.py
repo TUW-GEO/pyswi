@@ -13,7 +13,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from math import sqrt
+from math import exp, sqrt
 
 import pyximport
 import numpy as np
@@ -23,13 +23,10 @@ pyximport.install(setup_args={'include_dirs': [
 
 from pyswi.swi_ts.swi_calc_routines import swi_calc_cy, swi_calc_cy_noise
 
-
-def swi_error_prop(ssm, t_value, t_noise, gain_in=None, nan=-9999.):
+def swi_error_prop(ssm, t_value, t_noise, swi_error, gain_in=None, nan=-9999.):
     """
-    Recursive SWI calculation and error propagation function based on DeSantis and Biondi (2018)
-    "Error propagation from remotely sensed surface soil moisture
-    into soil water index using an exponential filter",
-    https://doi.org/10.29007/kvhb
+    Recursive SWI calculation and error propagation function
+    based on DeSantis and Biondi (2018; https://doi.org/10.29007/kvhb)
     Translated from MatLab code obtained from the authors.
 
     Parameters
@@ -39,8 +36,11 @@ def swi_error_prop(ssm, t_value, t_noise, gain_in=None, nan=-9999.):
     t_value: numpy.ndarray
         Exponential filter characteristic T-value parameter
     t_noise: numpy.ndarray
-        T-value standard error. Based on empirical experiments
-        author suggests 10% of T for calibrated T-values.
+        T-value standard error.
+        10% of T for calibrated T-values.
+    swi_error: numpy.ndarray
+        Exponential filter model structural error.
+        ubMSE(ISMNswi, ISMNrzsm), based on empirical experiments.
     gain_in: dict
         stored parameters of the last iteration.
     nan: float
@@ -81,7 +81,7 @@ def swi_error_prop(ssm, t_value, t_noise, gain_in=None, nan=-9999.):
         JT_curr = [gain_curr[i] / t_value[i] * (G_curr[i] * (gain_in['last_swi'][i] - swi[0][i]) + ef[i] * t_value[i]
                                                 / gain_in['last_gain'][i] * gain_in['last_JT'][i]) for i in range(0, len(t_value))]
         contr2 = [(JT_curr[i] * t_noise[i])**2 for i in range(0, len(t_value))]
-        swi_noise[0] = [sqrt(contr1_curr[i] + contr2[i]) for i in range(0, len(t_value))]
+        swi_noise[0] = [sqrt(contr1_curr[i] + contr2[i] + swi_error[i]) for i in range(0, len(t_value))]
         qflag[0] = gain_in['last_qflag']
         last_jd += 1
 
@@ -111,7 +111,7 @@ def swi_error_prop(ssm, t_value, t_noise, gain_in=None, nan=-9999.):
                     JT_curr[c] = gain_curr[c] / t_value[c] * (G_curr[c] * (swi[i-int(time_diff)][c] - swi[i][c])
                                                         + ef * t_value[c] / gain_old[c] * JT_old[c])
                     contr2[c] = (JT_curr[c] * t_noise[c])**2
-                    swi_noise[i][c] = sqrt(contr1_curr[c] + contr2[c])
+                    swi_noise[i][c] = sqrt(contr1_curr[c] + contr2[c] + swi_error[c])
 
                 last_jd = ssm['sm_jd'][i]
             j += 1
@@ -119,7 +119,7 @@ def swi_error_prop(ssm, t_value, t_noise, gain_in=None, nan=-9999.):
         for c in range(len_T):
             if ssm['sm'][i] != nan or ssm['sm'][i] == np.nan:
                 swi[i, c] = swi[i-int(time_diff)][c] + gain_curr[c] * (ssm['sm'][i] - swi[i-int(time_diff)][c])
-                swi_noise[i, c] = sqrt(contr1_curr[c] + contr2[c])
+                swi_noise[i, c] = sqrt(contr1_curr[c] + contr2[c] + swi_error[c])
                 qflag[i, c] = 1 + qflag[i-1][c] * np.exp(-(1. / float(t_value[c])))
 
             else:
