@@ -1,6 +1,6 @@
-*****
+=====
 pyswi
-*****
+=====
 
 Python package allowing computation of the Soil Water Index from surface soil moisture observations by means of exponential filter.
 
@@ -12,14 +12,13 @@ The package includes the following features:
 * SWI time series calculation and error propagation from SSM time series
     * a recursive approach to SWI and its noise with calculation routines in Cython
     * an equivalent SWI calculation in Python with an exponential-filter-based
-    error propagation scheme
-
+      error propagation scheme
 * Recursive SWI approach to calculate SWI for a single or a set of T-values in near-real time
-    * also *Weighted* calculation of the SWI, allowing for custom weight assignment to individual observations
+    * also *Weighted* calculation of the SWI, allowing for custom weight assignment to
+      individual observations
 
-*****
 iterative_storage
-*****
+=================
 
 Storage of iteration data between processing runs.
 
