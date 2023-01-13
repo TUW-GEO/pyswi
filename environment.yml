@@ -1,4 +1,4 @@
-name: swi_env
+name: pyswi
 dependencies:
 - cython
 - numpy
@@ -14,3 +14,5 @@ dependencies:
   - pykdtree
   - pyparsing
   - trollsift
+  - pytest
+  - pytest-cov
