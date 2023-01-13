@@ -77,7 +77,7 @@ def calc_swi(next_ssm, next_ssm_jd, tvalue, swi, jd,
     """
 
     # Calculate time diff
-    time_diff = (next_ssm_jd - jd).astype(np.float)
+    time_diff = (next_ssm_jd - jd).astype(np.float64)
 
     if weighted:
 
@@ -106,7 +106,7 @@ def calc_swi(next_ssm, next_ssm_jd, tvalue, swi, jd,
     else:
 
         # calculate gain
-        next_gain = (gain / (gain.astype(np.float) +
+        next_gain = (gain / (gain.astype(np.float64) +
                              np.exp(-(time_diff / float(tvalue)))))
         # calculate SWI
         next_swi = swi + next_gain * (next_ssm - swi)
