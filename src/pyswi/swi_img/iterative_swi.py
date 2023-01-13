@@ -16,7 +16,7 @@ import os
 from datetime import datetime
 
 import numpy as np
-from src.pyswi.swi_img.iterative_storage import IterStepData
+from pyswi.swi_img.iterative_storage import IterStepData
 from cadati.jd_date import julian2datetime
 
 def calc_swi(next_ssm, next_ssm_jd, tvalue, swi, jd,
@@ -402,8 +402,8 @@ class IterativeSWI(object):
 
         # update iter_data header for complete file.
         valid_jd = np.isfinite(self.iter_data['jd'])
-        header = {'sensing_start': julian2datetime(np.nanmin(self.iter_data['jd'][valid_jd])),
-                  'sensing_end': julian2datetime(np.max(self.iter_data['jd'][valid_jd])),
+        header = {'sensing_start': julian2datetime(float(np.nanmin(self.iter_data['jd'][valid_jd]))),
+                  'sensing_end': julian2datetime(float(np.max(self.iter_data['jd'][valid_jd]))),
                   'processing_start': self.processing_start,
                   'processing_end': datetime.now()}
         self.iter_data['header'].update(header)
