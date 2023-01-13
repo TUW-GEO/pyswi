@@ -1,3 +1,16 @@
+
+.. image:: https://github.com/TUW-GEO/pyswi/workflows/Automated%20Tests/badge.svg?branch=master
+   :target: https://github.com/TUW-GEO/pyswi/actions
+
+.. image:: https://coveralls.io/repos/TUW-GEO/pyswi/badge.png?branch=master
+  :target: https://coveralls.io/r/TUW-GEO/pyswi?branch=master
+
+.. image:: https://badge.fury.io/py/pyswi.svg
+    :target: https://badge.fury.io/py/pyswi
+
+.. image:: https://zenodo.org/badge/588555779.svg
+   :target: https://zenodo.org/badge/latestdoi/588555779
+
 =====
 pyswi
 =====
