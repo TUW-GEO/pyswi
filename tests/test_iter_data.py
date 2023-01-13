@@ -23,7 +23,7 @@ import numpy.testing as nptest
 import numpy as np
 from datetime import datetime
 
-from src.pyswi.swi_img.iterative_storage import IterStepData
+from pyswi.swi_img.iterative_storage import IterStepData
 
 
 def curpath():
