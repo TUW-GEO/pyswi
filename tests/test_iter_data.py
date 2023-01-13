@@ -73,7 +73,7 @@ class TestIterStepData(unittest.TestCase):
                                             'ssf': 255})
         iter_data = data_coll.get_empty_data()
         assert iter_data['ssf'][0] == 255
-        assert iter_data['ssf'].dtype == np.int64
+        assert iter_data['ssf'].dtype == int
         assert iter_data['gain_sigma'][0] == -9999.
         assert iter_data['gain_sigma'].dtype == np.float64
         iter_data['ssf'][50] = 38
