@@ -23,24 +23,28 @@ pyximport.install(setup_args={'include_dirs': [
 
 from pyswi.swi_ts.swi_calc_routines import swi_calc_cy, swi_calc_cy_noise
 
-
-def swi_error_prop(ssm, t_value, t_noise, gain_in=None):
+def swi_error_prop(ssm, t_value, t_noise, swi_error, gain_in=None, nan=-9999.):
     """
-    Recursive SWI calculation and error propagation function based on DeSantis and Biondi (2018)
-    "Error propagation from remotely sensed surface soil moisture
-    into soil water index using an exponential filter",
-    https://doi.org/10.29007/kvhb
+    Recursive SWI calculation and error propagation function
+    based on DeSantis and Biondi (2018; https://doi.org/10.29007/kvhb)
     Translated from MatLab code obtained from the authors.
 
     Parameters
     ----------
     ssm: numpy.ndarray
         Surface soil moisture time series with fields 'sm', 'sm_uncertainty' and 'sm_jd'
-    T_value: numpy.ndarray
+    t_value: numpy.ndarray
         Exponential filter characteristic T-value parameter
-    T_noise: numpy.ndarray
-        T-value standard error. Based on empirical experiments
-        author suggests 10% of T for calibrated T-values.
+    t_noise: numpy.ndarray
+        T-value standard error.
+        10% of T for calibrated T-values.
+    swi_error: numpy.ndarray
+        Exponential filter model structural error.
+        ubMSE(ISMNswi, ISMNrzsm), based on empirical experiments.
+    gain_in: dict
+        stored parameters of the last iteration.
+    nan: float
+        nan value of the input ssm dataset
 
     Returns
     -------
@@ -52,13 +56,14 @@ def swi_error_prop(ssm, t_value, t_noise, gain_in=None):
 
     len_ssm = len(ssm)
     len_T = len(t_value)
-
     swi = np.zeros((len_ssm, len_T))
     swi_noise = np.zeros((len_ssm, len_T))
+    qflag = np.ones((len_ssm, len_T))
 
     if gain_in is None:
         swi[0] = ssm['sm'][0]
         swi_noise[0] = ssm['sm_uncertainty'][0]
+        qflag[0] = 1.
         last_jd = ssm['sm_jd'][0]
         gain_curr = [1] * len_T
         contr1_curr = [ssm['sm_uncertainty'][0]**2] * len_T
@@ -68,7 +73,7 @@ def swi_error_prop(ssm, t_value, t_noise, gain_in=None):
         last_jd = gain_in['last_jd']
         time_diff = ssm['sm_jd'][0] - gain_in['last_jd']
         ef = [np.exp(-time_diff / t_value[i]) for i in range(0, len(t_value))]
-        swi[0] = gain_in['last_swi'] + gain_in['last_gain'] * (ssm['sm'][0] - gain_in['last_swi']) #todo swap with line below
+        swi[0] = gain_in['last_swi'] + gain_in['last_gain'] * (ssm['sm'][0] - gain_in['last_swi'])
         gain_curr = [gain_in['last_gain'][i] / (gain_in['last_gain'][i] + ef[i]) for i in range(0, len(t_value))]
         contr1_curr = [((1 - gain_curr[i])**2) * gain_in['last_contr1'][i] + (gain_curr[i] * ssm['sm_uncertainty'][0])**2
                        for i in range(0, len(t_value))]
@@ -76,41 +81,60 @@ def swi_error_prop(ssm, t_value, t_noise, gain_in=None):
         JT_curr = [gain_curr[i] / t_value[i] * (G_curr[i] * (gain_in['last_swi'][i] - swi[0][i]) + ef[i] * t_value[i]
                                                 / gain_in['last_gain'][i] * gain_in['last_JT'][i]) for i in range(0, len(t_value))]
         contr2 = [(JT_curr[i] * t_noise[i])**2 for i in range(0, len(t_value))]
-        swi_noise[0] = [sqrt(contr1_curr[i] + contr2[i]) for i in range(0, len(t_value))]
+        swi_noise[0] = [sqrt(contr1_curr[i] + contr2[i] + swi_error[i]) for i in range(0, len(t_value))]
+        qflag[0] = gain_in['last_qflag']
         last_jd += 1
 
     gain_old = [None] * len_T
     contr1_old = [None] * len_T
+    contr2 = [None] * len_T
     G_old = [None] * len_T
     JT_old = [None] * len_T
 
-    for i in range(1, len_ssm):
-        time_diff = ssm['sm_jd'][i] - last_jd #todo should be a list also, can vary for T-values due to q_flags
+    j = 0
 
-        for c in range(0, len_T):
-            ef = np.exp(-time_diff / t_value[c])
-            gain_old[c] = gain_curr[c]
-            contr1_old[c] = contr1_curr[c]
-            gain_curr[c] = gain_old[c] / (gain_old[c] + ef)
-            swi[i][c] = swi[i-1][c] + gain_curr[c] * (ssm['sm'][i] - swi[i-1][c])
-            contr1_curr[c] = ((1 - gain_curr[c])**2) * contr1_old[c] + (gain_curr[c] * ssm['sm_uncertainty'][i])**2
-            G_old[c] = G_curr[c]
-            JT_old[c] = JT_curr[c]
-            G_curr[c] = ef * (G_old[c] + time_diff / t_value[c] / gain_old[c])
-            JT_curr[c] = gain_curr[c] / t_value[c] * (G_curr[c] * (swi[i-1][c] - swi[i][c])
-                                                + ef * t_value[c] / gain_old[c] * JT_old[c])
-            contr2 = (JT_curr[c] * t_noise[c])**2
-            swi_noise[i][c] = sqrt(contr1_curr[c] + contr2)
+    for i in range(len_ssm):
+        while j < len_ssm and ssm['sm_jd'][j] <= ssm['sm_jd'][i]:
+            if ssm['sm'][j] != nan or ssm['sm'][j] == np.nan:
+                time_diff = ssm['sm_jd'][j] - last_jd
 
-        last_jd = ssm['sm_jd'][i]
+                for c in range(len_T):
+                    ef = np.exp(-time_diff / t_value[c])
+                    gain_old[c] = gain_curr[c]
+                    contr1_old[c] = contr1_curr[c]
+                    gain_curr[c] = gain_old[c] / (gain_old[c] + ef)
+                    swi[i][c] = swi[i-int(time_diff)][c] + gain_curr[c] * (ssm['sm'][i] - swi[i-int(time_diff)][c])
+                    contr1_curr[c] = ((1 - gain_curr[c])**2) * contr1_old[c] + (gain_curr[c] * ssm['sm_uncertainty'][i])**2
+                    G_old[c] = G_curr[c]
+                    JT_old[c] = JT_curr[c]
+                    G_curr[c] = ef * (G_old[c] + time_diff / t_value[c] / gain_old[c])
+                    JT_curr[c] = gain_curr[c] / t_value[c] * (G_curr[c] * (swi[i-int(time_diff)][c] - swi[i][c])
+                                                        + ef * t_value[c] / gain_old[c] * JT_old[c])
+                    contr2[c] = (JT_curr[c] * t_noise[c])**2
+                    swi_noise[i][c] = sqrt(contr1_curr[c] + contr2[c] + swi_error[c])
+
+                last_jd = ssm['sm_jd'][i]
+            j += 1
+
+        for c in range(len_T):
+            if ssm['sm'][i] != nan or ssm['sm'][i] == np.nan:
+                swi[i, c] = swi[i-int(time_diff)][c] + gain_curr[c] * (ssm['sm'][i] - swi[i-int(time_diff)][c])
+                swi_noise[i, c] = sqrt(contr1_curr[c] + contr2[c] + swi_error[c])
+                qflag[i, c] = 1 + qflag[i-1][c] * np.exp(-(1. / float(t_value[c])))
+
+            else:
+                swi[i, c] = np.nan
+                swi_noise[i, c] = np.nan
+                qflag[i, c] = qflag[i-1][c] * np.exp(-(1. / float(t_value[c])))
 
     gain_out = {'last_jd': last_jd, 'last_gain': gain_curr, 'last_contr1': contr1_curr,
-                'last_G': G_curr, 'last_JT': JT_curr, 'last_swi': swi[-1], 'last_noise': swi_noise[-1]}
+                'last_G': G_curr, 'last_JT': JT_curr, 'last_swi': swi[-1], 'last_noise': swi_noise[-1], 'last_qflag': qflag[-1]}
 
     dtype_list = [('swi_jd', np.float64)]
     for t in t_value:
         dtype_list.append(('swi_noise_{}'.format(t), np.float32))
         dtype_list.append(('swi_{}'.format(t), np.float32))
+        dtype_list.append(('qflag_{}'.format(t), np.float32))
 
     swi_ts = np.zeros(ssm.size, dtype=np.dtype(dtype_list))
 
@@ -118,6 +142,7 @@ def swi_error_prop(ssm, t_value, t_noise, gain_in=None):
     for i, t in enumerate(t_value):
         swi_ts['swi_{}'.format(t)] = swi[:, i]
         swi_ts['swi_noise_{}'.format(t)] = swi_noise[:, i]
+        swi_ts['qflag_{}'.format(t)] = qflag[:, i]
 
     return swi_ts, gain_out
 
