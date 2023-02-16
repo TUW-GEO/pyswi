@@ -1,4 +1,4 @@
-# Copyright (c) 2021, TU Wien, Department of Geodesy and Geoinformation (GEO).
+# Copyright (c) 2023, TU Wien, Department of Geodesy and Geoinformation (GEO).
 # All rights reserved.
 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -66,7 +66,7 @@ def swi_error_prop(ssm, t_value, t_noise, swi_error, gain_in=None, nan=-9999.):
         qflag[0] = 1.
         last_jd = ssm['sm_jd'][0]
         gain_curr = [1] * len_T
-        contr1_curr = [ssm['sm_uncertainty'][0]**2] * len_T
+        contr1_curr = [ssm['sm_uncertainty'][np.argmax(ssm['sm_uncertainty'] != nan)]**2] * len_T
         G_curr = [0] * len_T
         JT_curr = [0] * len_T # Jacobian term
     else:
@@ -95,33 +95,33 @@ def swi_error_prop(ssm, t_value, t_noise, swi_error, gain_in=None, nan=-9999.):
 
     for i in range(len_ssm):
         while j < len_ssm and ssm['sm_jd'][j] <= ssm['sm_jd'][i]:
-            if ssm['sm'][j] != nan or ssm['sm'][j] == np.nan:
+            if ssm['sm'][j] != nan:
                 time_diff = ssm['sm_jd'][j] - last_jd
-
                 for c in range(len_T):
                     ef = np.exp(-time_diff / t_value[c])
                     gain_old[c] = gain_curr[c]
-                    contr1_old[c] = contr1_curr[c]
                     gain_curr[c] = gain_old[c] / (gain_old[c] + ef)
                     swi[i][c] = swi[i-int(time_diff)][c] + gain_curr[c] * (ssm['sm'][i] - swi[i-int(time_diff)][c])
-                    contr1_curr[c] = ((1 - gain_curr[c])**2) * contr1_old[c] + (gain_curr[c] * ssm['sm_uncertainty'][i])**2
-                    G_old[c] = G_curr[c]
-                    JT_old[c] = JT_curr[c]
-                    G_curr[c] = ef * (G_old[c] + time_diff / t_value[c] / gain_old[c])
-                    JT_curr[c] = gain_curr[c] / t_value[c] * (G_curr[c] * (swi[i-int(time_diff)][c] - swi[i][c])
-                                                        + ef * t_value[c] / gain_old[c] * JT_old[c])
-                    contr2[c] = (JT_curr[c] * t_noise[c])**2
-                    swi_noise[i][c] = sqrt(contr1_curr[c] + contr2[c] + swi_error[c])
-
+                    if ssm['sm_uncertainty'][j] != nan:
+                        contr1_old[c] = contr1_curr[c]
+                        contr1_curr[c] = ((1 - gain_curr[c])**2) * contr1_old[c] + (gain_curr[c] * ssm['sm_uncertainty'][i])**2
+                        G_old[c] = G_curr[c]
+                        JT_old[c] = JT_curr[c]
+                        G_curr[c] = ef * (G_old[c] + time_diff / t_value[c] / gain_old[c])
+                        JT_curr[c] = gain_curr[c] / t_value[c] * (G_curr[c] * (swi[i-int(time_diff)][c] - swi[i][c])
+                                                            + ef * t_value[c] / gain_old[c] * JT_old[c])
+                        contr2[c] = (JT_curr[c] * t_noise[c])**2
+                        swi_noise[i][c] = sqrt(contr1_curr[c] + contr2[c] + swi_error[c])
                 last_jd = ssm['sm_jd'][i]
             j += 1
 
         for c in range(len_T):
-            if ssm['sm'][i] != nan or ssm['sm'][i] == np.nan:
-                swi[i, c] = swi[i-int(time_diff)][c] + gain_curr[c] * (ssm['sm'][i] - swi[i-int(time_diff)][c])
-                swi_noise[i, c] = sqrt(contr1_curr[c] + contr2[c] + swi_error[c])
+            if ssm['sm'][i] != nan:
                 qflag[i, c] = 1 + qflag[i-1][c] * np.exp(-(1. / float(t_value[c])))
-
+                if ssm['sm_uncertainty'][i] != nan:
+                    swi_noise[i, c] = sqrt(contr1_curr[c] + contr2[c] + swi_error[c])
+                else:
+                    swi_noise[i, c] = np.nan
             else:
                 swi[i, c] = np.nan
                 swi_noise[i, c] = np.nan
