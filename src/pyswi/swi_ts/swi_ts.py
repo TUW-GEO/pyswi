@@ -66,7 +66,8 @@ def swi_error_prop(ssm, t_value, t_noise, swi_error, gain_in=None, nan=-9999.):
         qflag[0] = 1.
         last_jd = ssm['sm_jd'][0]
         gain_curr = [1] * len_T
-        contr1_curr = [ssm['sm_uncertainty'][np.argmax(ssm['sm_uncertainty'] != nan)]**2] * len_T
+        contr1_curr = [ssm['sm_uncertainty'][np.argmax((ssm['sm_uncertainty'] != nan) &
+                                                       ~np.isnan(ssm['sm_uncertainty']))]**2] * len_T
         G_curr = [0] * len_T
         JT_curr = [0] * len_T # Jacobian term
     else:
@@ -95,14 +96,14 @@ def swi_error_prop(ssm, t_value, t_noise, swi_error, gain_in=None, nan=-9999.):
 
     for i in range(len_ssm):
         while j < len_ssm and ssm['sm_jd'][j] <= ssm['sm_jd'][i]:
-            if ssm['sm'][j] != nan:
+            if ssm['sm'][j] != nan and ~np.isnan(ssm['sm'][j]):
                 time_diff = ssm['sm_jd'][j] - last_jd
                 for c in range(len_T):
                     ef = np.exp(-time_diff / t_value[c])
                     gain_old[c] = gain_curr[c]
                     gain_curr[c] = gain_old[c] / (gain_old[c] + ef)
                     swi[i][c] = swi[i-int(time_diff)][c] + gain_curr[c] * (ssm['sm'][i] - swi[i-int(time_diff)][c])
-                    if ssm['sm_uncertainty'][j] != nan:
+                    if ssm['sm_uncertainty'][j] != nan and ~np.isnan(ssm['sm_uncertainty'][j]):
                         contr1_old[c] = contr1_curr[c]
                         contr1_curr[c] = ((1 - gain_curr[c])**2) * contr1_old[c] + (gain_curr[c] * ssm['sm_uncertainty'][i])**2
                         G_old[c] = G_curr[c]
@@ -116,9 +117,9 @@ def swi_error_prop(ssm, t_value, t_noise, swi_error, gain_in=None, nan=-9999.):
             j += 1
 
         for c in range(len_T):
-            if ssm['sm'][i] != nan:
+            if ssm['sm'][j] != nan and ~np.isnan(ssm['sm'][j]):
                 qflag[i, c] = 1 + qflag[i-1][c] * np.exp(-(1. / float(t_value[c])))
-                if ssm['sm_uncertainty'][i] != nan:
+                if ssm['sm_uncertainty'][i] != nan and ~np.isnan(ssm['sm_uncertainty'][j]):
                     swi_noise[i, c] = sqrt(contr1_curr[c] + contr2[c] + swi_error[c])
                 else:
                     swi_noise[i, c] = np.nan
