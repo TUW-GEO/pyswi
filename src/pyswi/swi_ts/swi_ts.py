@@ -117,9 +117,9 @@ def swi_error_prop(ssm, t_value, t_noise, swi_error, gain_in=None, nan=-9999.):
             j += 1
 
         for c in range(len_T):
-            if ssm['sm'][j] != nan and ~np.isnan(ssm['sm'][j]):
+            if ssm['sm'][i] != nan and ~np.isnan(ssm['sm'][i]):
                 qflag[i, c] = 1 + qflag[i-1][c] * np.exp(-(1. / float(t_value[c])))
-                if ssm['sm_uncertainty'][i] != nan and ~np.isnan(ssm['sm_uncertainty'][j]):
+                if ssm['sm_uncertainty'][i] != nan and ~np.isnan(ssm['sm_uncertainty'][i]):
                     swi_noise[i, c] = sqrt(contr1_curr[c] + contr2[c] + swi_error[c])
                 else:
                     swi_noise[i, c] = np.nan
