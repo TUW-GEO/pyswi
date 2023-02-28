@@ -61,13 +61,12 @@ def swi_error_prop(ssm, t_value, t_noise, swi_error, gain_in=None, nan=-9999.):
     qflag = np.ones((len_ssm, len_T))
 
     if gain_in is None:
-        swi[0] = ssm['sm'][0]
-        swi_noise[0] = ssm['sm_uncertainty'][0]
-        qflag[0] = 1.
-        last_jd = ssm['sm_jd'][0]
+        first_ssm_idx = np.argmax((ssm['sm'] != nan) & ~np.isnan(ssm['sm']))
+        first_noise_idx = np.argmax((ssm['sm_uncertainty'] != nan) & ~np.isnan(ssm['sm_uncertainty']))
+        swi[first_ssm_idx] = ssm['sm'][first_ssm_idx]
+        last_jd = ssm['sm_jd'][first_ssm_idx]
         gain_curr = [1] * len_T
-        contr1_curr = [ssm['sm_uncertainty'][np.argmax((ssm['sm_uncertainty'] != nan) &
-                                                       ~np.isnan(ssm['sm_uncertainty']))]**2] * len_T
+        contr1_curr = [ssm['sm_uncertainty'][first_noise_idx]**2] * len_T
         G_curr = [0] * len_T
         JT_curr = [0] * len_T # Jacobian term
     else:
