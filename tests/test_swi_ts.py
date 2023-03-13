@@ -263,8 +263,8 @@ def test_equivalency():
 def test_swi_error_prop_independent():
     """
     Test the ability of swi_error_prop() to correctly calculate SWI
-    independently of input noise data availability. Compare against
-    a hardcoded output as well as that of calc_swi_ts().
+    independently of input uncertainty data availability.
+    Compare against a hardcoded result.
     """
     t_value = [5, 50, 100]
     t_noise = np.array([.5, 5, 10])
@@ -274,14 +274,14 @@ def test_swi_error_prop_independent():
         '2007-01-01', periods=9).to_julian_date().values.astype(np.float64)
 
     sm = np.array([10, 20, 30, 40, 50, 60, 999, 80, 10])
-    sm_uncertainty = np.array([1, 2, 3, 4, 5, 6, 999, 8, 1])
+    sm_uncertainty = np.array([999, 999, 3, 4, 5, 6, 999, 8, 1])
 
     dtype = np.dtype([('sm_jd', np.float64), ('sm', np.float32), ('sm_uncertainty', np.float32)])
     ssm_ts = unstructured_to_structured(
         np.hstack((swi_jd[:, np.newaxis], sm[:, np.newaxis], sm_uncertainty[:, np.newaxis])), dtype=dtype)
 
-    swi_1, gain_1 = swi_error_prop(ssm_ts, t_value=t_value, t_noise=t_noise,
-                                   swi_error=swi_error, nan=999)
+    swi, gain = swi_error_prop(ssm_ts, t_value=t_value, t_noise=t_noise,
+                               swi_error=swi_error, nan=999)
 
     swi_ref = {
         'swi_5': np.array([10., 15.49834, 21.32452, 27.472094, 33.93228, 40.69421,
@@ -293,5 +293,5 @@ def test_swi_error_prop_independent():
     }
 
     for t in t_value:
-        np.testing.assert_array_almost_equal(swi_1['swi_{}'.format(t)],
+        np.testing.assert_array_almost_equal(swi['swi_{}'.format(t)],
                                              swi_ref['swi_{}'.format(t)], 4)
