@@ -91,9 +91,9 @@ def swi_error_prop(ssm, t_value, t_noise, swi_error, gain_in=None, nan=-9999.):
     G_old = [None] * len_T
     JT_old = [None] * len_T
 
-    j = 1
+    j = 1 + first_ssm_idx
 
-    for i in range(1, len_ssm):
+    for i in range(j, len_ssm):
         while j < len_ssm and ssm['sm_jd'][j] <= ssm['sm_jd'][i]:
             if ssm['sm'][j] != nan and ~np.isnan(ssm['sm'][j]):
                 time_diff = ssm['sm_jd'][j] - last_jd
