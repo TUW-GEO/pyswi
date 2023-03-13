@@ -56,8 +56,8 @@ def swi_error_prop(ssm, t_value, t_noise, swi_error, gain_in=None, nan=-9999.):
 
     len_ssm = len(ssm)
     len_T = len(t_value)
-    swi = np.zeros((len_ssm, len_T))
-    swi_noise = np.zeros((len_ssm, len_T))
+    swi = np.full((len_ssm, len_T), np.nan)
+    swi_noise = np.full((len_ssm, len_T), np.nan)
     qflag = np.ones((len_ssm, len_T))
 
     if gain_in is None:
@@ -91,9 +91,9 @@ def swi_error_prop(ssm, t_value, t_noise, swi_error, gain_in=None, nan=-9999.):
     G_old = [None] * len_T
     JT_old = [None] * len_T
 
-    j = 0
+    j = 1
 
-    for i in range(len_ssm):
+    for i in range(1, len_ssm):
         while j < len_ssm and ssm['sm_jd'][j] <= ssm['sm_jd'][i]:
             if ssm['sm'][j] != nan and ~np.isnan(ssm['sm'][j]):
                 time_diff = ssm['sm_jd'][j] - last_jd
