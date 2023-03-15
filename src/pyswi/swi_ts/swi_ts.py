@@ -59,6 +59,8 @@ def swi_error_prop(ssm, t_value, t_noise, swi_error, gain_in=None, nan=-9999.):
     swi = np.full((len_ssm, len_T), np.nan)
     swi_noise = np.full((len_ssm, len_T), np.nan)
     qflag = np.ones((len_ssm, len_T))
+    qflag_norm = [np.sum(np.exp(-(np.tensordot(np.arange(1000, dtype=np.float32),
+                                              (1. / t), axes=0))), axis=0) for t in t_value]
 
     if gain_in is None:
         first_ssm_idx = np.argmax((ssm['sm'] != nan) & ~np.isnan(ssm['sm']))
@@ -142,7 +144,7 @@ def swi_error_prop(ssm, t_value, t_noise, swi_error, gain_in=None, nan=-9999.):
     for i, t in enumerate(t_value):
         swi_ts['swi_{}'.format(t)] = swi[:, i]
         swi_ts['swi_noise_{}'.format(t)] = swi_noise[:, i]
-        swi_ts['qflag_{}'.format(t)] = qflag[:, i]
+        swi_ts['qflag_{}'.format(t)] = 100 * qflag[:, i] / qflag_norm[i]
 
     return swi_ts, gain_out
 
