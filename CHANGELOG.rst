@@ -5,14 +5,15 @@ Changelog
 Unreleased Changes in master
 ============================
 
--
-
+- SWI calculation in swi_error_prop() decoupled form input uncertainty data availability
+- quality flags normalized within swi_error_prop() and returned as percentages
+- restarting calculation with stored parameters (gain_in/out)
+- tests for above changes and swi_error_prop()/calc_swi_ts() result equivalence
 
 Version 1.0.0 (2023-01-13)
 ==========================
 
-- Includes improved error estimation scheme from `Pasik et al. (2023, submitted)`
-  and `De Santis and Biondi (2018) <https://doi.org/10.29007/kvhb>`_.
+- Includes an uncertainty characterization scheme from `Pasik et al. (2023, in review) <https://doi.org/10.5194/egusphere-2023-47>`_.
 - Public release on pypi (``pip install pyswi``)
 - Inclusion of iterative storage module
 
