@@ -58,12 +58,13 @@ def swi_error_prop(ssm, t_value, t_noise, swi_error, gain_in=None, nan=-9999.):
     len_T = len(t_value)
     swi = np.full((len_ssm, len_T), np.nan)
     swi_noise = np.full((len_ssm, len_T), np.nan)
-    qflag = np.ones((len_ssm, len_T))
+    qflag = np.full((len_ssm, len_T), np.nan)
     qflag_norm = [np.sum(np.exp(-(np.tensordot(np.arange(1000, dtype=np.float32),
                                                (1. / t), axes=0))), axis=0) for t in t_value]
 
     first_ssm_idx = np.argmax((ssm['sm'] != nan) & ~np.isnan(ssm['sm']))
     first_noise_idx = np.argmax((ssm['sm_uncertainty'] != nan) & ~np.isnan(ssm['sm_uncertainty']))
+    j = 1 + first_ssm_idx
 
     if gain_in is None:
         swi[first_ssm_idx] = ssm['sm'][first_ssm_idx]
@@ -72,23 +73,28 @@ def swi_error_prop(ssm, t_value, t_noise, swi_error, gain_in=None, nan=-9999.):
         contr1_curr = [ssm['sm_uncertainty'][first_noise_idx]**2] * len_T
         G_curr = [0] * len_T
         JT_curr = [0] * len_T # Jacobian term
+        qflag[first_ssm_idx] = [1] * len_T
     else:
-        last_jd = gain_in['last_jd']
-        time_diff = ssm['sm_jd'][0] - gain_in['last_jd']
+        time_diff = ssm['sm_jd'][first_ssm_idx] - gain_in['last_jd']
         ef = [np.exp(-time_diff / t_value[i]) for i in range(0, len(t_value))]
         gain_curr = [gain_in['last_gain'][i] / (gain_in['last_gain'][i] + ef[i]) for i in range(0, len(t_value))]
-        swi[0] = gain_in['last_swi'] + gain_curr * (ssm['sm'][0] - gain_in['last_swi'])
-        contr1_curr = [((1 - gain_curr[i])**2) * gain_in['last_contr1'][i] + (gain_curr[i] * ssm['sm_uncertainty'][0])**2
+        swi[first_ssm_idx] = gain_in['last_swi'] + gain_curr * (ssm['sm'][first_ssm_idx] - gain_in['last_swi'])
+        contr1_curr = [((1 - gain_curr[i])**2) * gain_in['last_contr1'][i] + (gain_curr[i] * ssm['sm_uncertainty'][first_noise_idx])**2
                        for i in range(0, len(t_value))]
         G_curr = [ef[i] * (gain_in['last_G'][i] + time_diff / t_value[i] / gain_in['last_gain'][i]) for i in range(0, len(t_value))]
-        JT_curr = [gain_curr[i] / t_value[i] * (G_curr[i] * (gain_in['last_swi'][i] - swi[0][i]) + ef[i] * t_value[i]
+        JT_curr = [gain_curr[i] / t_value[i] * (G_curr[i] * (gain_in['last_swi'][i] - swi[first_ssm_idx][i]) + ef[i] * t_value[i]
                                                 / gain_in['last_gain'][i] * gain_in['last_JT'][i]) for i in range(0, len(t_value))]
         contr2 = [(JT_curr[i] * t_noise[i])**2 for i in range(0, len(t_value))]
-        swi_noise[0] = [sqrt(contr1_curr[i] + contr2[i] + swi_error[i]) for i in range(0, len(t_value))]
+        swi_noise[first_noise_idx] = [sqrt(contr1_curr[i] + contr2[i] + swi_error[i]) for i in range(0, len(t_value))]
         if ssm['sm'][0] != nan and ~np.isnan(ssm['sm'][0]):
             qflag[0] = [1 + gain_in['last_qflag'][i] * np.exp(-(1. / float(t_value[i]))) for i in range(0, len(t_value))]
         else:
             qflag[0] = [gain_in['last_qflag'][i] * np.exp(-(1. / float(t_value[i]))) for i in range(0, len(t_value))]
+        for f in range(1, j):
+            if ssm['sm'][f] != nan and ~np.isnan(ssm['sm'][f]):
+                qflag[f] = [1 + qflag[f - 1][i] * np.exp(-(1. / float(t_value[i]))) for i in range(0, len(t_value))]
+            else:
+                qflag[f] = [qflag[f - 1][i] * np.exp(-(1. / float(t_value[i]))) for i in range(0, len(t_value))]
         last_jd = ssm['sm_jd'][first_ssm_idx]
 
     gain_old = [None] * len_T
@@ -96,8 +102,6 @@ def swi_error_prop(ssm, t_value, t_noise, swi_error, gain_in=None, nan=-9999.):
     contr2 = [None] * len_T
     G_old = [None] * len_T
     JT_old = [None] * len_T
-
-    j = 1 + first_ssm_idx
 
     for i in range(j, len_ssm):
         while j < len_ssm and ssm['sm_jd'][j] <= ssm['sm_jd'][i]:
