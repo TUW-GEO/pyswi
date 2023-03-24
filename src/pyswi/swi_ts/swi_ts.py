@@ -59,6 +59,7 @@ def swi_error_prop(ssm, t_value, t_noise, swi_error, gain_in=None, nan=-9999.):
     swi = np.full((len_ssm, len_T), np.nan)
     swi_noise = np.full((len_ssm, len_T), np.nan)
     qflag = np.full((len_ssm, len_T), np.nan)
+    # normalisation values for the qflag (to get %): convergence value of SUM_j_inf [e^(-j/T)]
     qflag_norm = [np.sum(np.exp(-(np.tensordot(np.arange(1000, dtype=np.float32),
                                                (1. / t), axes=0))), axis=0) for t in t_value]
 
