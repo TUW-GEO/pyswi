@@ -5,6 +5,11 @@ Changelog
 Unreleased Changes in master
 ============================
 
+-
+
+Version 1.1.0 (2024-06-06)
+==========================
+
 - SWI calculation in swi_error_prop() decoupled form input uncertainty data availability
 - quality flags normalized within swi_error_prop() and returned as percentages
 - restarting calculation with stored parameters (gain_in/out)
