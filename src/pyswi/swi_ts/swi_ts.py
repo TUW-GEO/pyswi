@@ -139,6 +139,10 @@ def swi_error_prop(ssm, t_value, t_noise, swi_error, gain_in=None, nan=-9999.):
 
     gain_out = {'last_jd': last_jd, 'last_gain': gain_curr, 'last_contr1': contr1_curr,
                 'last_G': G_curr, 'last_JT': JT_curr, 'last_swi': swi[-1], 'last_noise': swi_noise[-1], 'last_qflag': qflag[-1]}
+    
+    # If there are no sm values in the given ssm ts, gain_out should not be updated and should be the same as gain_in.
+    if gain_in and len(ssm[~np.isnan(ssm['sm'])]) == 0:
+        gain_out = gain_in
 
     dtype_list = [('swi_jd', np.float64)]
     for t in t_value:
