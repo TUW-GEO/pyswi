@@ -1,7 +1,7 @@
 name: pyswi
 dependencies:
 - cython
-- numpy
+- numpy<2
 - pandas
 - netCDF4
 - pyproj
