@@ -70,7 +70,7 @@ def swi_error_prop(ssm, t_value, t_noise, swi_error, gain_in=None, nan=-9999.):
         swi[first_ssm_idx] = ssm['sm'][first_ssm_idx]
         last_jd = ssm['sm_jd'][first_ssm_idx]
         gain_curr = [1] * len_T
-        contr1_curr = [ssm['sm_uncertainty'][first_noise_idx]**2] * len_T
+        contr1_curr = [ssm['sm_uncertainty'][first_noise_idx]**2] * len_T # delta
         G_curr = [0] * len_T
         JT_curr = [0] * len_T # Jacobian term
         qflag[first_ssm_idx] = [1] * len_T
@@ -103,8 +103,8 @@ def swi_error_prop(ssm, t_value, t_noise, swi_error, gain_in=None, nan=-9999.):
     G_old = [None] * len_T
     JT_old = [None] * len_T
 
-    for i in range(j, len_ssm):
-        while j < len_ssm and ssm['sm_jd'][j] <= ssm['sm_jd'][i]:
+    for i in range(j, len_ssm): 
+        while j < len_ssm and ssm['sm_jd'][j] <= ssm['sm_jd'][i]: 
             if ssm['sm'][j] != nan and ~np.isnan(ssm['sm'][j]):
                 time_diff = ssm['sm_jd'][j] - last_jd
                 for c in range(len_T):
@@ -123,6 +123,7 @@ def swi_error_prop(ssm, t_value, t_noise, swi_error, gain_in=None, nan=-9999.):
                         contr2[c] = (JT_curr[c] * t_noise[c])**2
                         swi_noise[i][c] = sqrt(contr1_curr[c] + contr2[c] + swi_error[c])
                 last_jd = ssm['sm_jd'][i]
+                last_valid_index = i
             j += 1
 
         for c in range(len_T):
@@ -137,12 +138,31 @@ def swi_error_prop(ssm, t_value, t_noise, swi_error, gain_in=None, nan=-9999.):
                 swi_noise[i, c] = np.nan
                 qflag[i, c] = qflag[i-1][c] * np.exp(-(1. / float(t_value[c])))
 
-    gain_out = {'last_jd': last_jd, 'last_gain': gain_curr, 'last_contr1': contr1_curr,
-                'last_G': G_curr, 'last_JT': JT_curr, 'last_swi': swi[-1], 'last_noise': swi_noise[-1], 'last_qflag': qflag[-1]}
-    
-    # If there are no sm values in the given ssm ts, gain_out should not be updated and should be the same as gain_in.
+    # If there are no input ssm values, gain_out should not be updated and should be the same as gain_in.
     if gain_in and len(ssm[~np.isnan(ssm['sm'])]) == 0:
         gain_out = gain_in
+        gain_out['last_qflag'] = qflag[-1] # Update to last qflag
+
+    # If there is only 1 input SSM value:
+    elif gain_in and len(ssm[~np.isnan(ssm['sm'])]) == 1:
+        gain_out = {'last_jd': last_jd, 
+                    'last_gain': gain_curr, 
+                    'last_contr1': contr1_curr,
+                    'last_G': G_curr, 
+                    'last_JT': JT_curr,
+                    'last_swi': swi[first_ssm_idx], 
+                    'last_noise': swi_noise[first_ssm_idx], 
+                    'last_qflag': qflag[-1]} # NOTE this is the last qflag.
+    else:
+        gain_out = {'last_jd': last_jd, # Last date where a swi calculation was done
+                    'last_gain': gain_curr, 
+                    'last_contr1': contr1_curr,
+                    'last_G': G_curr, 
+                    'last_JT': JT_curr, 
+                    'last_swi': swi[last_valid_index], 
+                    'last_noise': swi_noise[last_valid_index], 
+                    'last_qflag': qflag[-1]} # NOTE this is the last qflag. 
+
 
     dtype_list = [('swi_jd', np.float64)]
     for t in t_value:
