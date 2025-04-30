@@ -86,11 +86,13 @@ jobs:
     runs-on: ubuntu-latest
     container: python:3-slim
     steps:
-      - name: Finished
+      - name: Finalize Coveralls Parallel Build
         run: |
-          pip3 install --upgrade coveralls && coveralls --service=github --finish
+          pip3 install --upgrade coveralls
+          coveralls --finish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COVERALLS_SERVICE_NAME: github-actions
 
   publish:
     name: Upload to PyPI 🚀
@@ -111,11 +113,11 @@ jobs:
       - name: Display downloaded files
         run: ls -aR
       - name: Upload to PyPI
-        uses: pypa/gh-action-pypi-publish@v1.4.1
+        uses: pypa/gh-action-pypi-publish@v1.12
         with:
-          skip_existing: true
+          skip-existing: true
           verbose: true
-          verify_metadata: true
-          packages_dir: Artifacts/dist/
+          verify-metadata: true
+          packages-dir: Artifacts/dist/
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }} # this needs to be uploaded to github actions secrets
