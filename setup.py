@@ -17,7 +17,7 @@ import numpy
 def get_ext_modules(ext):
     return [
         Extension(
-            "pytesmo.time_series.filters",
+            "pyswi.swi_calc_routines",
             ["src/pyswi/swi_calc_routines" + ext],
             include_dirs=[numpy.get_include()],
             define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")],
