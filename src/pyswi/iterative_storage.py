@@ -1,5 +1,4 @@
-# Copyright (c) 2021, Vienna University of Technology (TU Wien),
-# Department of Geodesy and Geoinformation (GEO).
+# Copyright (c) 2025, TU Wien.
 # All rights reserved.
 #
 # All information contained herein is, and remains the property of Vienna
@@ -10,7 +9,6 @@
 # reproduction of this material is forbidden unless prior written permission
 # is obtained from Vienna University of Technology (TU Wien), Department of
 # Geodesy and Geoinformation (GEO).
-
 '''
 Storage of Iteration data between processing runs.
 '''
@@ -23,7 +21,6 @@ from trollsift import Parser
 
 
 class IterStepData(object):
-
     """
     reads and saves data needed between iteration steps
 
@@ -55,9 +52,7 @@ class IterStepData(object):
         filename prefix
     """
 
-    def __init__(self, path, n_obs,
-                 variables,
-                 prefix='GENERIC_PREFIX'):
+    def __init__(self, path, n_obs, variables, prefix='GENERIC_PREFIX'):
         self.path = path
         self.n_obs = n_obs
         self.variables = variables
@@ -66,16 +61,15 @@ class IterStepData(object):
         self.metadata = None
         self.datestoragefmt = "%Y-%m-%d %H:%M:%S"
         self.fname_datefmt = '%Y%m%d%H%M%SZ'
-        self.fname_template = '_'.join(
-            [self.prefix,
-             "{{sensing_start:{}}}".format(self.fname_datefmt),
-             "{{sensing_end:{}}}".format(self.fname_datefmt),
-             "{{processing_end:{}}}.nc".format(self.fname_datefmt)])
+        self.fname_template = '_'.join([
+            self.prefix, "{{sensing_start:{}}}".format(self.fname_datefmt),
+            "{{sensing_end:{}}}".format(self.fname_datefmt),
+            "{{processing_end:{}}}.nc".format(self.fname_datefmt)
+        ])
         self.fname_parser = Parser(self.fname_template)
         self._load_info()
 
-    def _construct_file_name(self, sensing_start, sensing_end,
-                             processing_end):
+    def _construct_file_name(self, sensing_start, sensing_end, processing_end):
         """
         construct filename from sensing start and end and
         processing end
@@ -95,9 +89,11 @@ class IterStepData(object):
             filename
         """
 
-        return self.fname_parser.compose({'sensing_start': sensing_start,
-                                          'sensing_end': sensing_end,
-                                          'processing_end': processing_end})
+        return self.fname_parser.compose({
+            'sensing_start': sensing_start,
+            'sensing_end': sensing_end,
+            'processing_end': processing_end
+        })
 
     def _load_info(self):
         """
@@ -129,9 +125,11 @@ class IterStepData(object):
         loads metadata from filenames. Important field is the end of sensing
         in each file which indicates if a bufr file has already been processed
         """
-        metadata = {'sensing_start': [],
-                    'sensing_end': [],
-                    'processing_end': []}
+        metadata = {
+            'sensing_start': [],
+            'sensing_end': [],
+            'processing_end': []
+        }
 
         fmt = '%Y%m%d%H%M%S'
 
@@ -184,8 +182,10 @@ class IterStepData(object):
             for name in nc.ncattrs():
                 structure['header'][name] = getattr(nc, name)
 
-            from_string = ['sensing_start', 'sensing_end',
-                           'processing_start', 'processing_end']
+            from_string = [
+                'sensing_start', 'sensing_end', 'processing_start',
+                'processing_end'
+            ]
             for name in from_string:
                 structure['header'][name] = datetime.strptime(
                     structure['header'][name], self.datestoragefmt)
@@ -197,17 +197,19 @@ class IterStepData(object):
         returns a empty structure dictionary
         """
 
-        header = {'product_name': "",
-                  'parent_product_name': "",
-                  'instrument_id': "",
-                  'sensing_start': datetime(1900, 1, 1),
-                  'sensing_end': datetime(4100, 12, 31, 15, 0, 0),
-                  'processing_end': ""}
+        header = {
+            'product_name': "",
+            'parent_product_name': "",
+            'instrument_id': "",
+            'sensing_start': datetime(1900, 1, 1),
+            'sensing_end': datetime(4100, 12, 31, 15, 0, 0),
+            'processing_end': ""
+        }
 
         structure = {'header': header}
         for variable in self.variables:
-            nan_array = np.empty(
-                self.n_obs, dtype=type(self.variables[variable]))
+            nan_array = np.empty(self.n_obs,
+                                 dtype=type(self.variables[variable]))
             nan_array.fill(self.variables[variable])
             structure[variable] = nan_array
 
@@ -234,15 +236,19 @@ class IterStepData(object):
             nc.createDimension('observations', self.n_obs)
             header = data['header'].copy()
             # convert date object to string for storage in netCDF
-            to_string = ['sensing_start', 'sensing_end',
-                         'processing_start', 'processing_end']
+            to_string = [
+                'sensing_start', 'sensing_end', 'processing_start',
+                'processing_end'
+            ]
             for name in to_string:
                 header[name] = header[name].strftime(self.datestoragefmt)
 
             nc.setncatts(header)
             for variable in self.variables:
-                var = nc.createVariable(variable, data[variable].dtype, ('observations'),
-                                        fill_value=self.variables[variable], zlib=True)
+                var = nc.createVariable(variable,
+                                        data[variable].dtype, ('observations'),
+                                        fill_value=self.variables[variable],
+                                        zlib=True)
                 var[:] = data[variable]
 
         if refresh_coll:

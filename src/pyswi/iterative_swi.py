@@ -1,4 +1,4 @@
-# Copyright (c) 2021, TU Wien, Department of Geodesy and Geoinformation (GEO).
+# Copyright (c) 2025, TU Wien.
 # All rights reserved.
 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -16,12 +16,21 @@ import os
 from datetime import datetime
 
 import numpy as np
-from pyswi.swi_img.iterative_storage import IterStepData
+from pyswi.iterative_storage import IterStepData
 from cadati.jd_date import julian2datetime
 
-def calc_swi(next_ssm, next_ssm_jd, tvalue, swi, jd,
-                  gain=None, weighted=False, den=None, n=None, wsum=None, next_w=None):
 
+def calc_swi(next_ssm,
+             next_ssm_jd,
+             tvalue,
+             swi,
+             jd,
+             gain=None,
+             weighted=False,
+             den=None,
+             n=None,
+             wsum=None,
+             next_w=None):
     """
     Takes input data and previous data and calculates swi_img
     values for the next date. All arrays have to be the same shape
@@ -93,8 +102,8 @@ def calc_swi(next_ssm, next_ssm_jd, tvalue, swi, jd,
         next_wsum = (next_w + wsum).astype(np.float32)
 
         # calculate weighted SWI
-        next_swi = ((swi * next_n / n * wsum * (next_den - 1) +
-                     next_ssm * next_n * next_w) /
+        next_swi = ((swi * next_n / n * wsum *
+                     (next_den - 1) + next_ssm * next_n * next_w) /
                     (next_wsum * next_den)).astype(np.float32)
 
         # rectify overshooting due to weighting
@@ -106,8 +115,9 @@ def calc_swi(next_ssm, next_ssm_jd, tvalue, swi, jd,
     else:
 
         # calculate gain
-        next_gain = (gain / (gain.astype(np.float64) +
-                             np.exp(-(time_diff / float(tvalue)))))
+        next_gain = (
+            gain /
+            (gain.astype(np.float64) + np.exp(-(time_diff / float(tvalue)))))
         # calculate SWI
         next_swi = swi + next_gain * (next_ssm - swi)
 
@@ -167,7 +177,10 @@ class IterativeMultiSWI(object):
         prev_iter_files = []
 
         for i in range(0, len(tvalues)):
-            it_swi = IterativeSWI(ssm, iter_data_path, tvalues[i], weighted=weighted)
+            it_swi = IterativeSWI(ssm,
+                                  iter_data_path,
+                                  tvalues[i],
+                                  weighted=weighted)
             iter_swi.append(it_swi)
             prev_iter_files.append(it_swi.iterstepdata.files)
 
@@ -195,7 +208,12 @@ class IterativeMultiSWI(object):
             for it_file in it_file_list:
                 os.remove(it_file)
 
-    def calc_iter(self, next_ssm_jd, next_ssm, ind=None, weighted=False, next_w=None):
+    def calc_iter(self,
+                  next_ssm_jd,
+                  next_ssm,
+                  ind=None,
+                  weighted=False,
+                  next_w=None):
         """
         Calculate SWI iteratively.
 
@@ -228,9 +246,12 @@ class IterativeMultiSWI(object):
         swi_dict = {}
 
         for i in range(0, len(self.tvalues)):
-            key_swi = "SWI_%03d" % (self.tvalues[i],)
-            swi_dict[key_swi] = self.calc_swi[i].calc_iter(next_ssm_jd, next_ssm, ind=ind,
-                                                                weighted=weighted, next_w=next_w)
+            key_swi = "SWI_%03d" % (self.tvalues[i], )
+            swi_dict[key_swi] = self.calc_swi[i].calc_iter(next_ssm_jd,
+                                                           next_ssm,
+                                                           ind=ind,
+                                                           weighted=weighted,
+                                                           next_w=next_w)
 
         return swi_dict
 
@@ -286,27 +307,29 @@ class IterativeSWI(object):
             Remote Sensing. 2018 Jul;10(7):1030.
         """
 
-        pref = "SWI_%03d" % (tvalue,)
+        pref = "SWI_%03d" % (tvalue, )
         self.iter_data_path = iter_data_path
         self.float_nan = np.float32(np.nan)
         self.jd_nan = np.float64(np.nan)
         if weighted:
             self.iterstepdata = IterStepData(self.iter_data_path,
-                                             len(ssm),
-                                             {'swi': self.float_nan,
-                                              'qflag': 1.0,
-                                              'den': self.float_nan,
-                                              'n': 0,
-                                              'wsum': self.float_nan,
-                                              'jd': self.jd_nan},
+                                             len(ssm), {
+                                                 'swi': self.float_nan,
+                                                 'qflag': 1.0,
+                                                 'den': self.float_nan,
+                                                 'n': 0,
+                                                 'wsum': self.float_nan,
+                                                 'jd': self.jd_nan
+                                             },
                                              prefix=pref)
         else:
             self.iterstepdata = IterStepData(self.iter_data_path,
-                                             len(ssm),
-                                             {'swi': self.float_nan,
-                                              'qflag': 1.0,
-                                              'gain': self.float_nan,
-                                              'jd': self.jd_nan},
+                                             len(ssm), {
+                                                 'swi': self.float_nan,
+                                                 'qflag': 1.0,
+                                                 'gain': self.float_nan,
+                                                 'jd': self.jd_nan
+                                             },
                                              prefix=pref)
         self.tvalue = tvalue
         self.processing_start = datetime.now()
@@ -331,8 +354,12 @@ class IterativeSWI(object):
         """
         self.iterstepdata.save_iter_data(self.iter_data)
 
-
-    def calc_iter(self, next_ssm_jd, next_ssm, ind=None, weighted=False, next_w=None):
+    def calc_iter(self,
+                  next_ssm_jd,
+                  next_ssm,
+                  ind=None,
+                  weighted=False,
+                  next_w=None):
         """
         Calculate SWI iteratively.
 
@@ -385,10 +412,16 @@ class IterativeSWI(object):
 
         # calculate new values
         if weighted:
-            next_swi, next_den, next_n, next_wsum = calc_swi(next_ssm, next_ssm_jd,
-                                       self.tvalue, swi, jd, den, n, wsum, next_w)
+            next_swi, next_den, next_n, next_wsum = calc_swi(
+                next_ssm, next_ssm_jd, self.tvalue, swi, jd, den, n, wsum,
+                next_w)
         else:
-            next_swi, next_gain = calc_swi(next_ssm, next_ssm_jd, self.tvalue, swi, jd, gain=gain)
+            next_swi, next_gain = calc_swi(next_ssm,
+                                           next_ssm_jd,
+                                           self.tvalue,
+                                           swi,
+                                           jd,
+                                           gain=gain)
 
         # update values of iter data with now calculated values
         self.iter_data['swi'][ind] = next_swi
@@ -402,10 +435,16 @@ class IterativeSWI(object):
 
         # update iter_data header for complete file.
         valid_jd = np.isfinite(self.iter_data['jd'])
-        header = {'sensing_start': julian2datetime(float(np.nanmin(self.iter_data['jd'][valid_jd]))),
-                  'sensing_end': julian2datetime(float(np.max(self.iter_data['jd'][valid_jd]))),
-                  'processing_start': self.processing_start,
-                  'processing_end': datetime.now()}
+        header = {
+            'sensing_start':
+            julian2datetime(float(np.nanmin(self.iter_data['jd'][valid_jd]))),
+            'sensing_end':
+            julian2datetime(float(np.max(self.iter_data['jd'][valid_jd]))),
+            'processing_start':
+            self.processing_start,
+            'processing_end':
+            datetime.now()
+        }
         self.iter_data['header'].update(header)
 
         return self.iter_data['swi']

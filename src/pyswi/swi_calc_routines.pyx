@@ -1,4 +1,4 @@
-# Copyright (c) 2019, TU Wien, Department of Geodesy and Geoinformation (GEO).
+# Copyright (c) 2025, TU Wien.
 # All rights reserved.
 
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -25,7 +25,7 @@ cimport cython
 @cython.cdivision(True)
 def swi_calc_cy(np.ndarray[np.double_t] juldate,
                 np.ndarray[np.float32_t] ssm,
-                np.ndarray[np.int_t] ctime,
+                np.ndarray[np.int32_t] ctime,
                 np.ndarray[np.double_t] swi_jd,
                 np.ndarray[np.float_t] nom,
                 np.ndarray[np.float_t] denom,
@@ -82,7 +82,7 @@ def swi_calc_cy(np.ndarray[np.double_t] juldate,
 @cython.cdivision(True)
 def swi_calc_cy_noise(np.ndarray[np.double_t] juldate,
                       np.ndarray[np.float32_t] ssm,
-                      np.ndarray[np.int_t] ctime,
+                      np.ndarray[np.int32_t] ctime,
                       np.ndarray[np.double_t] swi_jd,
                       np.ndarray[np.float_t] nom,
                       np.ndarray[np.float_t] denom,

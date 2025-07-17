@@ -6,6 +6,12 @@ Unreleased Changes in master
 ============================
 -
 
+Version 2.0.0 (2025-07-17)
+==========================
+
+- Update package structure (breaking change)
+- C files were recompiled for ``numpy>=2,<3``
+
 Version 1.2.0 (2025-04-30)
 ==========================
 - Updated the swi_error_prop function so it works when creating 10 day RZSM updates for C3S. Before, the function didn't work properly when the given SSM input data contained less than 2 data points.
