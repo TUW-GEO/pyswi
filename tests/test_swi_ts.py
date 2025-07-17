@@ -27,7 +27,7 @@ def test_process_swi_calc():
     """
     Test correct calculation of SWI, compared to a hardcoded calculation output.
     """
-    t_value = [5, 50, 100]
+    t_value = np.array([5, 50, 100], dtype=np.int32)
 
     swi_jd = pd.date_range(
         '2007-01-01', periods=9).to_julian_date().values.astype(np.float64)
@@ -69,7 +69,7 @@ def test_process_swi_calc_nan_values():
     Test correct calculation of SWI, compared to a hardcoded calculation output
     including nan values.
     """
-    t_value = [5, 50, 100]
+    t_value = np.array([5, 50, 100], dtype=np.int32)
 
     swi_jd = pd.date_range(
         '2007-01-01', periods=9).to_julian_date().values.astype(np.float64)
@@ -112,7 +112,7 @@ def test_process_swi_gain():
     then starts the calculation of day 5 to 9 and
     compares it with hardcoded output over the whole period.
     """
-    t_value = [5, 50, 100]
+    t_value = np.array([5, 50, 100], dtype=np.int32)
 
     swi_jd = pd.date_range(
         '2007-01-01', periods=9).to_julian_date().values.astype(np.float64)
@@ -167,7 +167,7 @@ def test_process_swi_not_daily_out():
     Test correct calculation of SWI with irregular timestamps,
     compared to a hardcoded calculation output.
     """
-    t_value = [5, 50, 100]
+    t_value = np.array([5, 50, 100], dtype=np.int32)
 
     swi_jd = np.array([
         2454102.3093969999, 2454103.3644969999, 2454103.873199,
@@ -213,7 +213,7 @@ def test_process_swi_noise():
     Test correct calculation of SWI Noise inside the SWI calculation
     process.
     """
-    t_value = [5, 50, 100]
+    t_value = np.array([5, 50, 100], dtype=np.int32)
 
     swi_jd = pd.date_range(
         '2007-01-01', periods=9).to_julian_date().values.astype(np.float64)
@@ -247,7 +247,7 @@ def test_swi_gain_noise():
     """
     Test correct calculation of SWI noise gain.
     """
-    t_value = [5, 50, 100]
+    t_value = np.array([5, 50, 100], dtype=np.int32)
 
     swi_jd = pd.date_range('2007-01-01', periods=9).to_julian_date().values
     sm = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90])
@@ -280,7 +280,7 @@ def test_equivalency():
     Compare both functions' outputs to each other as well as against a hadrcoded
     correct result.
     """
-    t_value = [5, 50, 100]
+    t_value = np.array([5, 50, 100], dtype=np.int32)
     t_noise = np.array([.5, 5, 10])
     swi_error = np.array([.0001, .0002, .0003])
 
@@ -335,7 +335,7 @@ def test_swi_error_prop_independence():
     independently of input uncertainty data availability.
     Compare against a hardcoded result.
     """
-    t_value = [5, 50, 100]
+    t_value = np.array([5, 50, 100], dtype=np.int32)
     t_noise = np.array([.5, 5, 10])
     swi_error = np.array([.0001, .0002, .0003])
 
@@ -387,7 +387,7 @@ def test_swi_error_prop_nan_handling():
     in the middle, and at the end of the input ssm array.
     Compare against a hardcoded result.
     """
-    t_value = [5, 50, 100]
+    t_value = np.array([5, 50, 100], dtype=np.int32)
     t_noise = np.array([.5, 5, 10])
     swi_error = np.array([.0001, .0002, .0003])
 
@@ -441,7 +441,7 @@ def test_swi_error_prop_restarting():
     intermediate parmeters (gain_out). Compare against a hardcoded result.
     """
 
-    t_value = [5, 50, 100]
+    t_value = np.array([5, 50, 100], dtype=np.int32)
     t_noise = np.array([.5, 5, 10])
     swi_error = np.array([.0001, .0002, .0003])
 
