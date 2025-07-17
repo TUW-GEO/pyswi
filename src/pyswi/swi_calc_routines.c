@@ -19,12 +19,12 @@
         "include_dirs": [
             "/home/shahn/.pyenv/versions/miniforge3-25.1.1-2/envs/ascat_env/lib/python3.13/site-packages/numpy/_core/include"
         ],
-        "name": "pytesmo.time_series.filters",
+        "name": "pyswi.swi_calc_routines",
         "sources": [
             "src/pyswi/swi_calc_routines.pyx"
         ]
     },
-    "module_name": "pytesmo.time_series.filters"
+    "module_name": "pyswi.swi_calc_routines"
 }
 END: Cython Metadata */
 
@@ -1140,8 +1140,8 @@ static CYTHON_INLINE float __PYX_NAN() {
   #endif
 #endif
 
-#define __PYX_HAVE__pytesmo__time_series__filters
-#define __PYX_HAVE_API__pytesmo__time_series__filters
+#define __PYX_HAVE__pyswi__swi_calc_routines
+#define __PYX_HAVE_API__pyswi__swi_calc_routines
 /* Early includes */
 #include <math.h>
 #include <string.h>
@@ -2704,18 +2704,18 @@ static CYTHON_INLINE char *__pyx_f_5numpy_7ndarray_4data_data(PyArrayObject *__p
 
 /* Module declarations from "cython" */
 
-/* Module declarations from "pytesmo.time_series.filters" */
+/* Module declarations from "pyswi.swi_calc_routines" */
 /* #### Code section: typeinfo ### */
 static const __Pyx_TypeInfo __Pyx_TypeInfo_nn___pyx_t_5numpy_double_t = { "double_t", NULL, sizeof(__pyx_t_5numpy_double_t), { 0 }, 0, 'R', 0, 0 };
 static const __Pyx_TypeInfo __Pyx_TypeInfo_nn___pyx_t_5numpy_float32_t = { "float32_t", NULL, sizeof(__pyx_t_5numpy_float32_t), { 0 }, 0, 'R', 0, 0 };
 static const __Pyx_TypeInfo __Pyx_TypeInfo_nn___pyx_t_5numpy_int32_t = { "int32_t", NULL, sizeof(__pyx_t_5numpy_int32_t), { 0 }, 0, __PYX_IS_UNSIGNED(__pyx_t_5numpy_int32_t) ? 'U' : 'I', __PYX_IS_UNSIGNED(__pyx_t_5numpy_int32_t), 0 };
 static const __Pyx_TypeInfo __Pyx_TypeInfo_nn___pyx_t_5numpy_float_t = { "float_t", NULL, sizeof(__pyx_t_5numpy_float_t), { 0 }, 0, 'R', 0, 0 };
 /* #### Code section: before_global_var ### */
-#define __Pyx_MODULE_NAME "pytesmo.time_series.filters"
-extern int __pyx_module_is_main_pytesmo__time_series__filters;
-int __pyx_module_is_main_pytesmo__time_series__filters = 0;
+#define __Pyx_MODULE_NAME "pyswi.swi_calc_routines"
+extern int __pyx_module_is_main_pyswi__swi_calc_routines;
+int __pyx_module_is_main_pyswi__swi_calc_routines = 0;
 
-/* Implementation of "pytesmo.time_series.filters" */
+/* Implementation of "pyswi.swi_calc_routines" */
 /* #### Code section: global_var ### */
 static PyObject *__pyx_builtin_range;
 static PyObject *__pyx_builtin_ImportError;
@@ -2769,16 +2769,16 @@ static const char __pyx_k_is_coroutine[] = "_is_coroutine";
 static const char __pyx_k_swi_calc_cy_noise[] = "swi_calc_cy_noise";
 static const char __pyx_k_asyncio_coroutines[] = "asyncio.coroutines";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
+static const char __pyx_k_pyswi_swi_calc_routines[] = "pyswi.swi_calc_routines";
 static const char __pyx_k_RvQc_s_1_c_AQ_5RvRy_TZZ_8_W[] = "\200\001\360\034\000\005\022\220\021\340\004%\240R\240v\250Q\250c\260\021\260!\360\006\000\005\030\220s\230!\2301\330\004\026\220c\230\021\230!\330\004\031\230\023\230A\230Q\330\0045\260R\260v\270R\270y\310\014\320TZ\320Z\\\320\\]\330\0048\270\002\270&\300\002\300)\310<\320W]\320]_\320_`\340\004\010\210\005\210U\220!\2201\340\010\016\210b\220\002\220'\230\024\230W\240A\240S\250\003\2506\260\021\260!\330\014\017\210s\220!\2203\220c\230\024\230S\240\003\2401\240C\240s\250\"\250A\330\020\030\230\007\230q\240\003\2402\240Q\330\020\024\220E\230\025\230a\230q\330\024\026\220a\220u\230C\230q\240\001\240\026\240r\250\025\250a\250q\330\024\027\220q\230\005\230R\230q\240\003\2402\240S\250\001\250\023\250B\250c\260\021\260!\330\024\031\230\021\230%\230r\240\021\240#\240R\240u\250A\250S\260\002\260!\340\020\036\230g\240Q\240a\330\014\021\220\021\340\010\013\2105\220\001\220\023\220C\220q\330\014\r\340\010\014\210E\220\025\220a\220q\330\014\017\210s\220!\2203\220c\230\024\230S\240\003\2401\240C\240s\250\"\250A\330\020\026\220a\220s\230%\230s\240!\2403\240b\250\005\250Q\250a\340\020\026\220a\220s\230%\230r\240\021\340\014\024\220F\230!\330\020\025\220Q\220c\230\022\2303\230a\230r\240\026\240q\250\003\2502\250]\270!\330\037$\240A\240T\250\022\250;\260a\260q\330\014\017\210v\220R\220q\330\020\030\230\001\330\014\025\220Q\220c\230\025\230a\340\004\013\2108\220;\230e\2407\250!";
-static const char __pyx_k_pytesmo_time_series_filters[] = "pytesmo.time_series.filters";
 static const char __pyx_k_RvQc_s_1_c_AQ_5RvRy_TZZ_8_W_2[] = "\200\001\360\032\000\005\022\220\021\330\004\021\220\021\330\004\021\220\021\330\004%\240R\240v\250Q\250c\260\021\260!\330\004\030\230\001\330\004\027\220s\230!\2301\330\004\026\220c\230\021\230!\330\004\031\230\023\230A\230Q\330\0045\260R\260v\270R\270y\310\014\320TZ\320Z\\\320\\]\330\0048\270\002\270&\300\002\300)\310<\320W]\320]_\320_`\340\004\010\210\005\210U\220!\2201\340\010\016\210b\220\002\220'\230\024\230W\240A\240S\250\003\2506\260\021\260!\330\014\024\220G\2301\230C\230r\240\021\330\014\020\220\005\220U\230!\2301\330\020\022\220!\2205\230\003\2301\230A\230V\2402\240U\250!\2501\330\020\023\2201\220E\230\022\2301\230C\230r\240\023\240A\240S\250\002\250#\250Q\250a\330\020\025\220Q\220e\2302\230Q\230c\240\022\2405\250\001\250\023\250B\250a\330\020\033\2302\230Q\230c\240\023\240A\330\020\031\230\021\230%\230y\250\001\250\023\250B\250i\260r\270\031\300!\3001\330\014\032\230'\240\021\240!\330\014\021\220\021\340\010\013\2105\220\001\220\023\220C\220q\330\014\r\340\010\014\210E\220\025\220a\220q\330\014\022\220!\2203\220e\2303\230a\230s\240\"\240E\250\021\250!\330\014\027\220u\230A\230S\240\003\2401\330\014\025\220Q\220c\230\025\230i\240q\250\003\2502\250Q\340\004\013\2108\220;\230e\2407\250-\260q";
 static const char __pyx_k_src_pyswi_swi_calc_routines_pyx[] = "src/pyswi/swi_calc_routines.pyx";
 static const char __pyx_k_Note_that_Cython_is_deliberately[] = "Note that Cython is deliberately stricter than PEP-484 and rejects subclasses of builtin types. If you need to pass subclasses then set the 'annotation_typing' directive to False.";
 static const char __pyx_k_numpy__core_multiarray_failed_to[] = "numpy._core.multiarray failed to import";
 static const char __pyx_k_numpy__core_umath_failed_to_impo[] = "numpy._core.umath failed to import";
 /* #### Code section: decls ### */
-static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_juldate, PyArrayObject *__pyx_v_ssm, PyArrayObject *__pyx_v_ctime, PyArrayObject *__pyx_v_swi_jd, PyArrayObject *__pyx_v_nom, PyArrayObject *__pyx_v_denom, double __pyx_v_last_jd_var, PyArrayObject *__pyx_v_norm_factor, double __pyx_v_nan); /* proto */
-static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_juldate, PyArrayObject *__pyx_v_ssm, PyArrayObject *__pyx_v_ctime, PyArrayObject *__pyx_v_swi_jd, PyArrayObject *__pyx_v_nom, PyArrayObject *__pyx_v_denom, double __pyx_v_last_jd_var, PyArrayObject *__pyx_v_ssm_noise, PyArrayObject *__pyx_v_nom_noise); /* proto */
+static PyObject *__pyx_pf_5pyswi_17swi_calc_routines_swi_calc_cy(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_juldate, PyArrayObject *__pyx_v_ssm, PyArrayObject *__pyx_v_ctime, PyArrayObject *__pyx_v_swi_jd, PyArrayObject *__pyx_v_nom, PyArrayObject *__pyx_v_denom, double __pyx_v_last_jd_var, PyArrayObject *__pyx_v_norm_factor, double __pyx_v_nan); /* proto */
+static PyObject *__pyx_pf_5pyswi_17swi_calc_routines_2swi_calc_cy_noise(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_juldate, PyArrayObject *__pyx_v_ssm, PyArrayObject *__pyx_v_ctime, PyArrayObject *__pyx_v_swi_jd, PyArrayObject *__pyx_v_nom, PyArrayObject *__pyx_v_denom, double __pyx_v_last_jd_var, PyArrayObject *__pyx_v_ssm_noise, PyArrayObject *__pyx_v_nom_noise); /* proto */
 /* #### Code section: late_includes ### */
 /* #### Code section: module_state ### */
 /* SmallCodeConfig */
@@ -2910,7 +2910,7 @@ static __pyx_mstatetype * const __pyx_mstate_global = &__pyx_mstate_global_stati
 #define __pyx_kp_u_numpy__core_multiarray_failed_to __pyx_string_tab[34]
 #define __pyx_kp_u_numpy__core_umath_failed_to_impo __pyx_string_tab[35]
 #define __pyx_n_u_pop __pyx_string_tab[36]
-#define __pyx_n_u_pytesmo_time_series_filters __pyx_string_tab[37]
+#define __pyx_n_u_pyswi_swi_calc_routines __pyx_string_tab[37]
 #define __pyx_n_u_qflag __pyx_string_tab[38]
 #define __pyx_n_u_qualname __pyx_string_tab[39]
 #define __pyx_n_u_range __pyx_string_tab[40]
@@ -4743,7 +4743,7 @@ static CYTHON_INLINE NPY_DATETIMEUNIT __pyx_f_5numpy_get_datetime64_unit(PyObjec
   return __pyx_r;
 }
 
-/* "src/pyswi/swi_calc_routines.pyx":23
+/* "pyswi/swi_calc_routines.pyx":23
  * 
  * 
  * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -4752,16 +4752,16 @@ static CYTHON_INLINE NPY_DATETIMEUNIT __pyx_f_5numpy_get_datetime64_unit(PyObjec
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pytesmo_11time_series_7filters_1swi_calc_cy(PyObject *__pyx_self, 
+static PyObject *__pyx_pw_5pyswi_17swi_calc_routines_1swi_calc_cy(PyObject *__pyx_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_7pytesmo_11time_series_7filters_swi_calc_cy, "swi_calc_cy(ndarray juldate, ndarray ssm, ndarray ctime, ndarray swi_jd, ndarray nom, ndarray denom, double last_jd_var, ndarray norm_factor, double nan)");
-static PyMethodDef __pyx_mdef_7pytesmo_11time_series_7filters_1swi_calc_cy = {"swi_calc_cy", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_7pytesmo_11time_series_7filters_1swi_calc_cy, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_7pytesmo_11time_series_7filters_swi_calc_cy};
-static PyObject *__pyx_pw_7pytesmo_11time_series_7filters_1swi_calc_cy(PyObject *__pyx_self, 
+PyDoc_STRVAR(__pyx_doc_5pyswi_17swi_calc_routines_swi_calc_cy, "swi_calc_cy(ndarray juldate, ndarray ssm, ndarray ctime, ndarray swi_jd, ndarray nom, ndarray denom, double last_jd_var, ndarray norm_factor, double nan)");
+static PyMethodDef __pyx_mdef_5pyswi_17swi_calc_routines_1swi_calc_cy = {"swi_calc_cy", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5pyswi_17swi_calc_routines_1swi_calc_cy, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5pyswi_17swi_calc_routines_swi_calc_cy};
+static PyObject *__pyx_pw_5pyswi_17swi_calc_routines_1swi_calc_cy(PyObject *__pyx_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -4887,7 +4887,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
     Py_XDECREF(values[__pyx_temp]);
   }
-  __Pyx_AddTraceback("pytesmo.time_series.filters.swi_calc_cy", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pyswi.swi_calc_routines.swi_calc_cy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
@@ -4898,7 +4898,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_nom), __pyx_mstate_global->__pyx_ptype_5numpy_ndarray, 1, "nom", 0))) __PYX_ERR(0, 30, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_denom), __pyx_mstate_global->__pyx_ptype_5numpy_ndarray, 1, "denom", 0))) __PYX_ERR(0, 31, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_norm_factor), __pyx_mstate_global->__pyx_ptype_5numpy_ndarray, 1, "norm_factor", 0))) __PYX_ERR(0, 33, __pyx_L1_error)
-  __pyx_r = __pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(__pyx_self, __pyx_v_juldate, __pyx_v_ssm, __pyx_v_ctime, __pyx_v_swi_jd, __pyx_v_nom, __pyx_v_denom, __pyx_v_last_jd_var, __pyx_v_norm_factor, __pyx_v_nan);
+  __pyx_r = __pyx_pf_5pyswi_17swi_calc_routines_swi_calc_cy(__pyx_self, __pyx_v_juldate, __pyx_v_ssm, __pyx_v_ctime, __pyx_v_swi_jd, __pyx_v_nom, __pyx_v_denom, __pyx_v_last_jd_var, __pyx_v_norm_factor, __pyx_v_nan);
 
   /* function exit code */
   goto __pyx_L0;
@@ -4917,7 +4917,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_juldate, PyArrayObject *__pyx_v_ssm, PyArrayObject *__pyx_v_ctime, PyArrayObject *__pyx_v_swi_jd, PyArrayObject *__pyx_v_nom, PyArrayObject *__pyx_v_denom, double __pyx_v_last_jd_var, PyArrayObject *__pyx_v_norm_factor, double __pyx_v_nan) {
+static PyObject *__pyx_pf_5pyswi_17swi_calc_routines_swi_calc_cy(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_juldate, PyArrayObject *__pyx_v_ssm, PyArrayObject *__pyx_v_ctime, PyArrayObject *__pyx_v_swi_jd, PyArrayObject *__pyx_v_nom, PyArrayObject *__pyx_v_denom, double __pyx_v_last_jd_var, PyArrayObject *__pyx_v_norm_factor, double __pyx_v_nan) {
   int __pyx_v_i;
   int __pyx_v_j;
   int __pyx_v_k;
@@ -5052,7 +5052,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
   }
   __pyx_pybuffernd_norm_factor.diminfo[0].strides = __pyx_pybuffernd_norm_factor.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_norm_factor.diminfo[0].shape = __pyx_pybuffernd_norm_factor.rcbuffer->pybuffer.shape[0];
 
-  /* "src/pyswi/swi_calc_routines.pyx":37
+  /* "pyswi/swi_calc_routines.pyx":37
  * 
  *     cdef int i
  *     cdef int j = 0             # <<<<<<<<<<<<<<
@@ -5061,7 +5061,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
 */
   __pyx_v_j = 0;
 
-  /* "src/pyswi/swi_calc_routines.pyx":39
+  /* "pyswi/swi_calc_routines.pyx":39
  *     cdef int j = 0
  *     cdef int k
  *     cdef np.ndarray[np.float_t] ef = np.empty(len(ctime))             # <<<<<<<<<<<<<<
@@ -5110,7 +5110,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
   __pyx_v_ef = ((PyArrayObject *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "src/pyswi/swi_calc_routines.pyx":42
+  /* "pyswi/swi_calc_routines.pyx":42
  *     cdef double tdiff
  *     cdef float qflag
  *     cdef int len_swi = len(swi_jd)             # <<<<<<<<<<<<<<
@@ -5120,7 +5120,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
   __pyx_t_5 = PyObject_Length(((PyObject *)__pyx_v_swi_jd)); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 42, __pyx_L1_error)
   __pyx_v_len_swi = __pyx_t_5;
 
-  /* "src/pyswi/swi_calc_routines.pyx":43
+  /* "pyswi/swi_calc_routines.pyx":43
  *     cdef float qflag
  *     cdef int len_swi = len(swi_jd)
  *     cdef int len_jd = len(juldate)             # <<<<<<<<<<<<<<
@@ -5130,7 +5130,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
   __pyx_t_5 = PyObject_Length(((PyObject *)__pyx_v_juldate)); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 43, __pyx_L1_error)
   __pyx_v_len_jd = __pyx_t_5;
 
-  /* "src/pyswi/swi_calc_routines.pyx":44
+  /* "pyswi/swi_calc_routines.pyx":44
  *     cdef int len_swi = len(swi_jd)
  *     cdef int len_jd = len(juldate)
  *     cdef int len_ctime = len(ctime)             # <<<<<<<<<<<<<<
@@ -5140,7 +5140,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
   __pyx_t_5 = PyObject_Length(((PyObject *)__pyx_v_ctime)); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 44, __pyx_L1_error)
   __pyx_v_len_ctime = __pyx_t_5;
 
-  /* "src/pyswi/swi_calc_routines.pyx":45
+  /* "pyswi/swi_calc_routines.pyx":45
  *     cdef int len_jd = len(juldate)
  *     cdef int len_ctime = len(ctime)
  *     cdef np.ndarray[np.float32_t, ndim = 2] swi_ts = np.empty((len_swi, len_ctime), dtype=np.float32)             # <<<<<<<<<<<<<<
@@ -5208,7 +5208,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
   __pyx_v_swi_ts = ((PyArrayObject *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "src/pyswi/swi_calc_routines.pyx":46
+  /* "pyswi/swi_calc_routines.pyx":46
  *     cdef int len_ctime = len(ctime)
  *     cdef np.ndarray[np.float32_t, ndim = 2] swi_ts = np.empty((len_swi, len_ctime), dtype=np.float32)
  *     cdef np.ndarray[np.float32_t, ndim = 2] swi_qflag = np.empty((len_swi, len_ctime), dtype=np.float32)             # <<<<<<<<<<<<<<
@@ -5276,7 +5276,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
   __pyx_v_swi_qflag = ((PyArrayObject *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "src/pyswi/swi_calc_routines.pyx":48
+  /* "pyswi/swi_calc_routines.pyx":48
  *     cdef np.ndarray[np.float32_t, ndim = 2] swi_qflag = np.empty((len_swi, len_ctime), dtype=np.float32)
  * 
  *     for i in range(len_swi):             # <<<<<<<<<<<<<<
@@ -5288,7 +5288,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
   for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
     __pyx_v_i = __pyx_t_11;
 
-    /* "src/pyswi/swi_calc_routines.pyx":50
+    /* "pyswi/swi_calc_routines.pyx":50
  *     for i in range(len_swi):
  * 
  *         while j < len_jd and juldate[j] <= swi_jd[i]:             # <<<<<<<<<<<<<<
@@ -5309,7 +5309,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
       __pyx_L7_bool_binop_done:;
       if (!__pyx_t_12) break;
 
-      /* "src/pyswi/swi_calc_routines.pyx":51
+      /* "pyswi/swi_calc_routines.pyx":51
  * 
  *         while j < len_jd and juldate[j] <= swi_jd[i]:
  *             if ssm[j] != nan or ssm[j] == np.nan:             # <<<<<<<<<<<<<<
@@ -5340,7 +5340,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
       __pyx_L10_bool_binop_done:;
       if (__pyx_t_12) {
 
-        /* "src/pyswi/swi_calc_routines.pyx":52
+        /* "pyswi/swi_calc_routines.pyx":52
  *         while j < len_jd and juldate[j] <= swi_jd[i]:
  *             if ssm[j] != nan or ssm[j] == np.nan:
  *                 tdiff = juldate[j] - last_jd_var             # <<<<<<<<<<<<<<
@@ -5350,7 +5350,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
         __pyx_t_15 = __pyx_v_j;
         __pyx_v_tdiff = ((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_juldate.rcbuffer->pybuffer.buf, __pyx_t_15, __pyx_pybuffernd_juldate.diminfo[0].strides)) - __pyx_v_last_jd_var);
 
-        /* "src/pyswi/swi_calc_routines.pyx":53
+        /* "pyswi/swi_calc_routines.pyx":53
  *             if ssm[j] != nan or ssm[j] == np.nan:
  *                 tdiff = juldate[j] - last_jd_var
  *                 for k in range(len_ctime):             # <<<<<<<<<<<<<<
@@ -5362,7 +5362,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
         for (__pyx_t_18 = 0; __pyx_t_18 < __pyx_t_17; __pyx_t_18+=1) {
           __pyx_v_k = __pyx_t_18;
 
-          /* "src/pyswi/swi_calc_routines.pyx":54
+          /* "pyswi/swi_calc_routines.pyx":54
  *                 tdiff = juldate[j] - last_jd_var
  *                 for k in range(len_ctime):
  *                     ef[k] = exp(-tdiff / ctime[k])             # <<<<<<<<<<<<<<
@@ -5373,7 +5373,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
           __pyx_t_14 = __pyx_v_k;
           *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float_t *, __pyx_pybuffernd_ef.rcbuffer->pybuffer.buf, __pyx_t_14, __pyx_pybuffernd_ef.diminfo[0].strides) = exp(((-__pyx_v_tdiff) / ((double)(*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_int32_t *, __pyx_pybuffernd_ctime.rcbuffer->pybuffer.buf, __pyx_t_15, __pyx_pybuffernd_ctime.diminfo[0].strides)))));
 
-          /* "src/pyswi/swi_calc_routines.pyx":55
+          /* "pyswi/swi_calc_routines.pyx":55
  *                 for k in range(len_ctime):
  *                     ef[k] = exp(-tdiff / ctime[k])
  *                     nom[k] = ef[k] * nom[k] + ssm[j]             # <<<<<<<<<<<<<<
@@ -5386,7 +5386,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
           __pyx_t_20 = __pyx_v_k;
           *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float_t *, __pyx_pybuffernd_nom.rcbuffer->pybuffer.buf, __pyx_t_20, __pyx_pybuffernd_nom.diminfo[0].strides) = (((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float_t *, __pyx_pybuffernd_ef.rcbuffer->pybuffer.buf, __pyx_t_15, __pyx_pybuffernd_ef.diminfo[0].strides)) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float_t *, __pyx_pybuffernd_nom.rcbuffer->pybuffer.buf, __pyx_t_14, __pyx_pybuffernd_nom.diminfo[0].strides))) + (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_ssm.rcbuffer->pybuffer.buf, __pyx_t_19, __pyx_pybuffernd_ssm.diminfo[0].strides)));
 
-          /* "src/pyswi/swi_calc_routines.pyx":56
+          /* "pyswi/swi_calc_routines.pyx":56
  *                     ef[k] = exp(-tdiff / ctime[k])
  *                     nom[k] = ef[k] * nom[k] + ssm[j]
  *                     denom[k] = ef[k] * denom[k] + 1             # <<<<<<<<<<<<<<
@@ -5399,7 +5399,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
           *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float_t *, __pyx_pybuffernd_denom.rcbuffer->pybuffer.buf, __pyx_t_15, __pyx_pybuffernd_denom.diminfo[0].strides) = (((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float_t *, __pyx_pybuffernd_ef.rcbuffer->pybuffer.buf, __pyx_t_19, __pyx_pybuffernd_ef.diminfo[0].strides)) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float_t *, __pyx_pybuffernd_denom.rcbuffer->pybuffer.buf, __pyx_t_14, __pyx_pybuffernd_denom.diminfo[0].strides))) + 1.0);
         }
 
-        /* "src/pyswi/swi_calc_routines.pyx":58
+        /* "pyswi/swi_calc_routines.pyx":58
  *                     denom[k] = ef[k] * denom[k] + 1
  * 
  *                 last_jd_var = juldate[j]             # <<<<<<<<<<<<<<
@@ -5409,7 +5409,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
         __pyx_t_14 = __pyx_v_j;
         __pyx_v_last_jd_var = (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_juldate.rcbuffer->pybuffer.buf, __pyx_t_14, __pyx_pybuffernd_juldate.diminfo[0].strides));
 
-        /* "src/pyswi/swi_calc_routines.pyx":51
+        /* "pyswi/swi_calc_routines.pyx":51
  * 
  *         while j < len_jd and juldate[j] <= swi_jd[i]:
  *             if ssm[j] != nan or ssm[j] == np.nan:             # <<<<<<<<<<<<<<
@@ -5418,7 +5418,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
 */
       }
 
-      /* "src/pyswi/swi_calc_routines.pyx":59
+      /* "pyswi/swi_calc_routines.pyx":59
  * 
  *                 last_jd_var = juldate[j]
  *             j += 1             # <<<<<<<<<<<<<<
@@ -5428,7 +5428,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
       __pyx_v_j = (__pyx_v_j + 1);
     }
 
-    /* "src/pyswi/swi_calc_routines.pyx":61
+    /* "pyswi/swi_calc_routines.pyx":61
  *             j += 1
  * 
  *         if denom[0] == 0:             # <<<<<<<<<<<<<<
@@ -5439,7 +5439,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
     __pyx_t_12 = ((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float_t *, __pyx_pybuffernd_denom.rcbuffer->pybuffer.buf, __pyx_t_14, __pyx_pybuffernd_denom.diminfo[0].strides)) == 0.0);
     if (__pyx_t_12) {
 
-      /* "src/pyswi/swi_calc_routines.pyx":62
+      /* "pyswi/swi_calc_routines.pyx":62
  * 
  *         if denom[0] == 0:
  *             continue  # no valid SSM measurement before swi_jd[i]             # <<<<<<<<<<<<<<
@@ -5448,7 +5448,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
 */
       goto __pyx_L3_continue;
 
-      /* "src/pyswi/swi_calc_routines.pyx":61
+      /* "pyswi/swi_calc_routines.pyx":61
  *             j += 1
  * 
  *         if denom[0] == 0:             # <<<<<<<<<<<<<<
@@ -5457,7 +5457,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
 */
     }
 
-    /* "src/pyswi/swi_calc_routines.pyx":64
+    /* "pyswi/swi_calc_routines.pyx":64
  *             continue  # no valid SSM measurement before swi_jd[i]
  * 
  *         for k in range(len_ctime):             # <<<<<<<<<<<<<<
@@ -5469,7 +5469,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
     for (__pyx_t_18 = 0; __pyx_t_18 < __pyx_t_17; __pyx_t_18+=1) {
       __pyx_v_k = __pyx_t_18;
 
-      /* "src/pyswi/swi_calc_routines.pyx":65
+      /* "pyswi/swi_calc_routines.pyx":65
  * 
  *         for k in range(len_ctime):
  *             if ssm[i] != nan or ssm[i] == np.nan:             # <<<<<<<<<<<<<<
@@ -5500,7 +5500,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
       __pyx_L18_bool_binop_done:;
       if (__pyx_t_12) {
 
-        /* "src/pyswi/swi_calc_routines.pyx":66
+        /* "pyswi/swi_calc_routines.pyx":66
  *         for k in range(len_ctime):
  *             if ssm[i] != nan or ssm[i] == np.nan:
  *                 swi_ts[i, k] = nom[k] / denom[k]             # <<<<<<<<<<<<<<
@@ -5513,7 +5513,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
         __pyx_t_20 = __pyx_v_k;
         *__Pyx_BufPtrStrided2d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_swi_ts.rcbuffer->pybuffer.buf, __pyx_t_15, __pyx_pybuffernd_swi_ts.diminfo[0].strides, __pyx_t_20, __pyx_pybuffernd_swi_ts.diminfo[1].strides) = ((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float_t *, __pyx_pybuffernd_nom.rcbuffer->pybuffer.buf, __pyx_t_14, __pyx_pybuffernd_nom.diminfo[0].strides)) / (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float_t *, __pyx_pybuffernd_denom.rcbuffer->pybuffer.buf, __pyx_t_19, __pyx_pybuffernd_denom.diminfo[0].strides)));
 
-        /* "src/pyswi/swi_calc_routines.pyx":65
+        /* "pyswi/swi_calc_routines.pyx":65
  * 
  *         for k in range(len_ctime):
  *             if ssm[i] != nan or ssm[i] == np.nan:             # <<<<<<<<<<<<<<
@@ -5523,7 +5523,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
         goto __pyx_L17;
       }
 
-      /* "src/pyswi/swi_calc_routines.pyx":68
+      /* "pyswi/swi_calc_routines.pyx":68
  *                 swi_ts[i, k] = nom[k] / denom[k]
  *             else:
  *                 swi_ts[i, k] = np.nan             # <<<<<<<<<<<<<<
@@ -5544,7 +5544,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
       }
       __pyx_L17:;
 
-      /* "src/pyswi/swi_calc_routines.pyx":71
+      /* "pyswi/swi_calc_routines.pyx":71
  * 
  *             qflag = 100.0 * \
  *                 denom[k] * exp(-(swi_jd[i] - last_jd_var) /             # <<<<<<<<<<<<<<
@@ -5553,7 +5553,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
 */
       __pyx_t_14 = __pyx_v_k;
 
-      /* "src/pyswi/swi_calc_routines.pyx":70
+      /* "pyswi/swi_calc_routines.pyx":70
  *                 swi_ts[i, k] = np.nan
  * 
  *             qflag = 100.0 * \             # <<<<<<<<<<<<<<
@@ -5562,7 +5562,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
 */
       __pyx_t_19 = __pyx_v_i;
 
-      /* "src/pyswi/swi_calc_routines.pyx":72
+      /* "pyswi/swi_calc_routines.pyx":72
  *             qflag = 100.0 * \
  *                 denom[k] * exp(-(swi_jd[i] - last_jd_var) /
  *                                ctime[k]) / norm_factor[k]             # <<<<<<<<<<<<<<
@@ -5571,7 +5571,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
 */
       __pyx_t_20 = __pyx_v_k;
 
-      /* "src/pyswi/swi_calc_routines.pyx":71
+      /* "pyswi/swi_calc_routines.pyx":71
  * 
  *             qflag = 100.0 * \
  *                 denom[k] * exp(-(swi_jd[i] - last_jd_var) /             # <<<<<<<<<<<<<<
@@ -5580,7 +5580,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
 */
       __pyx_t_15 = __pyx_v_k;
 
-      /* "src/pyswi/swi_calc_routines.pyx":72
+      /* "pyswi/swi_calc_routines.pyx":72
  *             qflag = 100.0 * \
  *                 denom[k] * exp(-(swi_jd[i] - last_jd_var) /
  *                                ctime[k]) / norm_factor[k]             # <<<<<<<<<<<<<<
@@ -5589,7 +5589,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
 */
       __pyx_v_qflag = (((100.0 * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float_t *, __pyx_pybuffernd_denom.rcbuffer->pybuffer.buf, __pyx_t_14, __pyx_pybuffernd_denom.diminfo[0].strides))) * exp(((-((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_swi_jd.rcbuffer->pybuffer.buf, __pyx_t_19, __pyx_pybuffernd_swi_jd.diminfo[0].strides)) - __pyx_v_last_jd_var)) / ((__pyx_t_5numpy_double_t)(*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_int32_t *, __pyx_pybuffernd_ctime.rcbuffer->pybuffer.buf, __pyx_t_20, __pyx_pybuffernd_ctime.diminfo[0].strides)))))) / (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float_t *, __pyx_pybuffernd_norm_factor.rcbuffer->pybuffer.buf, __pyx_t_15, __pyx_pybuffernd_norm_factor.diminfo[0].strides)));
 
-      /* "src/pyswi/swi_calc_routines.pyx":73
+      /* "pyswi/swi_calc_routines.pyx":73
  *                 denom[k] * exp(-(swi_jd[i] - last_jd_var) /
  *                                ctime[k]) / norm_factor[k]
  *             if qflag > 100:             # <<<<<<<<<<<<<<
@@ -5599,7 +5599,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
       __pyx_t_12 = (__pyx_v_qflag > 100.0);
       if (__pyx_t_12) {
 
-        /* "src/pyswi/swi_calc_routines.pyx":74
+        /* "pyswi/swi_calc_routines.pyx":74
  *                                ctime[k]) / norm_factor[k]
  *             if qflag > 100:
  *                 qflag = 100             # <<<<<<<<<<<<<<
@@ -5608,7 +5608,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
 */
         __pyx_v_qflag = 100.0;
 
-        /* "src/pyswi/swi_calc_routines.pyx":73
+        /* "pyswi/swi_calc_routines.pyx":73
  *                 denom[k] * exp(-(swi_jd[i] - last_jd_var) /
  *                                ctime[k]) / norm_factor[k]
  *             if qflag > 100:             # <<<<<<<<<<<<<<
@@ -5617,7 +5617,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
 */
       }
 
-      /* "src/pyswi/swi_calc_routines.pyx":75
+      /* "pyswi/swi_calc_routines.pyx":75
  *             if qflag > 100:
  *                 qflag = 100
  *             swi_qflag[i, k] = qflag             # <<<<<<<<<<<<<<
@@ -5631,7 +5631,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
     __pyx_L3_continue:;
   }
 
-  /* "src/pyswi/swi_calc_routines.pyx":77
+  /* "pyswi/swi_calc_routines.pyx":77
  *             swi_qflag[i, k] = qflag
  * 
  *     return swi_ts, swi_qflag, nom, denom, last_jd_var             # <<<<<<<<<<<<<<
@@ -5662,7 +5662,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
   __pyx_t_8 = 0;
   goto __pyx_L0;
 
-  /* "src/pyswi/swi_calc_routines.pyx":23
+  /* "pyswi/swi_calc_routines.pyx":23
  * 
  * 
  * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -5693,7 +5693,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_swi_qflag.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_swi_ts.rcbuffer->pybuffer);
   __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("pytesmo.time_series.filters.swi_calc_cy", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pyswi.swi_calc_routines.swi_calc_cy", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   goto __pyx_L2;
   __pyx_L0:;
@@ -5716,7 +5716,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
   return __pyx_r;
 }
 
-/* "src/pyswi/swi_calc_routines.pyx":80
+/* "pyswi/swi_calc_routines.pyx":80
  * 
  * 
  * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -5725,16 +5725,16 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_swi_calc_cy(CYTHON_UNU
 */
 
 /* Python wrapper */
-static PyObject *__pyx_pw_7pytesmo_11time_series_7filters_3swi_calc_cy_noise(PyObject *__pyx_self, 
+static PyObject *__pyx_pw_5pyswi_17swi_calc_routines_3swi_calc_cy_noise(PyObject *__pyx_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
 PyObject *__pyx_args, PyObject *__pyx_kwds
 #endif
 ); /*proto*/
-PyDoc_STRVAR(__pyx_doc_7pytesmo_11time_series_7filters_2swi_calc_cy_noise, "swi_calc_cy_noise(ndarray juldate, ndarray ssm, ndarray ctime, ndarray swi_jd, ndarray nom, ndarray denom, double last_jd_var, ndarray ssm_noise, ndarray nom_noise)");
-static PyMethodDef __pyx_mdef_7pytesmo_11time_series_7filters_3swi_calc_cy_noise = {"swi_calc_cy_noise", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_7pytesmo_11time_series_7filters_3swi_calc_cy_noise, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_7pytesmo_11time_series_7filters_2swi_calc_cy_noise};
-static PyObject *__pyx_pw_7pytesmo_11time_series_7filters_3swi_calc_cy_noise(PyObject *__pyx_self, 
+PyDoc_STRVAR(__pyx_doc_5pyswi_17swi_calc_routines_2swi_calc_cy_noise, "swi_calc_cy_noise(ndarray juldate, ndarray ssm, ndarray ctime, ndarray swi_jd, ndarray nom, ndarray denom, double last_jd_var, ndarray ssm_noise, ndarray nom_noise)");
+static PyMethodDef __pyx_mdef_5pyswi_17swi_calc_routines_3swi_calc_cy_noise = {"swi_calc_cy_noise", (PyCFunction)(void(*)(void))(__Pyx_PyCFunction_FastCallWithKeywords)__pyx_pw_5pyswi_17swi_calc_routines_3swi_calc_cy_noise, __Pyx_METH_FASTCALL|METH_KEYWORDS, __pyx_doc_5pyswi_17swi_calc_routines_2swi_calc_cy_noise};
+static PyObject *__pyx_pw_5pyswi_17swi_calc_routines_3swi_calc_cy_noise(PyObject *__pyx_self, 
 #if CYTHON_METH_FASTCALL
 PyObject *const *__pyx_args, Py_ssize_t __pyx_nargs, PyObject *__pyx_kwds
 #else
@@ -5860,7 +5860,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   for (Py_ssize_t __pyx_temp=0; __pyx_temp < (Py_ssize_t)(sizeof(values)/sizeof(values[0])); ++__pyx_temp) {
     Py_XDECREF(values[__pyx_temp]);
   }
-  __Pyx_AddTraceback("pytesmo.time_series.filters.swi_calc_cy_noise", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pyswi.swi_calc_routines.swi_calc_cy_noise", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
   return NULL;
   __pyx_L4_argument_unpacking_done:;
@@ -5872,7 +5872,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_denom), __pyx_mstate_global->__pyx_ptype_5numpy_ndarray, 1, "denom", 0))) __PYX_ERR(0, 88, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_ssm_noise), __pyx_mstate_global->__pyx_ptype_5numpy_ndarray, 1, "ssm_noise", 0))) __PYX_ERR(0, 90, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_nom_noise), __pyx_mstate_global->__pyx_ptype_5numpy_ndarray, 1, "nom_noise", 0))) __PYX_ERR(0, 91, __pyx_L1_error)
-  __pyx_r = __pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(__pyx_self, __pyx_v_juldate, __pyx_v_ssm, __pyx_v_ctime, __pyx_v_swi_jd, __pyx_v_nom, __pyx_v_denom, __pyx_v_last_jd_var, __pyx_v_ssm_noise, __pyx_v_nom_noise);
+  __pyx_r = __pyx_pf_5pyswi_17swi_calc_routines_2swi_calc_cy_noise(__pyx_self, __pyx_v_juldate, __pyx_v_ssm, __pyx_v_ctime, __pyx_v_swi_jd, __pyx_v_nom, __pyx_v_denom, __pyx_v_last_jd_var, __pyx_v_ssm_noise, __pyx_v_nom_noise);
 
   /* function exit code */
   goto __pyx_L0;
@@ -5891,7 +5891,7 @@ PyObject *__pyx_args, PyObject *__pyx_kwds
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_juldate, PyArrayObject *__pyx_v_ssm, PyArrayObject *__pyx_v_ctime, PyArrayObject *__pyx_v_swi_jd, PyArrayObject *__pyx_v_nom, PyArrayObject *__pyx_v_denom, double __pyx_v_last_jd_var, PyArrayObject *__pyx_v_ssm_noise, PyArrayObject *__pyx_v_nom_noise) {
+static PyObject *__pyx_pf_5pyswi_17swi_calc_routines_2swi_calc_cy_noise(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_juldate, PyArrayObject *__pyx_v_ssm, PyArrayObject *__pyx_v_ctime, PyArrayObject *__pyx_v_swi_jd, PyArrayObject *__pyx_v_nom, PyArrayObject *__pyx_v_denom, double __pyx_v_last_jd_var, PyArrayObject *__pyx_v_ssm_noise, PyArrayObject *__pyx_v_nom_noise) {
   int __pyx_v_i;
   int __pyx_v_j;
   int __pyx_v_k;
@@ -6039,7 +6039,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
   }
   __pyx_pybuffernd_nom_noise.diminfo[0].strides = __pyx_pybuffernd_nom_noise.rcbuffer->pybuffer.strides[0]; __pyx_pybuffernd_nom_noise.diminfo[0].shape = __pyx_pybuffernd_nom_noise.rcbuffer->pybuffer.shape[0];
 
-  /* "src/pyswi/swi_calc_routines.pyx":93
+  /* "pyswi/swi_calc_routines.pyx":93
  *                       np.ndarray[np.double_t] nom_noise):
  * 
  *     cdef int i = 0             # <<<<<<<<<<<<<<
@@ -6048,7 +6048,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
 */
   __pyx_v_i = 0;
 
-  /* "src/pyswi/swi_calc_routines.pyx":94
+  /* "pyswi/swi_calc_routines.pyx":94
  * 
  *     cdef int i = 0
  *     cdef int j = 0             # <<<<<<<<<<<<<<
@@ -6057,7 +6057,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
 */
   __pyx_v_j = 0;
 
-  /* "src/pyswi/swi_calc_routines.pyx":95
+  /* "pyswi/swi_calc_routines.pyx":95
  *     cdef int i = 0
  *     cdef int j = 0
  *     cdef int k = 0             # <<<<<<<<<<<<<<
@@ -6066,7 +6066,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
 */
   __pyx_v_k = 0;
 
-  /* "src/pyswi/swi_calc_routines.pyx":96
+  /* "pyswi/swi_calc_routines.pyx":96
  *     cdef int j = 0
  *     cdef int k = 0
  *     cdef np.ndarray[np.float_t] ef = np.empty(len(ctime))             # <<<<<<<<<<<<<<
@@ -6115,7 +6115,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
   __pyx_v_ef = ((PyArrayObject *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "src/pyswi/swi_calc_routines.pyx":97
+  /* "pyswi/swi_calc_routines.pyx":97
  *     cdef int k = 0
  *     cdef np.ndarray[np.float_t] ef = np.empty(len(ctime))
  *     cdef double tdiff = 0.0             # <<<<<<<<<<<<<<
@@ -6124,7 +6124,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
 */
   __pyx_v_tdiff = 0.0;
 
-  /* "src/pyswi/swi_calc_routines.pyx":98
+  /* "pyswi/swi_calc_routines.pyx":98
  *     cdef np.ndarray[np.float_t] ef = np.empty(len(ctime))
  *     cdef double tdiff = 0.0
  *     cdef int len_swi = len(swi_jd)             # <<<<<<<<<<<<<<
@@ -6134,7 +6134,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
   __pyx_t_5 = PyObject_Length(((PyObject *)__pyx_v_swi_jd)); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 98, __pyx_L1_error)
   __pyx_v_len_swi = __pyx_t_5;
 
-  /* "src/pyswi/swi_calc_routines.pyx":99
+  /* "pyswi/swi_calc_routines.pyx":99
  *     cdef double tdiff = 0.0
  *     cdef int len_swi = len(swi_jd)
  *     cdef int len_jd = len(juldate)             # <<<<<<<<<<<<<<
@@ -6144,7 +6144,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
   __pyx_t_5 = PyObject_Length(((PyObject *)__pyx_v_juldate)); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 99, __pyx_L1_error)
   __pyx_v_len_jd = __pyx_t_5;
 
-  /* "src/pyswi/swi_calc_routines.pyx":100
+  /* "pyswi/swi_calc_routines.pyx":100
  *     cdef int len_swi = len(swi_jd)
  *     cdef int len_jd = len(juldate)
  *     cdef int len_ctime = len(ctime)             # <<<<<<<<<<<<<<
@@ -6154,7 +6154,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
   __pyx_t_5 = PyObject_Length(((PyObject *)__pyx_v_ctime)); if (unlikely(__pyx_t_5 == ((Py_ssize_t)-1))) __PYX_ERR(0, 100, __pyx_L1_error)
   __pyx_v_len_ctime = __pyx_t_5;
 
-  /* "src/pyswi/swi_calc_routines.pyx":101
+  /* "pyswi/swi_calc_routines.pyx":101
  *     cdef int len_jd = len(juldate)
  *     cdef int len_ctime = len(ctime)
  *     cdef np.ndarray[np.float32_t, ndim = 2] swi_ts = np.empty((len_swi, len_ctime), dtype=np.float32)             # <<<<<<<<<<<<<<
@@ -6222,7 +6222,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
   __pyx_v_swi_ts = ((PyArrayObject *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "src/pyswi/swi_calc_routines.pyx":102
+  /* "pyswi/swi_calc_routines.pyx":102
  *     cdef int len_ctime = len(ctime)
  *     cdef np.ndarray[np.float32_t, ndim = 2] swi_ts = np.empty((len_swi, len_ctime), dtype=np.float32)
  *     cdef np.ndarray[np.float32_t, ndim = 2] swi_noise = np.empty((len_swi, len_ctime), dtype=np.float32)             # <<<<<<<<<<<<<<
@@ -6290,7 +6290,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
   __pyx_v_swi_noise = ((PyArrayObject *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "src/pyswi/swi_calc_routines.pyx":104
+  /* "pyswi/swi_calc_routines.pyx":104
  *     cdef np.ndarray[np.float32_t, ndim = 2] swi_noise = np.empty((len_swi, len_ctime), dtype=np.float32)
  * 
  *     for i in range(len_swi):             # <<<<<<<<<<<<<<
@@ -6302,7 +6302,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
   for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
     __pyx_v_i = __pyx_t_11;
 
-    /* "src/pyswi/swi_calc_routines.pyx":106
+    /* "pyswi/swi_calc_routines.pyx":106
  *     for i in range(len_swi):
  * 
  *         while j < len_jd and juldate[j] <= swi_jd[i]:             # <<<<<<<<<<<<<<
@@ -6323,7 +6323,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
       __pyx_L7_bool_binop_done:;
       if (!__pyx_t_12) break;
 
-      /* "src/pyswi/swi_calc_routines.pyx":107
+      /* "pyswi/swi_calc_routines.pyx":107
  * 
  *         while j < len_jd and juldate[j] <= swi_jd[i]:
  *             tdiff = juldate[j] - last_jd_var             # <<<<<<<<<<<<<<
@@ -6333,7 +6333,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
       __pyx_t_15 = __pyx_v_j;
       __pyx_v_tdiff = ((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_juldate.rcbuffer->pybuffer.buf, __pyx_t_15, __pyx_pybuffernd_juldate.diminfo[0].strides)) - __pyx_v_last_jd_var);
 
-      /* "src/pyswi/swi_calc_routines.pyx":108
+      /* "pyswi/swi_calc_routines.pyx":108
  *         while j < len_jd and juldate[j] <= swi_jd[i]:
  *             tdiff = juldate[j] - last_jd_var
  *             for k in range(len_ctime):             # <<<<<<<<<<<<<<
@@ -6345,7 +6345,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
       for (__pyx_t_18 = 0; __pyx_t_18 < __pyx_t_17; __pyx_t_18+=1) {
         __pyx_v_k = __pyx_t_18;
 
-        /* "src/pyswi/swi_calc_routines.pyx":109
+        /* "pyswi/swi_calc_routines.pyx":109
  *             tdiff = juldate[j] - last_jd_var
  *             for k in range(len_ctime):
  *                 ef[k] = exp(-tdiff / ctime[k])             # <<<<<<<<<<<<<<
@@ -6356,7 +6356,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
         __pyx_t_14 = __pyx_v_k;
         *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float_t *, __pyx_pybuffernd_ef.rcbuffer->pybuffer.buf, __pyx_t_14, __pyx_pybuffernd_ef.diminfo[0].strides) = exp(((-__pyx_v_tdiff) / ((double)(*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_int32_t *, __pyx_pybuffernd_ctime.rcbuffer->pybuffer.buf, __pyx_t_15, __pyx_pybuffernd_ctime.diminfo[0].strides)))));
 
-        /* "src/pyswi/swi_calc_routines.pyx":110
+        /* "pyswi/swi_calc_routines.pyx":110
  *             for k in range(len_ctime):
  *                 ef[k] = exp(-tdiff / ctime[k])
  *                 nom[k] = ef[k] * nom[k] + ssm[j]             # <<<<<<<<<<<<<<
@@ -6369,7 +6369,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
         __pyx_t_20 = __pyx_v_k;
         *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float_t *, __pyx_pybuffernd_nom.rcbuffer->pybuffer.buf, __pyx_t_20, __pyx_pybuffernd_nom.diminfo[0].strides) = (((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float_t *, __pyx_pybuffernd_ef.rcbuffer->pybuffer.buf, __pyx_t_15, __pyx_pybuffernd_ef.diminfo[0].strides)) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float_t *, __pyx_pybuffernd_nom.rcbuffer->pybuffer.buf, __pyx_t_14, __pyx_pybuffernd_nom.diminfo[0].strides))) + (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_ssm.rcbuffer->pybuffer.buf, __pyx_t_19, __pyx_pybuffernd_ssm.diminfo[0].strides)));
 
-        /* "src/pyswi/swi_calc_routines.pyx":111
+        /* "pyswi/swi_calc_routines.pyx":111
  *                 ef[k] = exp(-tdiff / ctime[k])
  *                 nom[k] = ef[k] * nom[k] + ssm[j]
  *                 denom[k] = ef[k] * denom[k] + 1             # <<<<<<<<<<<<<<
@@ -6381,7 +6381,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
         __pyx_t_15 = __pyx_v_k;
         *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float_t *, __pyx_pybuffernd_denom.rcbuffer->pybuffer.buf, __pyx_t_15, __pyx_pybuffernd_denom.diminfo[0].strides) = (((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float_t *, __pyx_pybuffernd_ef.rcbuffer->pybuffer.buf, __pyx_t_19, __pyx_pybuffernd_ef.diminfo[0].strides)) * (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float_t *, __pyx_pybuffernd_denom.rcbuffer->pybuffer.buf, __pyx_t_14, __pyx_pybuffernd_denom.diminfo[0].strides))) + 1.0);
 
-        /* "src/pyswi/swi_calc_routines.pyx":112
+        /* "pyswi/swi_calc_routines.pyx":112
  *                 nom[k] = ef[k] * nom[k] + ssm[j]
  *                 denom[k] = ef[k] * denom[k] + 1
  *                 exp_term = ef[k] ** 2             # <<<<<<<<<<<<<<
@@ -6394,7 +6394,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
         __Pyx_XDECREF_SET(__pyx_v_exp_term, __pyx_t_1);
         __pyx_t_1 = 0;
 
-        /* "src/pyswi/swi_calc_routines.pyx":113
+        /* "pyswi/swi_calc_routines.pyx":113
  *                 denom[k] = ef[k] * denom[k] + 1
  *                 exp_term = ef[k] ** 2
  *                 nom_noise[k] = nom_noise[k] * exp_term + ssm_noise[j]             # <<<<<<<<<<<<<<
@@ -6420,7 +6420,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
         *__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_nom_noise.rcbuffer->pybuffer.buf, __pyx_t_14, __pyx_pybuffernd_nom_noise.diminfo[0].strides) = __pyx_t_21;
       }
 
-      /* "src/pyswi/swi_calc_routines.pyx":114
+      /* "pyswi/swi_calc_routines.pyx":114
  *                 exp_term = ef[k] ** 2
  *                 nom_noise[k] = nom_noise[k] * exp_term + ssm_noise[j]
  *             last_jd_var = juldate[j]             # <<<<<<<<<<<<<<
@@ -6430,7 +6430,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
       __pyx_t_14 = __pyx_v_j;
       __pyx_v_last_jd_var = (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_double_t *, __pyx_pybuffernd_juldate.rcbuffer->pybuffer.buf, __pyx_t_14, __pyx_pybuffernd_juldate.diminfo[0].strides));
 
-      /* "src/pyswi/swi_calc_routines.pyx":115
+      /* "pyswi/swi_calc_routines.pyx":115
  *                 nom_noise[k] = nom_noise[k] * exp_term + ssm_noise[j]
  *             last_jd_var = juldate[j]
  *             j += 1             # <<<<<<<<<<<<<<
@@ -6440,7 +6440,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
       __pyx_v_j = (__pyx_v_j + 1);
     }
 
-    /* "src/pyswi/swi_calc_routines.pyx":117
+    /* "pyswi/swi_calc_routines.pyx":117
  *             j += 1
  * 
  *         if denom[0] == 0:             # <<<<<<<<<<<<<<
@@ -6451,7 +6451,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
     __pyx_t_12 = ((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float_t *, __pyx_pybuffernd_denom.rcbuffer->pybuffer.buf, __pyx_t_14, __pyx_pybuffernd_denom.diminfo[0].strides)) == 0.0);
     if (__pyx_t_12) {
 
-      /* "src/pyswi/swi_calc_routines.pyx":118
+      /* "pyswi/swi_calc_routines.pyx":118
  * 
  *         if denom[0] == 0:
  *             continue  # no valid SSM measurement before swi_jd[i]             # <<<<<<<<<<<<<<
@@ -6460,7 +6460,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
 */
       goto __pyx_L3_continue;
 
-      /* "src/pyswi/swi_calc_routines.pyx":117
+      /* "pyswi/swi_calc_routines.pyx":117
  *             j += 1
  * 
  *         if denom[0] == 0:             # <<<<<<<<<<<<<<
@@ -6469,7 +6469,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
 */
     }
 
-    /* "src/pyswi/swi_calc_routines.pyx":120
+    /* "pyswi/swi_calc_routines.pyx":120
  *             continue  # no valid SSM measurement before swi_jd[i]
  * 
  *         for k in range(len_ctime):             # <<<<<<<<<<<<<<
@@ -6481,7 +6481,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
     for (__pyx_t_18 = 0; __pyx_t_18 < __pyx_t_17; __pyx_t_18+=1) {
       __pyx_v_k = __pyx_t_18;
 
-      /* "src/pyswi/swi_calc_routines.pyx":121
+      /* "pyswi/swi_calc_routines.pyx":121
  * 
  *         for k in range(len_ctime):
  *             swi_ts[i, k] = nom[k] / denom[k]             # <<<<<<<<<<<<<<
@@ -6494,7 +6494,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
       __pyx_t_20 = __pyx_v_k;
       *__Pyx_BufPtrStrided2d(__pyx_t_5numpy_float32_t *, __pyx_pybuffernd_swi_ts.rcbuffer->pybuffer.buf, __pyx_t_15, __pyx_pybuffernd_swi_ts.diminfo[0].strides, __pyx_t_20, __pyx_pybuffernd_swi_ts.diminfo[1].strides) = ((*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float_t *, __pyx_pybuffernd_nom.rcbuffer->pybuffer.buf, __pyx_t_14, __pyx_pybuffernd_nom.diminfo[0].strides)) / (*__Pyx_BufPtrStrided1d(__pyx_t_5numpy_float_t *, __pyx_pybuffernd_denom.rcbuffer->pybuffer.buf, __pyx_t_19, __pyx_pybuffernd_denom.diminfo[0].strides)));
 
-      /* "src/pyswi/swi_calc_routines.pyx":122
+      /* "pyswi/swi_calc_routines.pyx":122
  *         for k in range(len_ctime):
  *             swi_ts[i, k] = nom[k] / denom[k]
  *             denom_ns = denom[k] ** 2             # <<<<<<<<<<<<<<
@@ -6507,7 +6507,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
       __Pyx_XDECREF_SET(__pyx_v_denom_ns, __pyx_t_8);
       __pyx_t_8 = 0;
 
-      /* "src/pyswi/swi_calc_routines.pyx":123
+      /* "pyswi/swi_calc_routines.pyx":123
  *             swi_ts[i, k] = nom[k] / denom[k]
  *             denom_ns = denom[k] ** 2
  *             swi_noise[i, k] = nom_noise[k] / denom_ns             # <<<<<<<<<<<<<<
@@ -6529,7 +6529,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
     __pyx_L3_continue:;
   }
 
-  /* "src/pyswi/swi_calc_routines.pyx":125
+  /* "pyswi/swi_calc_routines.pyx":125
  *             swi_noise[i, k] = nom_noise[k] / denom_ns
  * 
  *     return swi_ts, swi_noise, nom, denom, last_jd_var, nom_noise             # <<<<<<<<<<<<<<
@@ -6561,7 +6561,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
   __pyx_t_8 = 0;
   goto __pyx_L0;
 
-  /* "src/pyswi/swi_calc_routines.pyx":80
+  /* "pyswi/swi_calc_routines.pyx":80
  * 
  * 
  * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
@@ -6593,7 +6593,7 @@ static PyObject *__pyx_pf_7pytesmo_11time_series_7filters_2swi_calc_cy_noise(CYT
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_swi_noise.rcbuffer->pybuffer);
     __Pyx_SafeReleaseBuffer(&__pyx_pybuffernd_swi_ts.rcbuffer->pybuffer);
   __Pyx_ErrRestore(__pyx_type, __pyx_value, __pyx_tb);}
-  __Pyx_AddTraceback("pytesmo.time_series.filters.swi_calc_cy_noise", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __Pyx_AddTraceback("pyswi.swi_calc_routines.swi_calc_cy_noise", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = NULL;
   goto __pyx_L2;
   __pyx_L0:;
@@ -6861,10 +6861,10 @@ static int __Pyx_modinit_function_import_code(__pyx_mstatetype *__pyx_mstate) {
 
 #if CYTHON_PEP489_MULTI_PHASE_INIT
 static PyObject* __pyx_pymod_create(PyObject *spec, PyModuleDef *def); /*proto*/
-static int __pyx_pymod_exec_filters(PyObject* module); /*proto*/
+static int __pyx_pymod_exec_swi_calc_routines(PyObject* module); /*proto*/
 static PyModuleDef_Slot __pyx_moduledef_slots[] = {
   {Py_mod_create, (void*)__pyx_pymod_create},
-  {Py_mod_exec, (void*)__pyx_pymod_exec_filters},
+  {Py_mod_exec, (void*)__pyx_pymod_exec_swi_calc_routines},
   #if CYTHON_COMPILING_IN_CPYTHON_FREETHREADING
   {Py_mod_gil, Py_MOD_GIL_USED},
   #endif
@@ -6883,7 +6883,7 @@ namespace {
   #endif
   {
       PyModuleDef_HEAD_INIT,
-      "filters",
+      "swi_calc_routines",
       0, /* m_doc */
     #if CYTHON_USE_MODULE_STATE
       sizeof(__pyx_mstatetype), /* m_size */
@@ -6921,8 +6921,8 @@ namespace {
   #endif
 #endif
 
-__Pyx_PyMODINIT_FUNC PyInit_filters(void) CYTHON_SMALL_CODE; /*proto*/
-__Pyx_PyMODINIT_FUNC PyInit_filters(void)
+__Pyx_PyMODINIT_FUNC PyInit_swi_calc_routines(void) CYTHON_SMALL_CODE; /*proto*/
+__Pyx_PyMODINIT_FUNC PyInit_swi_calc_routines(void)
 #if CYTHON_PEP489_MULTI_PHASE_INIT
 {
   return PyModuleDef_Init(&__pyx_moduledef);
@@ -7025,7 +7025,7 @@ bad:
 }
 
 
-static CYTHON_SMALL_CODE int __pyx_pymod_exec_filters(PyObject *__pyx_pyinit_module)
+static CYTHON_SMALL_CODE int __pyx_pymod_exec_swi_calc_routines(PyObject *__pyx_pyinit_module)
 #endif
 {
   int stringtab_initialized = 0;
@@ -7042,7 +7042,7 @@ static CYTHON_SMALL_CODE int __pyx_pymod_exec_filters(PyObject *__pyx_pyinit_mod
   #if CYTHON_PEP489_MULTI_PHASE_INIT
   if (__pyx_m) {
     if (__pyx_m == __pyx_pyinit_module) return 0;
-    PyErr_SetString(PyExc_RuntimeError, "Module 'filters' has already been imported. Re-initialisation is not supported.");
+    PyErr_SetString(PyExc_RuntimeError, "Module 'swi_calc_routines' has already been imported. Re-initialisation is not supported.");
     return -1;
   }
   #else
@@ -7058,7 +7058,7 @@ static CYTHON_SMALL_CODE int __pyx_pymod_exec_filters(PyObject *__pyx_pyinit_mod
   #if CYTHON_USE_MODULE_STATE
   {
     int add_module_result = __Pyx_State_AddModule(__pyx_t_1, &__pyx_moduledef);
-    __pyx_t_1 = 0; /* transfer ownership from __pyx_t_1 to "filters" pseudovariable */
+    __pyx_t_1 = 0; /* transfer ownership from __pyx_t_1 to "swi_calc_routines" pseudovariable */
     if (unlikely((add_module_result < 0))) __PYX_ERR(0, 1, __pyx_L1_error)
     pystate_addmodule_run = 1;
   }
@@ -7086,7 +7086,7 @@ if (!__Pyx_RefNanny) {
 }
 #endif
 
-__Pyx_RefNannySetupContext("PyInit_filters", 0);
+__Pyx_RefNannySetupContext("PyInit_swi_calc_routines", 0);
   if (__Pyx_check_binary_version(__PYX_LIMITED_VERSION_HEX, __Pyx_get_runtime_version(), CYTHON_COMPILING_IN_LIMITED_API) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #ifdef __Pxy_PyFrame_Initialize_Offsets
   __Pxy_PyFrame_Initialize_Offsets();
@@ -7117,13 +7117,13 @@ __Pyx_RefNannySetupContext("PyInit_filters", 0);
   if (__pyx_AsyncGen_init(__pyx_m) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
   /*--- Library function declarations ---*/
-  if (__pyx_module_is_main_pytesmo__time_series__filters) {
+  if (__pyx_module_is_main_pyswi__swi_calc_routines) {
     if (PyObject_SetAttr(__pyx_m, __pyx_mstate_global->__pyx_n_u_name, __pyx_mstate_global->__pyx_n_u_main) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   }
   {
     PyObject *modules = PyImport_GetModuleDict(); if (unlikely(!modules)) __PYX_ERR(0, 1, __pyx_L1_error)
-    if (!PyDict_GetItemString(modules, "pytesmo.time_series.filters")) {
-      if (unlikely((PyDict_SetItemString(modules, "pytesmo.time_series.filters", __pyx_m) < 0))) __PYX_ERR(0, 1, __pyx_L1_error)
+    if (!PyDict_GetItemString(modules, "pyswi.swi_calc_routines")) {
+      if (unlikely((PyDict_SetItemString(modules, "pyswi.swi_calc_routines", __pyx_m) < 0))) __PYX_ERR(0, 1, __pyx_L1_error)
     }
   }
   /*--- Builtin init code ---*/
@@ -7141,7 +7141,7 @@ __Pyx_RefNannySetupContext("PyInit_filters", 0);
   (void)__Pyx_modinit_function_import_code(__pyx_mstate);
   /*--- Execution code ---*/
 
-  /* "src/pyswi/swi_calc_routines.pyx":18
+  /* "pyswi/swi_calc_routines.pyx":18
  * 
  * from libc.math cimport exp
  * import numpy as np             # <<<<<<<<<<<<<<
@@ -7153,31 +7153,31 @@ __Pyx_RefNannySetupContext("PyInit_filters", 0);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_np, __pyx_t_2) < 0) __PYX_ERR(0, 18, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "src/pyswi/swi_calc_routines.pyx":23
+  /* "pyswi/swi_calc_routines.pyx":23
  * 
  * 
  * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  * @cython.wraparound(False)
  * @cython.cdivision(True)
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_7pytesmo_11time_series_7filters_1swi_calc_cy, 0, __pyx_mstate_global->__pyx_n_u_swi_calc_cy, NULL, __pyx_mstate_global->__pyx_n_u_pytesmo_time_series_filters, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 23, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5pyswi_17swi_calc_routines_1swi_calc_cy, 0, __pyx_mstate_global->__pyx_n_u_swi_calc_cy, NULL, __pyx_mstate_global->__pyx_n_u_pyswi_swi_calc_routines, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[0])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 23, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_swi_calc_cy, __pyx_t_2) < 0) __PYX_ERR(0, 23, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "src/pyswi/swi_calc_routines.pyx":80
+  /* "pyswi/swi_calc_routines.pyx":80
  * 
  * 
  * @cython.boundscheck(False)             # <<<<<<<<<<<<<<
  * @cython.wraparound(False)
  * @cython.cdivision(True)
 */
-  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_7pytesmo_11time_series_7filters_3swi_calc_cy_noise, 0, __pyx_mstate_global->__pyx_n_u_swi_calc_cy_noise, NULL, __pyx_mstate_global->__pyx_n_u_pytesmo_time_series_filters, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 80, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_CyFunction_New(&__pyx_mdef_5pyswi_17swi_calc_routines_3swi_calc_cy_noise, 0, __pyx_mstate_global->__pyx_n_u_swi_calc_cy_noise, NULL, __pyx_mstate_global->__pyx_n_u_pyswi_swi_calc_routines, __pyx_mstate_global->__pyx_d, ((PyObject *)__pyx_mstate_global->__pyx_codeobj_tab[1])); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 80, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   if (PyDict_SetItem(__pyx_mstate_global->__pyx_d, __pyx_mstate_global->__pyx_n_u_swi_calc_cy_noise, __pyx_t_2) < 0) __PYX_ERR(0, 80, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-  /* "src/pyswi/swi_calc_routines.pyx":1
+  /* "pyswi/swi_calc_routines.pyx":1
  * # Copyright (c) 2025, TU Wien.             # <<<<<<<<<<<<<<
  * # All rights reserved.
  * 
@@ -7194,7 +7194,7 @@ __Pyx_RefNannySetupContext("PyInit_filters", 0);
   __Pyx_XDECREF(__pyx_t_2);
   if (__pyx_m) {
     if (__pyx_mstate->__pyx_d && stringtab_initialized) {
-      __Pyx_AddTraceback("init pytesmo.time_series.filters", __pyx_clineno, __pyx_lineno, __pyx_filename);
+      __Pyx_AddTraceback("init pyswi.swi_calc_routines", __pyx_clineno, __pyx_lineno, __pyx_filename);
     }
     #if !CYTHON_USE_MODULE_STATE
     Py_CLEAR(__pyx_m);
@@ -7208,7 +7208,7 @@ __Pyx_RefNannySetupContext("PyInit_filters", 0);
     }
     #endif
   } else if (!PyErr_Occurred()) {
-    PyErr_SetString(PyExc_ImportError, "init pytesmo.time_series.filters");
+    PyErr_SetString(PyExc_ImportError, "init pyswi.swi_calc_routines");
   }
   __pyx_L0:;
   __Pyx_RefNannyFinishContext();
@@ -7282,7 +7282,7 @@ static const __Pyx_StringTabEntry __pyx_string_tab[] = {
   {__pyx_k_numpy__core_multiarray_failed_to, sizeof(__pyx_k_numpy__core_multiarray_failed_to), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_numpy__core_multiarray_failed_to */
   {__pyx_k_numpy__core_umath_failed_to_impo, sizeof(__pyx_k_numpy__core_umath_failed_to_impo), 0, 1, 0}, /* PyObject cname: __pyx_kp_u_numpy__core_umath_failed_to_impo */
   {__pyx_k_pop, sizeof(__pyx_k_pop), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pop */
-  {__pyx_k_pytesmo_time_series_filters, sizeof(__pyx_k_pytesmo_time_series_filters), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pytesmo_time_series_filters */
+  {__pyx_k_pyswi_swi_calc_routines, sizeof(__pyx_k_pyswi_swi_calc_routines), 0, 1, 1}, /* PyObject cname: __pyx_n_u_pyswi_swi_calc_routines */
   {__pyx_k_qflag, sizeof(__pyx_k_qflag), 0, 1, 1}, /* PyObject cname: __pyx_n_u_qflag */
   {__pyx_k_qualname, sizeof(__pyx_k_qualname), 0, 1, 1}, /* PyObject cname: __pyx_n_u_qualname */
   {__pyx_k_range, sizeof(__pyx_k_range), 0, 1, 1}, /* PyObject cname: __pyx_n_u_range */
