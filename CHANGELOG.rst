@@ -6,10 +6,15 @@ Unreleased Changes in master
 ============================
 -
 
+Version 2.0.2 (2025-07-17)
+==========================
+
+- Fix github ci workflow
+
 Version 2.0.1 (2025-07-17)
 ==========================
 
-- Fix github workflow
+- Fix github ci workflow
 
 Version 2.0.0 (2025-07-17)
 ==========================
