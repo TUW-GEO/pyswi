@@ -6,13 +6,17 @@ Unreleased Changes in master
 ============================
 -
 
+Version 2.0.1 (2025-07-17)
+==========================
+
+- Fix github workflow
+
 Version 2.0.0 (2025-07-17)
 ==========================
 
 - Update package structure (breaking change)
 - C files were recompiled for ``numpy>=2,<3``
 - t value in swi_ts needs to be int32 datatype
-
 
 Version 1.2.0 (2025-04-30)
 ==========================
